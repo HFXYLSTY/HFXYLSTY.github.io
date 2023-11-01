@@ -73,33 +73,38 @@
       <div class="outer">
         <section id="main">
   
-    <article id="post-测试" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+    <article id="post-c++基础一" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
-    <a href="/2023/10/31/%E6%B5%8B%E8%AF%95/" class="article-date">
-  <time class="dt-published" datetime="2023-10-31T12:23:17.000Z" itemprop="datePublished">2023-10-31</time>
+    <a href="/2023/11/01/c++%E5%9F%BA%E7%A1%80%E4%B8%80/" class="article-date">
+  <time class="dt-published" datetime="2023-11-01T11:54:02.614Z" itemprop="datePublished">2023-11-01</time>
 </a>
     
   </div>
   <div class="article-inner">
     
     
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/10/31/%E6%B5%8B%E8%AF%95/">测试</a>
-    </h1>
-  
-
-      </header>
-    
     <div class="e-content article-entry" itemprop="articleBody">
       
-        
+        <pre><code>                c++基础一
+</code></pre>
+<p>1.多态的实现原理</p>
+<pre><code>c++中的多态分为静态多态和动态多态。静态多态是编译时的多态，通过重载函数和模板实现。动态多态是运行时的多态，通过虚函数和继承实现。
+
+
+动态多态实现原理：为每个包含虚函数的类建立一个虚函数表。虚函数表的项存储各个虚函数在内存中的入口地址。
+在该类的每个对象中设置一个指向虚函数表的指针。在调用虚函数时，先利用虚指针找到虚函数表，确认调用的虚函数的入口地址在表中的位置，获取入口地址后完成调用
+
+静态多态的实现原理：
+    函数重载：编译器用过函数调用的时候传递的参数类型和数量来确定合适的函数版本。
+             在编译阶段，编译器检查函数调用的上下文，通过实际参数确定调用重载版本
+    模板：模板允许我们编写通用的代码。编译器根据模板实例化的类型生成对应的代码
+</code></pre>
+<p>2.菱形继承：</p>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2023/10/31/%E6%B5%8B%E8%AF%95/" data-id="cloeayyfa00010wuz7m912i2f" data-title="测试" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2023/11/01/c++%E5%9F%BA%E7%A1%80%E4%B8%80/" data-id="clofpd7bg0000c4uzftwae9rx" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -149,57 +154,6 @@
 
 
   
-    <article id="post-hello-world" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/10/31/hello-world/" class="article-date">
-  <time class="dt-published" datetime="2023-10-31T00:58:10.952Z" itemprop="datePublished">2023-10-31</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/10/31/hello-world/">Hello World</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/10/31/hello-world/" data-id="cloeayyf400000wuz70edc0j8" data-title="Hello World" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
 
 
 </section>
@@ -218,7 +172,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/10/">October 2023</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/11/">November 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/10/">October 2023</a></li></ul>
     </div>
   </div>
 
@@ -231,15 +185,11 @@
       <ul>
         
           <li>
-            <a href="/2023/10/31/%E6%B5%8B%E8%AF%95/">测试</a>
+            <a href="/2023/11/01/c++%E5%9F%BA%E7%A1%80%E4%B8%80/">(no title)</a>
           </li>
         
           <li>
             <a href="/2023/10/31/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0/">我的第一篇博客文章</a>
-          </li>
-        
-          <li>
-            <a href="/2023/10/31/hello-world/">Hello World</a>
           </li>
         
       </ul>
