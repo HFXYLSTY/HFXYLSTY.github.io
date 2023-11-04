@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>tcp连接的建立与断开 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="TCP连接的建立与断开1.连接的建立—–3次握手​		1.发起连接的客户端会向服务器发送一个SYN报文段（在SYN段置位的tcp报文），并指定端口号和客户端序列号（INC）。 ​		 2.服务器收到SYN报文段后，会向客户端回发一个SYN报文段，并指定服务器序列号（INS），ACK为INC+1 ​		3.客户端收到后，返回ACK &#x3D; INS+1的报文段确认，至此三次握手完成 ​">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tcp连接的建立与断开">
+<meta property="og:url" content="http://example.com/2023/11/04/tcp%E8%BF%9E%E6%8E%A5%E7%9A%84%E5%BB%BA%E7%AB%8B%E4%B8%8E%E6%96%AD%E5%BC%80/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="TCP连接的建立与断开1.连接的建立—–3次握手​		1.发起连接的客户端会向服务器发送一个SYN报文段（在SYN段置位的tcp报文），并指定端口号和客户端序列号（INC）。 ​		 2.服务器收到SYN报文段后，会向客户端回发一个SYN报文段，并指定服务器序列号（INS），ACK为INC+1 ​		3.客户端收到后，返回ACK &#x3D; INS+1的报文段确认，至此三次握手完成 ​">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-11-04T08:06:03.000Z">
+<meta property="article:modified_time" content="2023-11-04T11:50:58.763Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-tcp连接的建立与断开" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/04/tcp%E8%BF%9E%E6%8E%A5%E7%9A%84%E5%BB%BA%E7%AB%8B%E4%B8%8E%E6%96%AD%E5%BC%80/" class="article-date">
+  <time class="dt-published" datetime="2023-11-04T08:06:03.000Z" itemprop="datePublished">2023-11-04</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      tcp连接的建立与断开
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="TCP连接的建立与断开"><a href="#TCP连接的建立与断开" class="headerlink" title="TCP连接的建立与断开"></a>TCP连接的建立与断开</h1><h3 id="1-连接的建立—–3次握手"><a href="#1-连接的建立—–3次握手" class="headerlink" title="1.连接的建立—–3次握手"></a>1.连接的建立—–3次握手</h3><p>​		1.发起连接的客户端会向服务器发送一个SYN报文段（在SYN段置位的tcp报文），并指定端口号和客户端序列号（INC）。</p>
+<p>​		 2.服务器收到SYN报文段后，会向客户端回发一个SYN报文段，并指定服务器序列号（INS），ACK为INC+1</p>
+<p>​		3.客户端收到后，返回ACK &#x3D; INS+1的报文段确认，至此三次握手完成</p>
+<p>​					![屏幕截图 2023-11-04 162752](C:\Users\Enterprise\Pictures\Screenshots\屏幕截图 2023-11-04 162752.png)</p>
+<p>​		三次握手的目的不仅在于让通信双方了解一个连接正在建立,还在于利用数据包的选项来承载特殊的信息,交换初始序列号</p>
+<h3 id="2-连接的断开—–4次挥手"><a href="#2-连接的断开—–4次挥手" class="headerlink" title="2.连接的断开—–4次挥手"></a>2.连接的断开—–4次挥手</h3><p>​			1.连接的主动关闭者发送一个FIN报文段来发起关闭，指明接收者希望看到的自已当前的序列号K，同时携带ACK来确认最近一次收到的数据。</p>
+<p>​			2.连接的被动关闭者收到FIN报文段后将K+1作为ACK值来确认收到FIN段。此时,上层的应用程序会被告知连接的另一端已经提出了关闭的请求。通常,这将导致应用程序发起自已的关闭操作。</p>
+<p>​			3.连接的被动关闭者变为主动关闭者，发送一个FIN报文，以L为序列号</p>
+<p>​			4..为了完成连接的关闭,关闭发起者最后发送一个报文段，包含一个ACK用于确认上一个FIN,如果出现FIN丢失的情况,那么发送方将重新传输，直到接收到一个ACK确认为止。</p>
+<h5 id="连接的半关闭"><a href="#连接的半关闭" class="headerlink" title="连接的半关闭"></a>连接的半关闭</h5><p>​					首先发送的两个报文与正常关闭一致，接受到半关闭的一方扔能发送数据，直到数据发送完毕。它将会发送一个FIN来关闭本方的连接,同时向发起半关闭的应用程序发出一个文件尾指示。</p>
+<p>​					![屏幕截图 2023-11-04 164013](C:\Users\Enterprise\Pictures\Screenshots\屏幕截图 2023-11-04 164013.png)</p>
+<h3 id="3-TCP状态转移"><a href="#3-TCP状态转移" class="headerlink" title="3.TCP状态转移"></a>3.TCP状态转移</h3><pre><code>         ![屏幕截图 2023-11-04 153504](C:\Users\Enterprise\Pictures\Screenshots\屏幕截图 2023-11-04 153504.png)
+</code></pre>
+<p>​				TIME_WAIT状态：TIME_WAIT状态也称为2MSL等待状态。在该状态中, TCP将会等待两倍于最大段生</p>
+<p>​				存期。</p>
+<h5 id="TIME-WAIT状态存在的意义"><a href="#TIME-WAIT状态存在的意义" class="headerlink" title="TIME_WAIT状态存在的意义"></a>TIME_WAIT状态存在的意义</h5><p>​					MSL:最大段生存期,它代表任何报文段在被丢弃前在网络中被允许存在的最长时间。</p>
+<p>​					1.确保连接被可靠的关闭:让TCP重新发送最终的ACK以避免出现丢失的情况。重新发送最终的ACK并不是因为TCP重传了ACK. 					(它们并不消耗序列号也不会被TCP重传),而是因为通信另一方重传了它的FIN (它消耗一个序列号)。事实上, TCP总是重传FIN,					直到它收到一个最终的ACK	。</p>
+<p>​					2.TIME_WAIT状态能够防止新的连接将前一个连接的延迟报文段解释成自身数据的状况。因为一个TCP报文的能存在的最长时					间是1个MSL，所以等待一个MSL就可以保证网络中不会再有本次连接的报文了</p>
+<p>​				</p>
+<p>​															</p>
+<p>​														</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/04/tcp%E8%BF%9E%E6%8E%A5%E7%9A%84%E5%BB%BA%E7%AB%8B%E4%B8%8E%E6%96%AD%E5%BC%80/" data-id="clojzh5e8000080uzdbok86ng" data-title="tcp连接的建立与断开" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2023/11/03/c-%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">c++右值引用</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/11/">November 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/10/">October 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/11/04/tcp%E8%BF%9E%E6%8E%A5%E7%9A%84%E5%BB%BA%E7%AB%8B%E4%B8%8E%E6%96%AD%E5%BC%80/">tcp连接的建立与断开</a>
+          </li>
+        
+          <li>
+            <a href="/2023/11/03/c-%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8/">c++右值引用</a>
+          </li>
+        
+          <li>
+            <a href="/2023/11/03/c-%E5%9F%BA%E7%A1%80%E4%B9%8B%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B/">c++基础之编译过程</a>
+          </li>
+        
+          <li>
+            <a href="/2023/11/02/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/">智能指针</a>
+          </li>
+        
+          <li>
+            <a href="/2023/11/01/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/">面向对象设计原则</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
