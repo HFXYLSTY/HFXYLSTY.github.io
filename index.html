@@ -73,6 +73,53 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-c-右值引用" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/03/c-%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8/" class="article-date">
+  <time class="dt-published" datetime="2023-11-03T02:51:49.000Z" itemprop="datePublished">2023-11-03</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/11/03/c-%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8/">c++右值引用</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="右值引用"><a href="#右值引用" class="headerlink" title="右值引用"></a>右值引用</h1><h3 id="1-左值和右值"><a href="#1-左值和右值" class="headerlink" title="1.左值和右值"></a>1.左值和右值</h3><p>​				左值：指一个指向特定内存的具有名称的值，它有一个相对稳定的地址并有一段较长的声明周期</p>
+<p>​				右值：不指向稳定内存地址的匿名值，它的生命周期很短。（如函数返回时构建的临时对象）</p>
+<h3 id="2-右值引用"><a href="#2-右值引用" class="headerlink" title="2.右值引用"></a>2.右值引用</h3><p>​			    顾名思义，右值引用是一种引用右值切只能应用于右值的方法。它可以延长临时对象的声明周期，目的是减少对象的复制，提升性能。</p>
+<h3 id="3-移动语义"><a href="#3-移动语义" class="headerlink" title="3.移动语义"></a>3.移动语义</h3><p>​				移动语义帮助我们将临时对象的内存转移到另一个对象中，来避免内存数据的复制。原理是在类中创建一个移动构造函数，它以右值引用作为形参，函数中不进行资源的拷贝，而是进行资源所有权的转让。对于右值，编译器会优先使用移动构造函数去构造目标对象。</p>
+<h3 id="4-将亡值和std-move"><a href="#4-将亡值和std-move" class="headerlink" title="4.将亡值和std::move()"></a>4.将亡值和std::move()</h3><p>​				将亡值表示资源可以被重用的对象和位域，通常这是因为它们接近生命周期的末尾，也坑你是经过右值引用的转换产生的。</p>
+<p>​	   		将左值转换成右值引用代码</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">static_cast</span>&lt;classname&amp;&amp;&gt;(xxxx)</span><br></pre></td></tr></table></figure>
+
+<p>​				这个操作的意义是让左值使用移动语义，std::move()实质上与上述代码等价。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/03/c-%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8/" data-id="clojm5px800004ouzcmyo78r1" data-title="c++右值引用" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-c-基础之编译过程" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2023/11/03/c-%E5%9F%BA%E7%A1%80%E4%B9%8B%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B/" class="article-date">
@@ -338,6 +385,10 @@
       <ul>
         
           <li>
+            <a href="/2023/11/03/c-%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8/">c++右值引用</a>
+          </li>
+        
+          <li>
             <a href="/2023/11/03/c-%E5%9F%BA%E7%A1%80%E4%B9%8B%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B/">c++基础之编译过程</a>
           </li>
         
@@ -351,10 +402,6 @@
         
           <li>
             <a href="/2023/11/01/C-%E5%9F%BA%E7%A1%80%E4%B8%80/">C++基础一</a>
-          </li>
-        
-          <li>
-            <a href="/2023/10/31/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0/">我的第一篇博客文章</a>
           </li>
         
       </ul>
