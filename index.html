@@ -73,6 +73,67 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-TCP重传机制" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/05/TCP%E9%87%8D%E4%BC%A0%E6%9C%BA%E5%88%B6/" class="article-date">
+  <time class="dt-published" datetime="2023-11-05T06:30:11.000Z" itemprop="datePublished">2023-11-05</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/11/05/TCP%E9%87%8D%E4%BC%A0%E6%9C%BA%E5%88%B6/">TCP重传机制</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="TCP重传机制"><a href="#TCP重传机制" class="headerlink" title="TCP重传机制"></a>TCP重传机制</h1><p>​				为了保证数据的正确性，TCP协议会重传丢失的数据包。TCP通过接收端返回的一系列确认信息来判断是否丢包。TCP有两套独立机制进行重传：超时重传和快速重传。</p>
+<h3 id="1-超时重传"><a href="#1-超时重传" class="headerlink" title="1.超时重传"></a>1.超时重传</h3><p>​				当发送端发送数据包后，会启动一个定时器，如果在一定时间阈值内没能收到接收端的ACK确认包，就会进行重传。</p>
+<h4 id="超时时间的确定"><a href="#超时时间的确定" class="headerlink" title="超时时间的确定"></a>超时时间的确定</h4><p>​				RTT（Round Trip Time）：往返时延，也就是<strong>数据包从发出去到收到对应 ACK 的时间。</strong>RTT 是针对连接的，每一个连接都有各			    自独立的 RTT。</p>
+<p>​				RTO（Retransmission Time Out）：重传超时，也就是超时时间。</p>
+<p>​			 <strong>SRTT &lt;- (1 - α)·SRTT + α·RTT</strong> &#x2F;&#x2F;<strong>求 SRTT 的加权平均</strong></p>
+<p>​			  <strong>rttvar &lt;- (1 - h)·rttvar + h·(|RTT - SRTT |)</strong> &#x2F;&#x2F;计算 <strong>SRTT 与真实值的差距</strong>（称之为绝对误差|Err|），同样用到<strong>加权平均</strong></p>
+<p>​			 <strong>RTO &#x3D; SRTT + 4·rttvar</strong> &#x2F;&#x2F;估算出来的新的 RTO，rttvar 的系数 4 是调参调出来的</p>
+<p>​			这个算法的整体思想就是结合<strong>平均值</strong>（就是基本方法）和<strong>平均偏差</strong>来进行估算，</p>
+<p>​				</p>
+<p>​				</p>
+<h3 id="2-快速重传"><a href="#2-快速重传" class="headerlink" title="2.快速重传"></a>2.快速重传</h3><p>​				当发现接收到失序数据包后，TCP会立刻生成确认信息，来表明出现了丢包现象。如接收端收到序号为101的段后，接收端期望收到102段，但收到了103段，此时接收端会立刻向发送端发送确认102段的ACK信息，直到102段被接受。重复ACk也可能在另一种情况下出现,即当网络中出现失序分组时，若接收端收到当前期盼序列号的后续分组时,当前期盼的段可能丢失,也可能仅为延迟到达。通常我们无法得知是哪种情况,因此TCP等待一定数目的重复ACK.，决定数据是否丢失并触发快速重传。当重复ACK累计到阈值的时候，发送端立即重传。</p>
+<h4 id="带选择确认的重传-SACK"><a href="#带选择确认的重传-SACK" class="headerlink" title="带选择确认的重传(SACK)"></a>带选择确认的重传(SACK)</h4><p>​					发送端通过重传来填补丢失的数据段，但同时也要保证不重传已经正确接收到的数据，只需要重传接收端没收到的段。</p>
+<p>​					接收端向发送端指明SACK数据，指导发送端重传数据。</p>
+<p>​					SACK选项结构：</p>
+<p>​										![屏幕截图 2023-11-05 190453](C:\Users\Enterprise\Pictures\Screenshots\屏幕截图 2023-11-05 190453.png)</p>
+<p>​			其中Kind表示SACK选项被启用，Length是SACK信息总长度，L和R指明了接收端已经接受到的块，每个ACK段中的SACK信息最多包含三个块。</p>
+<p>​			第一个SACK块内包含的是最近接收到的报文段的序列号范围。由于SACK选项的空间有限,应尽可能确保向TCP发送端提供最新信息。其余的SACK块包含的内容也按照接收的先后依次排列。</p>
+<p>​			![屏幕截图 2023-11-05 191413](C:\Users\Enterprise\Pictures\Screenshots\屏幕截图 2023-11-05 191413.png)</p>
+<p>​			</p>
+<h3 id="3-为什么选择在传输层将数据分成多个段，而不是等到网络层再去分片？"><a href="#3-为什么选择在传输层将数据分成多个段，而不是等到网络层再去分片？" class="headerlink" title="3.为什么选择在传输层将数据分成多个段，而不是等到网络层再去分片？"></a>3.为什么选择在传输层将数据分成多个段，而不是等到网络层再去分片？</h3><p>​		如果网络层分片，那么如果出现丢包现象，那么只能去重传整个数据包，在传输层分段的话，可以只重传丢失的部分，提高效率</p>
+<p>​		<img src="C:\Users\Enterprise\Pictures\Screenshots\a20d4103c3164557a8b4121c82857dcf.jpg" alt="a20d4103c3164557a8b4121c82857dcf"></p>
+<p>​		</p>
+<p>​		</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/05/TCP%E9%87%8D%E4%BC%A0%E6%9C%BA%E5%88%B6/" data-id="clolepwns0000l0uzb7uy2iow" data-title="TCP重传机制" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-tcp连接的建立与断开" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2023/11/04/tcp%E8%BF%9E%E6%8E%A5%E7%9A%84%E5%BB%BA%E7%AB%8B%E4%B8%8E%E6%96%AD%E5%BC%80/" class="article-date">
@@ -444,6 +505,10 @@
       <ul>
         
           <li>
+            <a href="/2023/11/05/TCP%E9%87%8D%E4%BC%A0%E6%9C%BA%E5%88%B6/">TCP重传机制</a>
+          </li>
+        
+          <li>
             <a href="/2023/11/04/tcp%E8%BF%9E%E6%8E%A5%E7%9A%84%E5%BB%BA%E7%AB%8B%E4%B8%8E%E6%96%AD%E5%BC%80/">tcp连接的建立与断开</a>
           </li>
         
@@ -457,10 +522,6 @@
         
           <li>
             <a href="/2023/11/02/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/">智能指针</a>
-          </li>
-        
-          <li>
-            <a href="/2023/11/01/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/">面向对象设计原则</a>
           </li>
         
       </ul>
