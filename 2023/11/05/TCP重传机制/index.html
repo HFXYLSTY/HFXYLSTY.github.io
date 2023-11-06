@@ -13,12 +13,14 @@
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="TCP重传机制​				为了保证数据的正确性，TCP协议会重传丢失的数据包。TCP通过接收端返回的一系列确认信息来判断是否丢包。TCP有两套独立机制进行重传：超时重传和快速重传。 1.超时重传​				当发送端发送数据包后，会启动一个定时器，如果在一定时间阈值内没能收到接收端的ACK确认包，就会进行重传。 超时时间的确定​				RTT（Round Trip Time）：往返时延，也就是数据包从发">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="d:\myboke\source\images\sack.png">
+<meta property="og:image" content="d:\myboke\source\images\sack1.png">
 <meta property="og:image" content="d:\myboke\source\images\a20d4103c3164557a8b4121c82857dcf.jpg">
 <meta property="article:published_time" content="2023-11-05T06:30:11.000Z">
-<meta property="article:modified_time" content="2023-11-06T13:18:11.217Z">
+<meta property="article:modified_time" content="2023-11-06T13:31:43.146Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="d:\myboke\source\images\a20d4103c3164557a8b4121c82857dcf.jpg">
+<meta name="twitter:image" content="d:\myboke\source\images\sack.png">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -113,10 +115,10 @@
 <h4 id="带选择确认的重传-SACK"><a href="#带选择确认的重传-SACK" class="headerlink" title="带选择确认的重传(SACK)"></a>带选择确认的重传(SACK)</h4><p>​					发送端通过重传来填补丢失的数据段，但同时也要保证不重传已经正确接收到的数据，只需要重传接收端没收到的段。</p>
 <p>​					接收端向发送端指明SACK数据，指导发送端重传数据。</p>
 <p>​					SACK选项结构：</p>
-<p>​										![屏幕截图 2023-11-05 190453](D:\myboke\source\images\屏幕截图 2023-11-05 190453.png)</p>
+<p>​		<img src="D:\myboke\source\images\sack.png" alt="sack"></p>
 <p>​			其中Kind表示SACK选项被启用，Length是SACK信息总长度，L和R指明了接收端已经接受到的块，每个ACK段中的SACK信息最多包含三个块。</p>
 <p>​			第一个SACK块内包含的是最近接收到的报文段的序列号范围。由于SACK选项的空间有限,应尽可能确保向TCP发送端提供最新信息。其余的SACK块包含的内容也按照接收的先后依次排列。</p>
-<p>​			![屏幕截图 2023-11-05 191413](D:\myboke\source\images\屏幕截图 2023-11-05 191413.png)</p>
+<p>​			<img src="D:\myboke\source\images\sack1.png" alt="sack1"></p>
 <p>​			</p>
 <h3 id="3-为什么选择在传输层将数据分成多个段，而不是等到网络层再去分片？"><a href="#3-为什么选择在传输层将数据分成多个段，而不是等到网络层再去分片？" class="headerlink" title="3.为什么选择在传输层将数据分成多个段，而不是等到网络层再去分片？"></a>3.为什么选择在传输层将数据分成多个段，而不是等到网络层再去分片？</h3><p>​		如果网络层分片，那么如果出现丢包现象，那么只能去重传整个数据包，在传输层分段的话，可以只重传丢失的部分，提高效率</p>
 <p>​		<img src="D:\myboke\source\images\a20d4103c3164557a8b4121c82857dcf.jpg" alt="a20d4103c3164557a8b4121c82857dcf"></p>
