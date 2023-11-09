@@ -204,8 +204,8 @@
 <p>​			3.连接的被动关闭者变为主动关闭者，发送一个FIN报文，以L为序列号</p>
 <p>​			4..为了完成连接的关闭,关闭发起者最后发送一个报文段，包含一个ACK用于确认上一个FIN,如果出现FIN丢失的情况,那么发送方将重新传输，直到接收到一个ACK确认为止。</p>
 <h5 id="连接的半关闭"><a href="#连接的半关闭" class="headerlink" title="连接的半关闭"></a>连接的半关闭</h5><p>​					首先发送的两个报文与正常关闭一致，接受到半关闭的一方扔能发送数据，直到数据发送完毕。它将会发送一个FIN来关闭本方的连接,同时向发起半关闭的应用程序发出一个文件尾指示。</p>
-<p>​					<img src="D:\myboke\source\images\tcpsicihuishou.png" alt="tcpsicihuishou"></p>
-<h3 id="3-TCP状态转移"><a href="#3-TCP状态转移" class="headerlink" title="3.TCP状态转移"></a>3.TCP状态转移</h3><p>​				<img src="D:\myboke\source\images\TCPztzy.png" alt="TCPztzy"></p>
+<p>​					<img src="/..%5Cimages%5Ctcpsicihuishou.png" alt="tcpsicihuishou"></p>
+<h3 id="3-TCP状态转移"><a href="#3-TCP状态转移" class="headerlink" title="3.TCP状态转移"></a>3.TCP状态转移</h3><p>​				<img src="/..%5Cimages%5CTCPztzy.png" alt="TCPztzy"></p>
 <p>​				TIME_WAIT状态：TIME_WAIT状态也称为2MSL等待状态。在该状态中, TCP将会等待两倍于最大段生存期。</p>
 <h5 id="TIME-WAIT状态存在的意义"><a href="#TIME-WAIT状态存在的意义" class="headerlink" title="TIME_WAIT状态存在的意义"></a>TIME_WAIT状态存在的意义</h5><p>​					MSL:最大段生存期,它代表任何报文段在被丢弃前在网络中被允许存在的最长时间。</p>
 <p>​					1.确保连接被可靠的关闭:让TCP重新发送最终的ACK以避免出现丢失的情况。重新发送最终的ACK并不是因为TCP重传了ACK. 					(它们并不消耗序列号也不会被TCP重传),而是因为通信另一方重传了它的FIN (它消耗一个序列号)。事实上, TCP总是重传FIN,					直到它收到一个最终的ACK	。</p>
