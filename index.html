@@ -73,6 +73,51 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-适配器模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/16/%E9%80%82%E9%85%8D%E5%99%A8%E6%A8%A1%E5%BC%8F/" class="article-date">
+  <time class="dt-published" datetime="2023-11-16T11:46:56.000Z" itemprop="datePublished">2023-11-16</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/11/16/%E9%80%82%E9%85%8D%E5%99%A8%E6%A8%A1%E5%BC%8F/">适配器模式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="适配器模式"><a href="#适配器模式" class="headerlink" title="适配器模式"></a>适配器模式</h1><h3 id="1-何为适配器模式"><a href="#1-何为适配器模式" class="headerlink" title="1.何为适配器模式"></a>1.何为适配器模式</h3><p>​				将一个类的接口转换成另一种用户需要的接口，根据已有的接口来得到另一个不同的接口，来满足我们的需要</p>
+<h3 id="2-适配器模式的意义和使用场景"><a href="#2-适配器模式的意义和使用场景" class="headerlink" title="2.适配器模式的意义和使用场景"></a>2.适配器模式的意义和使用场景</h3><p>​				在软件系统中，由于应用环境的变化，可能需要将现有的对象放到新的环境中使用。而现有对象的接口无法满足使用需求。这时我们需要使用适配器来完成新旧接口的转换。使得一个类的接口转换成另一种希望的接口，来满足我们的需要。</p>
+<h3 id="3-适配器模式的实现"><a href="#3-适配器模式的实现" class="headerlink" title="3.适配器模式的实现"></a>3.适配器模式的实现</h3><p>​				只需要定义一个适配器抽象基类，在定义好新的接口，再用已有的接口去实现子类中相应的新接口即可。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 目标接口（Target）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Target</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">request</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 需要适配的类（Adaptee）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Adaptee</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">specificRequest</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 进行特殊的操作</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 适配器类（Adapter）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Adapter</span> : <span class="keyword">public</span> Target &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Adaptee* adaptee;<span class="comment">//这里可能有很多需要适配的类</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Adapter</span>(Adaptee* a) : <span class="built_in">adaptee</span>(a) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">request</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        adaptee-&gt;<span class="built_in">specificRequest</span>();</span><br><span class="line">        <span class="comment">// 进行其他适配操作</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/16/%E9%80%82%E9%85%8D%E5%99%A8%E6%A8%A1%E5%BC%8F/" data-id="clp150xbj0000ewuzgux4dhhc" data-title="适配器模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-单例模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2023/11/16/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" class="article-date">
@@ -523,56 +568,6 @@
 
 
   
-    <article id="post-c-基础之编译过程" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/11/03/c-%E5%9F%BA%E7%A1%80%E4%B9%8B%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B/" class="article-date">
-  <time class="dt-published" datetime="2023-11-03T02:11:44.000Z" itemprop="datePublished">2023-11-03</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/11/03/c-%E5%9F%BA%E7%A1%80%E4%B9%8B%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B/">c++基础之编译过程</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="从C-文件到可执行文件经过了哪几个过程"><a href="#从C-文件到可执行文件经过了哪几个过程" class="headerlink" title="从C++文件到可执行文件经过了哪几个过程"></a>从C++文件到可执行文件经过了哪几个过程</h1><p>​					预编译、编译、汇编、链接</p>
-<h2 id="1-预编译"><a href="#1-预编译" class="headerlink" title="1.预编译"></a>1.预编译</h2><p>​			处理#开头的指令,比如拷贝#include包含的文件代码，#define<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E5%AE%8F%E5%AE%9A%E4%B9%89&spm=1001.2101.3001.7020">宏定义</a>的替换,条件编译等</p>
-<p>　　	就是为编译做的预备工作的阶段</p>
-<p>　　	主要处理#开始的<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E9%A2%84%E7%BC%96%E8%AF%91&spm=1001.2101.3001.7020">预编译</a>指令</p>
-<p>　　	预编译指令指示了在程序正式编译前就由<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E7%BC%96%E8%AF%91%E5%99%A8&spm=1001.2101.3001.7020">编译器</a>进行的操作，可以放在程序中的任何位置。</p>
-<h2 id="2-编译"><a href="#2-编译" class="headerlink" title="2.编译"></a>2.编译</h2><p>​			编译器对预编译后的c++文件进行词法分析、语法分析、语义分析和优化，翻译成文本文件xxx.s，包含了一系列汇编语言</p>
-<h2 id="3-汇编"><a href="#3-汇编" class="headerlink" title="3.汇编"></a>3.汇编</h2><p>​			汇编器将xxx.s翻译成机器语言指令，把这些指令打包成一种叫做<strong>可重定位目标程序</strong>的格式，并将结果保存在目标文件xxx.o中，xxx.o是一个二进制文件。</p>
-<h2 id="4-链接"><a href="#4-链接" class="headerlink" title="4.链接"></a>4.链接</h2><p>​			链接（linking）是将各种代码和数据片段收集并组合成为一个单一文件的过程，这个文件可被加载（复制）到内存并执行。链接可以执行于<strong>编译时（compile time）</strong>，也就是在源代码被翻译成机器代码时；也可以执行于<strong>加载时（load time）</strong>，也就是在程序被<strong>加载器（loader）</strong>加载到内存并执行时；甚至执行于<strong>运行时（run time）</strong>，也就是由应用程序来执行。链接是由叫<strong>链接器（linker）</strong>的程序自动执行的。</p>
-<h4 id="链接的过程做了什么？"><a href="#链接的过程做了什么？" class="headerlink" title="链接的过程做了什么？"></a>链接的过程做了什么？</h4><p>​					1.符号解析：目标文件和库中包含很多符号（函数、变量名），它们在编译过程中被分配到了唯一的标识符。链接器需要解析这些符号，找到它们在其他文件中的定义。</p>
-<p>​					2.地址分配：链接器为每个目标文件和库分配内存地址空间，并确定它们在最终可执行文件中的布局。连接器还需要处理重定位，即根据实际内存地址更新代码中的地址引用。</p>
-<p>​					3.库依赖管理：连接器处理程序对库的依赖关系，确保所有需要的库都被包含在可执行文件中。链接器还需要处理库之间的依赖关系，确保它们按正确顺序链接。</p>
-<h4 id="链接存在的意义"><a href="#链接存在的意义" class="headerlink" title="链接存在的意义"></a>链接存在的意义</h4><p>​						链接使得<strong>分离编译</strong>成为可能，我们不用将一个大型的应用程序组织成一个巨大的源文件，而是可以把它分解成为更小、更好管理的模块，可以独立的修改和编译这些模块。当我们改变这些模块中的一个时，只需要简单的重新编译它，并重新链接应用，而不必重新编译其他文件。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/03/c-%E5%9F%BA%E7%A1%80%E4%B9%8B%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B/" data-id="clohzw9kh00009wuz5y7edm1c" data-title="c++基础之编译过程" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
 
 
   <nav id="page-nav">
@@ -623,6 +618,10 @@
       <ul>
         
           <li>
+            <a href="/2023/11/16/%E9%80%82%E9%85%8D%E5%99%A8%E6%A8%A1%E5%BC%8F/">适配器模式</a>
+          </li>
+        
+          <li>
             <a href="/2023/11/16/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/">单例模式</a>
           </li>
         
@@ -636,10 +635,6 @@
         
           <li>
             <a href="/2023/11/10/TCP%E7%B2%98%E5%8C%85%E9%97%AE%E9%A2%98/">TCP粘包问题</a>
-          </li>
-        
-          <li>
-            <a href="/2023/11/09/TCP%E6%8B%A5%E5%A1%9E%E6%8E%A7%E5%88%B6/">TCP拥塞控制</a>
           </li>
         
       </ul>
