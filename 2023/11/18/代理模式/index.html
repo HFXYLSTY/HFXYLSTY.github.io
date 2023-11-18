@@ -4,16 +4,19 @@
   <meta charset="utf-8">
   
   
-  <title>TCP窗口管理 | Hexo</title>
+  <title>代理模式 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta property="og:type" content="article">
-<meta property="og:title" content="TCP窗口管理">
-<meta property="og:url" content="http://example.com/2023/11/06/TCP%E7%AA%97%E5%8F%A3%E7%AE%A1%E7%90%86/index.html">
+  <meta name="description" content="代理模式1.何为代理模式​				为其他对象提供一种代理以控制（隔离、使用接口）对这个对象的访问。代理模式与装饰模式的区别是，它不会拓展对象的功能，它只是强化现有对象的潜在行为。 2.代理模式的意义和使用场景​				有些对象由于某种原因（如创建开销大、需要安全加密、需要远程访问等），直接访问会带来许多问题，甚至不能直接访问。这是我们使用一个代理类，来访问该对象。如在分布式系统中，要访问存在于服务">
+<meta property="og:type" content="article">
+<meta property="og:title" content="代理模式">
+<meta property="og:url" content="http://example.com/2023/11/18/%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="代理模式1.何为代理模式​				为其他对象提供一种代理以控制（隔离、使用接口）对这个对象的访问。代理模式与装饰模式的区别是，它不会拓展对象的功能，它只是强化现有对象的潜在行为。 2.代理模式的意义和使用场景​				有些对象由于某种原因（如创建开销大、需要安全加密、需要远程访问等），直接访问会带来许多问题，甚至不能直接访问。这是我们使用一个代理类，来访问该对象。如在分布式系统中，要访问存在于服务">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2023-11-06T13:13:54.000Z">
-<meta property="article:modified_time" content="2023-11-06T13:13:54.747Z">
+<meta property="article:published_time" content="2023-11-18T08:59:08.000Z">
+<meta property="article:modified_time" content="2023-11-18T09:09:51.101Z">
 <meta property="article:author" content="John Doe">
+<meta property="article:tag" content="设计模式">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
@@ -73,10 +76,10 @@
 </header>
 
       <div class="outer">
-        <section id="main"><article id="post-TCP窗口管理" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+        <section id="main"><article id="post-代理模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
-    <a href="/2023/11/06/TCP%E7%AA%97%E5%8F%A3%E7%AE%A1%E7%90%86/" class="article-date">
-  <time class="dt-published" datetime="2023-11-06T13:13:54.000Z" itemprop="datePublished">2023-11-06</time>
+    <a href="/2023/11/18/%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F/" class="article-date">
+  <time class="dt-published" datetime="2023-11-18T08:59:08.000Z" itemprop="datePublished">2023-11-18</time>
 </a>
     
   </div>
@@ -87,7 +90,7 @@
         
   
     <h1 class="p-name article-title" itemprop="headline name">
-      TCP窗口管理
+      代理模式
     </h1>
   
 
@@ -95,33 +98,30 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        
+        <h1 id="代理模式"><a href="#代理模式" class="headerlink" title="代理模式"></a>代理模式</h1><h3 id="1-何为代理模式"><a href="#1-何为代理模式" class="headerlink" title="1.何为代理模式"></a>1.何为代理模式</h3><p>​				为其他对象提供一种代理以控制（隔离、使用接口）对这个对象的访问。代理模式与装饰模式的区别是，它不会拓展对象的功能，它只是强化现有对象的潜在行为。</p>
+<h3 id="2-代理模式的意义和使用场景"><a href="#2-代理模式的意义和使用场景" class="headerlink" title="2.代理模式的意义和使用场景"></a>2.代理模式的意义和使用场景</h3><p>​				有些对象由于某种原因（如创建开销大、需要安全加密、需要远程访问等），直接访问会带来许多问题，甚至不能直接访问。这是我们使用一个代理类，来访问该对象。如在分布式系统中，要访问存在于服务器的对象，无法直接访问。必须通过代理类，在代理类中封装网络通信的细节，实现服务器对象的访问。</p>
+<h3 id="3-代理模式的实现"><a href="#3-代理模式的实现" class="headerlink" title="3.代理模式的实现"></a>3.代理模式的实现</h3><p>​				代理模式的实现多种多样，核心是代理类的实现。代理类很多时候是框架自动生成的。有很多种代理类型，智能指针便是一种代理模式的实现。</p>
+<p>​				</p>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/06/TCP%E7%AA%97%E5%8F%A3%E7%AE%A1%E7%90%86/" data-id="clomxenp00000x8uzdnej4bvo" data-title="TCP窗口管理" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2023/11/18/%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F/" data-id="clp469b4000008kuz7hkz9nux" data-title="代理模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+
     </footer>
   </div>
   
     
 <nav id="article-nav">
   
-    <a href="/2023/11/09/TCP%E6%8B%A5%E5%A1%9E%E6%8E%A7%E5%88%B6/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
-        
-          TCP拥塞控制
-        
-      </div>
-    </a>
   
-  
-    <a href="/2023/11/05/TCP%E9%87%8D%E4%BC%A0%E6%9C%BA%E5%88%B6/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2023/11/18/%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">TCP重传机制</div>
+      <div class="article-nav-title">享元模式</div>
     </a>
   
 </nav>
