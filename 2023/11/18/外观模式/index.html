@@ -4,18 +4,19 @@
   <meta charset="utf-8">
   
   
-  <title>c++右值引用 | Hexo</title>
+  <title>外观模式 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="右值引用1.左值和右值​				左值：指一个指向特定内存的具有名称的值，它有一个相对稳定的地址并有一段较长的声明周期 ​				右值：不指向稳定内存地址的匿名值，它的生命周期很短。（如函数返回时构建的临时对象） 2.右值引用​			    顾名思义，右值引用是一种引用右值切只能应用于右值的方法。它可以延长临时对象的声明周期，目的是减少对象的复制，提升性能。 3.移动语义​				移动语义帮助我们将">
+  <meta name="description" content="外观（门面）模式1.何为外观模式​				为子系统中的一组接口提供一个一致、稳定的界面（中间层），外观模式定义了一个高层的接口，将子系统的变化隔离。 2.外观模式的意义和使用场景​					在组件构建时，接口间直接依赖可能会导致很多问题，这时，提供一个稳定的中间接口。如此便可以隔离子系统的变化，无论子系统实现如何改变，外部调用者只需要和中间层的稳定的接口打交道。这达到了解耦的效果—子系统内部的任何">
 <meta property="og:type" content="article">
-<meta property="og:title" content="c++右值引用">
-<meta property="og:url" content="http://example.com/2023/11/03/c-%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8/index.html">
+<meta property="og:title" content="外观模式">
+<meta property="og:url" content="http://example.com/2023/11/18/%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8F/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="右值引用1.左值和右值​				左值：指一个指向特定内存的具有名称的值，它有一个相对稳定的地址并有一段较长的声明周期 ​				右值：不指向稳定内存地址的匿名值，它的生命周期很短。（如函数返回时构建的临时对象） 2.右值引用​			    顾名思义，右值引用是一种引用右值切只能应用于右值的方法。它可以延长临时对象的声明周期，目的是减少对象的复制，提升性能。 3.移动语义​				移动语义帮助我们将">
+<meta property="og:description" content="外观（门面）模式1.何为外观模式​				为子系统中的一组接口提供一个一致、稳定的界面（中间层），外观模式定义了一个高层的接口，将子系统的变化隔离。 2.外观模式的意义和使用场景​					在组件构建时，接口间直接依赖可能会导致很多问题，这时，提供一个稳定的中间接口。如此便可以隔离子系统的变化，无论子系统实现如何改变，外部调用者只需要和中间层的稳定的接口打交道。这达到了解耦的效果—子系统内部的任何">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2023-11-03T02:51:49.000Z">
-<meta property="article:modified_time" content="2023-11-03T13:16:57.978Z">
+<meta property="article:published_time" content="2023-11-18T02:41:02.000Z">
+<meta property="article:modified_time" content="2023-11-18T02:50:03.133Z">
 <meta property="article:author" content="John Doe">
+<meta property="article:tag" content="设计模式">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
@@ -75,10 +76,10 @@
 </header>
 
       <div class="outer">
-        <section id="main"><article id="post-c-右值引用" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+        <section id="main"><article id="post-外观模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
-    <a href="/2023/11/03/c-%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8/" class="article-date">
-  <time class="dt-published" datetime="2023-11-03T02:51:49.000Z" itemprop="datePublished">2023-11-03</time>
+    <a href="/2023/11/18/%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8F/" class="article-date">
+  <time class="dt-published" datetime="2023-11-18T02:41:02.000Z" itemprop="datePublished">2023-11-18</time>
 </a>
     
   </div>
@@ -89,7 +90,7 @@
         
   
     <h1 class="p-name article-title" itemprop="headline name">
-      c++右值引用
+      外观模式
     </h1>
   
 
@@ -97,42 +98,39 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <h1 id="右值引用"><a href="#右值引用" class="headerlink" title="右值引用"></a>右值引用</h1><h3 id="1-左值和右值"><a href="#1-左值和右值" class="headerlink" title="1.左值和右值"></a>1.左值和右值</h3><p>​				左值：指一个指向特定内存的具有名称的值，它有一个相对稳定的地址并有一段较长的声明周期</p>
-<p>​				右值：不指向稳定内存地址的匿名值，它的生命周期很短。（如函数返回时构建的临时对象）</p>
-<h3 id="2-右值引用"><a href="#2-右值引用" class="headerlink" title="2.右值引用"></a>2.右值引用</h3><p>​			    顾名思义，右值引用是一种引用右值切只能应用于右值的方法。它可以延长临时对象的声明周期，目的是减少对象的复制，提升性能。</p>
-<h3 id="3-移动语义"><a href="#3-移动语义" class="headerlink" title="3.移动语义"></a>3.移动语义</h3><p>​				移动语义帮助我们将临时对象的内存转移到另一个对象中，来避免内存数据的复制。原理是在类中创建一个移动构造函数，它以右值引用作为形参，函数中不进行资源的拷贝，而是进行资源所有权的转让。对于右值，编译器会优先使用移动构造函数去构造目标对象。</p>
-<h3 id="4-将亡值和std-move"><a href="#4-将亡值和std-move" class="headerlink" title="4.将亡值和std::move()"></a>4.将亡值和std::move()</h3><p>​				将亡值表示资源可以被重用的对象和位域，通常这是因为它们接近生命周期的末尾，也坑你是经过右值引用的转换产生的。</p>
-<p>​	   		将左值转换成右值引用代码</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">static_cast</span>&lt;classname&amp;&amp;&gt;(xxxx)</span><br></pre></td></tr></table></figure>
-
-<p>​				这个操作的意义是让左值使用移动语义，std::move()实质上与上述代码等价。</p>
+        <h1 id="外观（门面）模式"><a href="#外观（门面）模式" class="headerlink" title="外观（门面）模式"></a>外观（门面）模式</h1><h3 id="1-何为外观模式"><a href="#1-何为外观模式" class="headerlink" title="1.何为外观模式"></a>1.何为外观模式</h3><p>​				为子系统中的一组接口提供一个一致、稳定的界面（中间层），外观模式定义了一个高层的接口，将子系统的变化隔离。</p>
+<h3 id="2-外观模式的意义和使用场景"><a href="#2-外观模式的意义和使用场景" class="headerlink" title="2.外观模式的意义和使用场景"></a>2.外观模式的意义和使用场景</h3><p>​					在组件构建时，接口间直接依赖可能会导致很多问题，这时，提供一个稳定的中间接口。如此便可以隔离子系统的变化，无论子系统实现如何改变，外部调用者只需要和中间层的稳定的接口打交道。这达到了解耦的效果—子系统内部的任何变化不会影响到中间层接口。</p>
+<h3 id="3-外观模式的实现"><a href="#3-外观模式的实现" class="headerlink" title="3.外观模式的实现"></a>3.外观模式的实现</h3><p>​					外观模式注重从架构的层次看待整个系统，而不是单个类的层次。它更多是一种架构设计模式。所以没有固定的代码实现，只需要封装一个中间层，隔离子系统和使用者。就像操作系统一样，隔离计算机使用者和计算机硬件，不论硬件如何变化，计算机的使用方式不变。</p>
+<p>​					值得注意的是，外观模式封装的子系统内部应该是相互耦合关系比较大的一组组件，而不是一个简单的功能集合。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/03/c-%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8/" data-id="clojm5px800004ouzcmyo78r1" data-title="c++右值引用" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2023/11/18/%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8F/" data-id="clp3scdcx0000uouzdpt74ecb" data-title="外观模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+
     </footer>
   </div>
   
     
 <nav id="article-nav">
   
-    <a href="/2023/11/04/tcp%E8%BF%9E%E6%8E%A5%E7%9A%84%E5%BB%BA%E7%AB%8B%E4%B8%8E%E6%96%AD%E5%BC%80/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2023/11/18/%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
-          tcp连接的建立与断开
+          享元模式
         
       </div>
     </a>
   
   
-    <a href="/2023/11/03/c-%E5%9F%BA%E7%A1%80%E4%B9%8B%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2023/11/17/%E8%A3%85%E9%A5%B0%E6%A8%A1%E5%BC%8F/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">c++基础之编译过程</div>
+      <div class="article-nav-title">装饰模式</div>
     </a>
   
 </nav>
