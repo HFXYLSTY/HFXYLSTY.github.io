@@ -73,6 +73,65 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-C-基础一" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/01/C-%E5%9F%BA%E7%A1%80%E4%B8%80/" class="article-date">
+  <time class="dt-published" datetime="2023-11-01T12:00:08.000Z" itemprop="datePublished">2023-11-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/11/01/C-%E5%9F%BA%E7%A1%80%E4%B8%80/">C++基础一</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <pre><code>                c++基础一
+</code></pre>
+<p>1.多态的实现原理</p>
+<pre><code>c++中的多态分为静态多态和动态多态。
+静态多态是编译时的多态，通过重载函数和模板实现。
+动态多态是运行时的多态，通过虚函数和继承实现。
+
+
+动态多态实现原理：为每个包含虚函数的类建立一个虚函数表。
+        虚函数表的项存储各个虚函数在内存中的入口地址。
+        在该类的每个对象中设置一个指向虚函数表的指针。
+        在调用虚函数时，先利用虚指针找到虚函数表，确认调用的虚函数的入口地址在表中的位置，获取入口地址后完成调用
+
+静态多态的实现原理：
+    函数重载：编译器用过函数调用的时候传递的参数类型和数量来确定合适的函数版本。
+         在编译阶段，编译器检查函数调用的上下文，通过实际参数确定调用重载版本
+    模板：模板允许我们编写通用的代码。编译器根据模板实例化的类型生成对应的代码
+</code></pre>
+<p>2.菱形继承问题<br>    菱形继承问题是指在多重继承时，两个或多个派生类继承自同一个基类，然后又有另一个类继承这些派生类。<br>    这种情况下，最终生成的派生类将包含多个来自同一个基类的子对象副本，导致二义性和资源浪费。<br>    为了解决这个问题：可以使用虚继承，让最终生成的派生类只包含一个基类的子对象副本<br>    菱形继承下的虚函数：若子类中有虚函数，而所继承的父类中没有虚函数，则子类就有自己的虚表指针。当父类中有虚函数，则子类的虚表放在			  第一个继承的父类中。</p>
+<p>3.析构函数为什么设置成虚函数<br>    一般来说，如果这个类是一个带有多态性质的类，那么它的析构函数就应该是虚函数，否则就不应该是虚函数。<br>    原因是，如果这个类是有虚函数，那它很可能会被继承。当通过父类指针指向子类对象时，在父类对象销毁时，<br>    如果它的析构函数不是虚函数，那么只有父类的析构函数会被调用，子类析构函数不会调用。造成内存的局部释放，<br>    导致资源泄露</p>
+<p>4.static和const对象的用法’<br>    const</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/01/C-%E5%9F%BA%E7%A1%80%E4%B8%80/" data-id="clofpyuev0000mkuzgxuthazr" data-title="C++基础一" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-我的第一篇博客文章" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2023/10/31/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0/" class="article-date">
@@ -161,6 +220,10 @@
       <ul>
         
           <li>
+            <a href="/2023/11/19/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F/">命令模式</a>
+          </li>
+        
+          <li>
             <a href="/2023/11/18/%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F/">代理模式</a>
           </li>
         
@@ -174,10 +237,6 @@
         
           <li>
             <a href="/2023/11/17/%E8%A3%85%E9%A5%B0%E6%A8%A1%E5%BC%8F/">装饰模式</a>
-          </li>
-        
-          <li>
-            <a href="/2023/11/17/%E7%BB%84%E5%90%88%E6%A8%A1%E5%BC%8F/">组合模式</a>
           </li>
         
       </ul>
