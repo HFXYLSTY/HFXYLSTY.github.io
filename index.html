@@ -73,6 +73,95 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-观察者模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/19/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/" class="article-date">
+  <time class="dt-published" datetime="2023-11-19T11:18:17.000Z" itemprop="datePublished">2023-11-19</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/11/19/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/">观察者模式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="观察者模式"><a href="#观察者模式" class="headerlink" title="观察者模式"></a>观察者模式</h1><h3 id="1-何为观察者模式"><a href="#1-何为观察者模式" class="headerlink" title="1.何为观察者模式"></a>1.何为观察者模式</h3><p>​				观察者模式定义了一种一对多（变化）的依赖关系，以便当一个对象发生变化时，所有依赖与它的对象都能接受到通知并做出相应更新。</p>
+<h3 id="2-观察者模式的意义和使用场景"><a href="#2-观察者模式的意义和使用场景" class="headerlink" title="2.观察者模式的意义和使用场景"></a>2.观察者模式的意义和使用场景</h3><p>​				在软件构建中，我们可能需要对一些对象建立一种“通知依赖关系”，当一个对象（目标对象）的状态发生了改变，，所有依赖对象（观察者）都能收到通知。观察者模式解开了二者之间的耦合，使得我们可以独立地改变目标和观察者。这是依赖倒置原则的体现。</p>
+<h3 id="3-观察者模式的实现"><a href="#3-观察者模式的实现" class="headerlink" title="3.观察者模式的实现"></a>3.观察者模式的实现</h3><p>​				创建一个观察者基类，所有观察者继承于该基类，去实现对不同状态的观察。在目标对象中包含一个观察者集合，代表订阅当前对象的观察者，当目标变化发生时，无需指定某个观察者，通知（可以携带通知信息作为参数）将自动传播到所有订阅观察者。观察者自己决定是否订阅，目标对象对此一无所知。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 抽象观察者类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Observer</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">update</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 具体观察者类 - 学生</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Student</span> : <span class="keyword">public</span> Observer &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::string name;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Student</span>(<span class="type">const</span> std::string&amp; name) : <span class="built_in">name</span>(name) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">update</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; name &lt;&lt; <span class="string">&quot; received a notification&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 抽象主题类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Subject</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::vector&lt;Observer*&gt; observers;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">// 注册观察者</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">attach</span><span class="params">(Observer* observer)</span> </span>&#123;</span><br><span class="line">        observers.<span class="built_in">push_back</span>(observer);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 取消注册观察者</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">detach</span><span class="params">(Observer* observer)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">auto</span> it = observers.<span class="built_in">begin</span>(); it != observers.<span class="built_in">end</span>(); ++it) &#123;</span><br><span class="line">            <span class="keyword">if</span> (*it == observer) &#123;</span><br><span class="line">                observers.<span class="built_in">erase</span>(it);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 通知所有观察者</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">notify</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (Observer* observer : observers) &#123;</span><br><span class="line">            observer-&gt;<span class="built_in">update</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 具体主题类 - 教师</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Teacher</span> : <span class="keyword">public</span> Subject &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">teach</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Teacher is teaching&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        <span class="built_in">notify</span>(); <span class="comment">// 通知所有观察者</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>​		</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/19/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/" data-id="clp5eh9yd0001p8uz0cq4brye" data-title="观察者模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-中介者模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/19/%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F/" class="article-date">
+  <time class="dt-published" datetime="2023-11-19T05:50:36.000Z" itemprop="datePublished">2023-11-19</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/11/19/%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F/">中介者模式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="中介者模式"><a href="#中介者模式" class="headerlink" title="中介者模式"></a>中介者模式</h1><h3 id="1-何为中介者模式"><a href="#1-何为中介者模式" class="headerlink" title="1.何为中介者模式"></a>1.何为中介者模式</h3><p>​				使用一个中介对象来封装（封装变化）一系列的对象交互。它使得各个对象不需要显示地相互引用（编译时依赖–&gt;运行时依赖），从而达到解耦的目的，而且可以独立地改变它们的交互</p>
+<h3 id="2-中介者模式的意义和使用场景"><a href="#2-中介者模式的意义和使用场景" class="headerlink" title="2.中介者模式的意义和使用场景"></a>2.中介者模式的意义和使用场景</h3><p>​				在软件系统中，经常会出现一系列对象相互引用的情况，这种紧耦合非常不利于应对变化。中介者模式本质上提出引入中间组件，使将多个对象间的控制逻辑进行集中，把“多个对象相互关联”转为“多个对象和一个中介者关联”，实现了解耦。值得注意的是，外观模式是解耦<strong>系统间</strong>（单向）的对象关联关系，中介者模式是解耦<strong>系统内</strong>各个对象间（双向）的关联关系</p>
+<h3 id="3-中介者模式的实现"><a href="#3-中介者模式的实现" class="headerlink" title="3.中介者模式的实现"></a>3.中介者模式的实现</h3><p>​				中介者模式的实现多种多样，中介组件内部可能非常复杂。但究其本质都是使系统中的各个成员都引用该中间组件，并通过它来相互通信。当中介者过于复杂的 时候，考虑拆分成多个中介者。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/19/%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F/" data-id="clp5eh9ya0000p8uz0osebd7z" data-title="中介者模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-命令模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2023/11/19/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F/" class="article-date">
@@ -426,105 +515,6 @@
 
 
   
-    <article id="post-单例模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/11/16/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" class="article-date">
-  <time class="dt-published" datetime="2023-11-16T07:14:55.000Z" itemprop="datePublished">2023-11-16</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/11/16/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/">单例模式</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h1><h3 id="1-何为单例模式"><a href="#1-何为单例模式" class="headerlink" title="1.何为单例模式"></a>1.何为单例模式</h3><p>​				单例模式的理念是，应用程序中只能有一个特定组件的实例。保证一个类只有一个实例，并提供一个该实例的全局访问点。</p>
-<h3 id="2-单例模式的意义和使用场景"><a href="#2-单例模式的意义和使用场景" class="headerlink" title="2.单例模式的意义和使用场景"></a>2.单例模式的意义和使用场景</h3><p>​				有的类需要保证只有一个实例才能确保其逻辑正确性以及保持良好的效率。</p>
-<h3 id="3-单例模式的实现"><a href="#3-单例模式的实现" class="headerlink" title="3.单例模式的实现"></a>3.单例模式的实现</h3><p>​				只需要将单例模式的构造函数、拷贝构造函数、移动构造函数、拷贝赋值函数删除，再提供一个返回唯一实例的指针的函数就可以了。</p>
-<h3 id="4-多线程下的单例模式"><a href="#4-多线程下的单例模式" class="headerlink" title="4.多线程下的单例模式"></a>4.多线程下的单例模式</h3><h5 id="单例模式的两种实现方式"><a href="#单例模式的两种实现方式" class="headerlink" title="单例模式的两种实现方式"></a>单例模式的两种实现方式</h5><p>​					1.饿汉式：唯一实例在定义时就初始化，这种方式是线程安全的。但是它会使程序启动事件增加，浪费资源。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Singleton</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">static</span> Singleton* instance;</span><br><span class="line">    <span class="built_in">Singleton</span>() &#123;&#125;  <span class="comment">// 将构造函数设为私有，禁止外部实例化</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> Singleton* <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Singleton* Singleton::instance = <span class="keyword">new</span> <span class="built_in">Singleton</span>();  <span class="comment">// 在定义静态成员变量时直接初始化</span></span><br></pre></td></tr></table></figure>
-
-<p>​				2.懒汉式：延迟初始化的方式，即在首次使用时才创建单例对象。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">class Singleton &#123;</span><br><span class="line">private:</span><br><span class="line">    static Singleton* instance;</span><br><span class="line">    Singleton() &#123;&#125;  // 将构造函数设为私有，禁止外部实例化</span><br><span class="line"></span><br><span class="line">public:</span><br><span class="line">    static Singleton* getInstance() &#123;</span><br><span class="line">        if (instance == nullptr) &#123;</span><br><span class="line">            instance = new Singleton();</span><br><span class="line">        &#125;</span><br><span class="line">        return instance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Singleton* Singleton::instance = nullptr;  // 初始化静态成员变量</span><br></pre></td></tr></table></figure>
-
-<p>​				这种形式的创建存在线程安全问题，有两种解决方案。一是在 getInstance()函数的第一行上锁，但这种方式十分浪费资源，在高并发环境下不可取。</p>
-<p>​				第二种是使用<strong>双重校验锁</strong>。这种双重校验锁在c++11前会出现问题，因为编译器优化可能会分配内存后直接将地址返回给指针。导致在一段时间内，指针指向未完全初始化的内存。而其他线程可能会将这个未初始化完成的内存返回。</p>
-<p>​				C++11标准对静态局部变量的初始化进行了明确规定：静态局部变量在第一次访问时进行初始化，且只有一个线程能够执行初始化过程。这确保了静态局部变量的线程安全性。</p>
-<p>​					</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">static Singleton* getInstance() &#123;</span><br><span class="line">       if (instance == nullptr) &#123;</span><br><span class="line">           std::lock_guard&lt;std::mutex&gt; lock(mtx);  // 加锁</span><br><span class="line">           if (instance == nullptr) &#123;  // 双重检查</span><br><span class="line">               instance = new Singleton();</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">       return instance;</span><br></pre></td></tr></table></figure>
-
-<p>​	</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/16/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" data-id="clp0wtomw0000asuzhjqdhcl5" data-title="单例模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-原型模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/11/16/%E5%8E%9F%E5%9E%8B%E6%A8%A1%E5%BC%8F/" class="article-date">
-  <time class="dt-published" datetime="2023-11-16T01:54:02.000Z" itemprop="datePublished">2023-11-16</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/11/16/%E5%8E%9F%E5%9E%8B%E6%A8%A1%E5%BC%8F/">原型模式</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="原型模式"><a href="#原型模式" class="headerlink" title="原型模式"></a>原型模式</h1><h3 id="1-何为原型模式"><a href="#1-何为原型模式" class="headerlink" title="1.何为原型模式"></a>1.何为原型模式</h3><p>​				使用原型实例来制定创建对象的种类，然后拷贝这些原型来创造新的对象。</p>
-<h3 id="2-原型模式的意义和使用场景"><a href="#2-原型模式的意义和使用场景" class="headerlink" title="2.原型模式的意义和使用场景"></a>2.原型模式的意义和使用场景</h3><p>​				在生产中，存在一些比较负责的类，它们经常会发生改变，用原型克隆的方式来创建这样的类的对象。它可是使我们灵活地动态创建某些拥有稳定接口的新对象。所需的工作仅仅是注册一个新对象（原型），然后在任何需要的地方进行克隆。</p>
-<h3 id="3-如何使用"><a href="#3-如何使用" class="headerlink" title="3.如何使用"></a>3.如何使用</h3><p>​				在抽象基类中定义一个clone接口，然后每当有新类继承于该抽象类，就去实现相应的clone接口。当需要创建该类对象时，传入原型（即一个已经创建好的该类对象），然后调用clone函数创建</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/16/%E5%8E%9F%E5%9E%8B%E6%A8%A1%E5%BC%8F/" data-id="clp0wton50003asuzgfnhfxw2" data-title="原型模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
 
 
   <nav id="page-nav">
@@ -575,6 +565,14 @@
       <ul>
         
           <li>
+            <a href="/2023/11/19/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/">观察者模式</a>
+          </li>
+        
+          <li>
+            <a href="/2023/11/19/%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F/">中介者模式</a>
+          </li>
+        
+          <li>
             <a href="/2023/11/19/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F/">命令模式</a>
           </li>
         
@@ -584,14 +582,6 @@
         
           <li>
             <a href="/2023/11/18/%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/">享元模式</a>
-          </li>
-        
-          <li>
-            <a href="/2023/11/18/%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8F/">外观模式</a>
-          </li>
-        
-          <li>
-            <a href="/2023/11/17/%E8%A3%85%E9%A5%B0%E6%A8%A1%E5%BC%8F/">装饰模式</a>
           </li>
         
       </ul>

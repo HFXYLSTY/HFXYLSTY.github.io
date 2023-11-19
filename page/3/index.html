@@ -73,6 +73,115 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-智能指针" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/02/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/" class="article-date">
+  <time class="dt-published" datetime="2023-11-02T10:47:41.000Z" itemprop="datePublished">2023-11-02</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/11/02/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/">智能指针</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="智能指针"><a href="#智能指针" class="headerlink" title="智能指针"></a>智能指针</h1><h2 id="1-什么是智能指针？"><a href="#1-什么是智能指针？" class="headerlink" title="1.什么是智能指针？"></a>1.什么是智能指针？</h2><p>​		智能指针是对裸指针的封装，初衷是让程序员无需手动释放内存，避免内存泄漏。常见的智能指针有auto_ptr（被淘汰）</p>
+<p>,unique_ptr,shared_ptr,weak_ptr.。</p>
+<h2 id="2-几种智能指针的优缺点"><a href="#2-几种智能指针的优缺点" class="headerlink" title="2.几种智能指针的优缺点"></a>2.几种智能指针的优缺点</h2><p>​		1.weak_ptr：weak_ptr本身不具备资源管理的能力，它存在的目的是解决shared_ptr产生的循环引用问题。weak_ptr指向的对象的引用计数不会增加。</p>
+<p>​		2.unique_ptr：unique_ptr最大的特点是，它对资源是独占的，它不可以复制。它通过在析构函数中释放资源来管理对象的生命周期。可以防止多个指针指向同一个对象，它比shared_ptr更加高效。</p>
+<p>​		3.shared_ptr:shared_ptr最大的特点是可以共享资源。当一个资源需要在多个对象间共享时，就需要shared_ptr了。他通过引用计数来管理资源。当引用计数为0时，资源被释放。shared_ptr可能会导致循环引用问题。</p>
+<h2 id="3-shared-ptr自动管理内存的原理"><a href="#3-shared-ptr自动管理内存的原理" class="headerlink" title="3.shared_ptr自动管理内存的原理"></a>3.shared_ptr自动管理内存的原理</h2><p>​	     shared_ptr内部维护了一个计数器，来跟踪有多少shared_ptr指向同一个资源，当计数器为0的时候，调用delete或自定义的delete来释放资源。</p>
+<p>​		引用计数器何时增加：1.新建一个shared_ptr并指向一个资源； 2.复制构造函数创建一个shared_ptr； 3.用复制运算符（&#x3D;）给把一个shared_ptr给另一个shared_ptr时</p>
+<p>​		引用计数器何时减少：1.shared_ptr被销毁时，如离开局部作用域或析构函数析构类对象时；2.shared_ptr不再指向一个资源时，如调用reset函数或让它指向另一个资源时</p>
+<h2 id="4-循环引用的发生和解决"><a href="#4-循环引用的发生和解决" class="headerlink" title="4.循环引用的发生和解决"></a>4.循环引用的发生和解决</h2><p>​        两个或多个对象相互引用，或复杂数据结构，如图、双向链表等，存在多个引用路径的情况下，可能会存在循环引用问题，导致资源无法释放。这是就需要用weak_ptr来解除循环引用，因为weak_ptr指向的对象的引用计数不会增加。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">myclass</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	std::shared_ptr&lt;myclass&gt; other;</span><br><span class="line">	<span class="built_in">myclass</span>()&#123;&#125;</span><br><span class="line">	~<span class="built_in">myclass</span>()&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span>** argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="function">std::shared_ptr&lt;myclass&gt; <span class="title">ptr1</span><span class="params">(<span class="keyword">new</span> myclass())</span></span>;</span><br><span class="line">	<span class="function">std::shared_ptr&lt;myclass&gt; <span class="title">ptr2</span><span class="params">(<span class="keyword">new</span> myclass())</span></span>;</span><br><span class="line">	<span class="comment">//这里在myclass内部，ptr1和ptr2相互引用，导致ptr1和ptr2的引用计数均为2，资源无法释放。</span></span><br><span class="line">	ptr1-&gt;other = ptr2;</span><br><span class="line">	ptr2-&gt;other = ptr1;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/02/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/" data-id="cloh3vv9c0000xouz7kg2gpvp" data-title="智能指针" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-面向对象设计原则" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/01/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/" class="article-date">
+  <time class="dt-published" datetime="2023-11-01T12:44:48.000Z" itemprop="datePublished">2023-11-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/11/01/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/">面向对象设计原则</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="面向对象设计原则"><a href="#面向对象设计原则" class="headerlink" title="面向对象设计原则"></a>面向对象设计原则</h1><h3 id="1-何为设计原则"><a href="#1-何为设计原则" class="headerlink" title="1.何为设计原则"></a>1.何为设计原则</h3><p>​				设计原则是写面向对象代码时的指导思想。我们在设计软件时，需求往往是复杂而多变的，为了应对这一点，我们有两大法宝：分解和抽象。<strong>分解</strong>即把复杂问题分解成若干简单问题，<strong>抽象</strong>即提取事物的核心特征。面向对象设计原则的核心任务就是<strong>抵御变化</strong>，将变化点进行封装来减少对代码的修改，来方便人们进行功能的拓展。</p>
+<h3 id="2-单一责任原则"><a href="#2-单一责任原则" class="headerlink" title="2.单一责任原则"></a>2.单一责任原则</h3><p>​			单一责任原则是设计原则的核心，它认为：每个类应该只有一个职责。因此也只有一个修改该类的原因。如此一来，我们可以最大程度减少类方法的膨胀，减小修改类内容的可能性。</p>
+<p>​			如：一个日志类应该拥有添加日志记录的功能，而不应该有将日志持久化到磁盘的功能。应该专门设计一个类去执行持久化操作。</p>
+<h3 id="3-开放封闭原则"><a href="#3-开放封闭原则" class="headerlink" title="3.开放封闭原则"></a>3.开放封闭原则</h3><p>​			开放封闭原则实质上是对单一责任原则和抽象的运用。它认为：软件实体对拓展开放，对修改封闭。我们可以将某个类的功能进行拆分，将其分为多个部分，提取其核心抽象部分作为抽象基类，当新业务到来，直接继承抽象基类，在新的业务类中实现具体细节即可，此为拓展。</p>
+<p>​			如：要实现一个过滤器，（如通过颜色、大小过滤对象）。可以将其分为两个部分（单一责任原则）：过滤器（输入并返回某些对象的过程），规范（用于规定如何过滤数据元素）。如此，当我们需要一个具体的过滤器的时候，就可以继承过滤器抽象基类，再将规范作为参数传递给类方法，我们变可以得到各种过滤器了。</p>
+<h3 id="4-里氏替换原则"><a href="#4-里氏替换原则" class="headerlink" title="4.里氏替换原则"></a>4.里氏替换原则</h3><p>​			里氏替换反映了继承必须基于抽象。它认为：如果某个接口以基类Parent类型的对象为参数，那么它应该同等的接受子类对象为参数，并且程序不会产生任何异常。简单来说，子类可以替换它们的基类。</p>
+<h3 id="5-接口隔离原则"><a href="#5-接口隔离原则" class="headerlink" title="5.接口隔离原则"></a>5.接口隔离原则</h3><p>​		接口隔离原则也是对单一责任原则的运用。它认为：应该将复杂的接口分离为多个单独的接口，以避免强制实现者必须实现他们实际上并不需要的接口。</p>
+<p>​		如：需要一个抽象打印机基类，有打印、扫描、传真三个接口，但是有时使用者只需要打印功能，他还得把三个接口全实现一遍。如果将打印机基类拆分成打印、扫描、传真三个接口类，再由类组合或继承的方式生成打印机基类，那么就可以根据想要的功能，去实现对应的接口，不需要实现内些不需要的接口。</p>
+<p>​		实际上还是体现了类的单一责任，尽可能缩减类的功能，减少耦合，增加灵活性。</p>
+<h3 id="6-依赖倒置（倒转）原则"><a href="#6-依赖倒置（倒转）原则" class="headerlink" title="6.依赖倒置（倒转）原则"></a>6.依赖倒置（倒转）原则</h3><p>​			依赖倒置原则体现了抽象和封装变化思想。它认为：</p>
+<p>​					高层模块（稳定）不应该依赖低层模块，它们都该依赖于抽象（稳定）</p>
+<p>​					抽象（稳定）不应该依赖于实现细节（变化），实现细节（变化）应该依赖于抽象（稳定）</p>
+<p>​			如：有一个打印日志的模块，它应该依赖于日志抽象类（将日志抽象类的引用或指针作为类成员），而不应该依赖于某个具体的日志类。</p>
+<p>​			使用建议：</p>
+<p>​			（1）每个类尽量都有接口或抽象类，或者接口和抽象类两者都具备。</p>
+<p>​			（2）变量的表面类型尽量是接口或抽象类。</p>
+<p>​			（3）任何类都不应该从具体类派生。</p>
+<p>​			（4）尽量不要重写基类的方法。如果基类是一个抽象类，而且这个方法已经实现了，子类尽量不要重写。</p>
+<p>​			（5）结合里氏替换原则使用。</p>
+<p>​		</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/01/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/" data-id="cloh3vv9h0001xouz80bgano2" data-title="面向对象设计原则" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-C-基础一" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2023/11/01/C-%E5%9F%BA%E7%A1%80%E4%B8%80/" class="article-date">
@@ -220,6 +329,14 @@
       <ul>
         
           <li>
+            <a href="/2023/11/19/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/">观察者模式</a>
+          </li>
+        
+          <li>
+            <a href="/2023/11/19/%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F/">中介者模式</a>
+          </li>
+        
+          <li>
             <a href="/2023/11/19/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F/">命令模式</a>
           </li>
         
@@ -229,14 +346,6 @@
         
           <li>
             <a href="/2023/11/18/%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/">享元模式</a>
-          </li>
-        
-          <li>
-            <a href="/2023/11/18/%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8F/">外观模式</a>
-          </li>
-        
-          <li>
-            <a href="/2023/11/17/%E8%A3%85%E9%A5%B0%E6%A8%A1%E5%BC%8F/">装饰模式</a>
           </li>
         
       </ul>

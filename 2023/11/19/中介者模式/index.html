@@ -4,18 +4,19 @@
   <meta charset="utf-8">
   
   
-  <title>c++右值引用 | Hexo</title>
+  <title>中介者模式 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="右值引用1.左值和右值​				左值：指一个指向特定内存的具有名称的值，它有一个相对稳定的地址并有一段较长的声明周期 ​				右值：不指向稳定内存地址的匿名值，它的生命周期很短。（如函数返回时构建的临时对象） 2.右值引用​			    顾名思义，右值引用是一种引用右值切只能应用于右值的方法。它可以延长临时对象的声明周期，目的是减少对象的复制，提升性能。 3.移动语义​				移动语义帮助我们将">
+  <meta name="description" content="中介者模式1.何为中介者模式​				使用一个中介对象来封装（封装变化）一系列的对象交互。它使得各个对象不需要显示地相互引用（编译时依赖–&gt;运行时依赖），从而达到解耦的目的，而且可以独立地改变它们的交互 2.中介者模式的意义和使用场景​				在软件系统中，经常会出现一系列对象相互引用的情况，这种紧耦合非常不利于应对变化。中介者模式本质上提出引入中间组件，使将多个对象间的控制逻辑进行集中，把">
 <meta property="og:type" content="article">
-<meta property="og:title" content="c++右值引用">
-<meta property="og:url" content="http://example.com/2023/11/03/c-%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8/index.html">
+<meta property="og:title" content="中介者模式">
+<meta property="og:url" content="http://example.com/2023/11/19/%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="右值引用1.左值和右值​				左值：指一个指向特定内存的具有名称的值，它有一个相对稳定的地址并有一段较长的声明周期 ​				右值：不指向稳定内存地址的匿名值，它的生命周期很短。（如函数返回时构建的临时对象） 2.右值引用​			    顾名思义，右值引用是一种引用右值切只能应用于右值的方法。它可以延长临时对象的声明周期，目的是减少对象的复制，提升性能。 3.移动语义​				移动语义帮助我们将">
+<meta property="og:description" content="中介者模式1.何为中介者模式​				使用一个中介对象来封装（封装变化）一系列的对象交互。它使得各个对象不需要显示地相互引用（编译时依赖–&gt;运行时依赖），从而达到解耦的目的，而且可以独立地改变它们的交互 2.中介者模式的意义和使用场景​				在软件系统中，经常会出现一系列对象相互引用的情况，这种紧耦合非常不利于应对变化。中介者模式本质上提出引入中间组件，使将多个对象间的控制逻辑进行集中，把">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2023-11-03T02:51:49.000Z">
-<meta property="article:modified_time" content="2023-11-03T13:16:57.978Z">
+<meta property="article:published_time" content="2023-11-19T05:50:36.000Z">
+<meta property="article:modified_time" content="2023-11-19T06:10:07.578Z">
 <meta property="article:author" content="John Doe">
+<meta property="article:tag" content="设计模式">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
@@ -75,10 +76,10 @@
 </header>
 
       <div class="outer">
-        <section id="main"><article id="post-c-右值引用" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+        <section id="main"><article id="post-中介者模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
-    <a href="/2023/11/03/c-%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8/" class="article-date">
-  <time class="dt-published" datetime="2023-11-03T02:51:49.000Z" itemprop="datePublished">2023-11-03</time>
+    <a href="/2023/11/19/%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F/" class="article-date">
+  <time class="dt-published" datetime="2023-11-19T05:50:36.000Z" itemprop="datePublished">2023-11-19</time>
 </a>
     
   </div>
@@ -89,7 +90,7 @@
         
   
     <h1 class="p-name article-title" itemprop="headline name">
-      c++右值引用
+      中介者模式
     </h1>
   
 
@@ -97,42 +98,38 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <h1 id="右值引用"><a href="#右值引用" class="headerlink" title="右值引用"></a>右值引用</h1><h3 id="1-左值和右值"><a href="#1-左值和右值" class="headerlink" title="1.左值和右值"></a>1.左值和右值</h3><p>​				左值：指一个指向特定内存的具有名称的值，它有一个相对稳定的地址并有一段较长的声明周期</p>
-<p>​				右值：不指向稳定内存地址的匿名值，它的生命周期很短。（如函数返回时构建的临时对象）</p>
-<h3 id="2-右值引用"><a href="#2-右值引用" class="headerlink" title="2.右值引用"></a>2.右值引用</h3><p>​			    顾名思义，右值引用是一种引用右值切只能应用于右值的方法。它可以延长临时对象的声明周期，目的是减少对象的复制，提升性能。</p>
-<h3 id="3-移动语义"><a href="#3-移动语义" class="headerlink" title="3.移动语义"></a>3.移动语义</h3><p>​				移动语义帮助我们将临时对象的内存转移到另一个对象中，来避免内存数据的复制。原理是在类中创建一个移动构造函数，它以右值引用作为形参，函数中不进行资源的拷贝，而是进行资源所有权的转让。对于右值，编译器会优先使用移动构造函数去构造目标对象。</p>
-<h3 id="4-将亡值和std-move"><a href="#4-将亡值和std-move" class="headerlink" title="4.将亡值和std::move()"></a>4.将亡值和std::move()</h3><p>​				将亡值表示资源可以被重用的对象和位域，通常这是因为它们接近生命周期的末尾，也坑你是经过右值引用的转换产生的。</p>
-<p>​	   		将左值转换成右值引用代码</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">static_cast</span>&lt;classname&amp;&amp;&gt;(xxxx)</span><br></pre></td></tr></table></figure>
-
-<p>​				这个操作的意义是让左值使用移动语义，std::move()实质上与上述代码等价。</p>
+        <h1 id="中介者模式"><a href="#中介者模式" class="headerlink" title="中介者模式"></a>中介者模式</h1><h3 id="1-何为中介者模式"><a href="#1-何为中介者模式" class="headerlink" title="1.何为中介者模式"></a>1.何为中介者模式</h3><p>​				使用一个中介对象来封装（封装变化）一系列的对象交互。它使得各个对象不需要显示地相互引用（编译时依赖–&gt;运行时依赖），从而达到解耦的目的，而且可以独立地改变它们的交互</p>
+<h3 id="2-中介者模式的意义和使用场景"><a href="#2-中介者模式的意义和使用场景" class="headerlink" title="2.中介者模式的意义和使用场景"></a>2.中介者模式的意义和使用场景</h3><p>​				在软件系统中，经常会出现一系列对象相互引用的情况，这种紧耦合非常不利于应对变化。中介者模式本质上提出引入中间组件，使将多个对象间的控制逻辑进行集中，把“多个对象相互关联”转为“多个对象和一个中介者关联”，实现了解耦。值得注意的是，外观模式是解耦<strong>系统间</strong>（单向）的对象关联关系，中介者模式是解耦<strong>系统内</strong>各个对象间（双向）的关联关系</p>
+<h3 id="3-中介者模式的实现"><a href="#3-中介者模式的实现" class="headerlink" title="3.中介者模式的实现"></a>3.中介者模式的实现</h3><p>​				中介者模式的实现多种多样，中介组件内部可能非常复杂。但究其本质都是使系统中的各个成员都引用该中间组件，并通过它来相互通信。当中介者过于复杂的 时候，考虑拆分成多个中介者。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/03/c-%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8/" data-id="clojm5px800004ouzcmyo78r1" data-title="c++右值引用" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2023/11/19/%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F/" data-id="clp5eh9ya0000p8uz0osebd7z" data-title="中介者模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+
     </footer>
   </div>
   
     
 <nav id="article-nav">
   
-    <a href="/2023/11/04/tcp%E8%BF%9E%E6%8E%A5%E7%9A%84%E5%BB%BA%E7%AB%8B%E4%B8%8E%E6%96%AD%E5%BC%80/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2023/11/19/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
-          tcp连接的建立与断开
+          观察者模式
         
       </div>
     </a>
   
   
-    <a href="/2023/11/03/c-%E5%9F%BA%E7%A1%80%E4%B9%8B%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2023/11/19/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">c++基础之编译过程</div>
+      <div class="article-nav-title">命令模式</div>
     </a>
   
 </nav>
