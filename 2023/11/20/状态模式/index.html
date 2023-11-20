@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>状态模式 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="状态模式1.何为状态模式​				允许一个对象在其内部状态改变时改变它的行为。从而使对象看似修改了它的行为。本质上是将状态封装为对象。 2.状态模式的意义和使用场景​				在软件构建过程中，某些对象的行为会随着状态的变化而变化。而状态通常是不稳定的（可能增加、变化），状态模式通过将状态封装为对象实现在运行时根据对象的状态改变对象的行为，实现了具体行为和状态转换之间的解耦。为不同状态创建不同状态对">
+<meta property="og:type" content="article">
+<meta property="og:title" content="状态模式">
+<meta property="og:url" content="http://example.com/2023/11/20/%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="状态模式1.何为状态模式​				允许一个对象在其内部状态改变时改变它的行为。从而使对象看似修改了它的行为。本质上是将状态封装为对象。 2.状态模式的意义和使用场景​				在软件构建过程中，某些对象的行为会随着状态的变化而变化。而状态通常是不稳定的（可能增加、变化），状态模式通过将状态封装为对象实现在运行时根据对象的状态改变对象的行为，实现了具体行为和状态转换之间的解耦。为不同状态创建不同状态对">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-11-20T05:29:26.000Z">
+<meta property="article:modified_time" content="2023-11-20T09:52:14.496Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="设计模式">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-状态模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/20/%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F/" class="article-date">
+  <time class="dt-published" datetime="2023-11-20T05:29:26.000Z" itemprop="datePublished">2023-11-20</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      状态模式
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="状态模式"><a href="#状态模式" class="headerlink" title="状态模式"></a>状态模式</h1><h3 id="1-何为状态模式"><a href="#1-何为状态模式" class="headerlink" title="1.何为状态模式"></a>1.何为状态模式</h3><p>​				允许一个对象在其内部状态改变时改变它的行为。从而使对象看似修改了它的行为。本质上是将状态封装为对象。</p>
+<h3 id="2-状态模式的意义和使用场景"><a href="#2-状态模式的意义和使用场景" class="headerlink" title="2.状态模式的意义和使用场景"></a>2.状态模式的意义和使用场景</h3><p>​				在软件构建过程中，某些对象的行为会随着状态的变化而变化。而状态通常是不稳定的（可能增加、变化），状态模式通过将状态封装为对象实现在<strong>运行时</strong>根据对象的状态改变对象的行为，实现了具体行为和状态转换之间的解耦。为不同状态创建不同状态对象同时使得状态转换更加明确。</p>
+<h3 id="3-状态模式的实现"><a href="#3-状态模式的实现" class="headerlink" title="3.状态模式的实现"></a>3.状态模式的实现</h3><p>​				创建一个状态抽象基类，在抽象基类中定义接口。具体状态从该基类继承而来，并重写接口。在需要使用状态的对象内部包含状态抽象基类指针，实现运行时根据对象的状态改变对象的行为。可以结合单例模式来节约内存。</p>
+<p>​			</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 抽象状态类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">State</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    State* pnext;<span class="comment">//下一状态</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">handle</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 具体状态类 - 开始状态</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">StartState</span> : <span class="keyword">public</span> State &#123;	<span class="comment">//这个继承是继承接口</span></span><br><span class="line">    <span class="type">static</span> State* m_state;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> State* <span class="title">getInstance</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(m_state == <span class="literal">nullptr</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            m_state = <span class="keyword">new</span> <span class="built_in">StartState</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> m_state;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">handle</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;The current state is start state&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        pnext = EndState::<span class="built_in">getInstance</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 具体状态类 - 结束状态</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">EndState</span> : <span class="keyword">public</span> State &#123;</span><br><span class="line">    tatic State* m_state;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">        <span class="function"><span class="type">static</span> State* <span class="title">getInstance</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(m_state == <span class="literal">nullptr</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            m_state = <span class="keyword">new</span> <span class="built_in">EndState</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> m_state;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">handle</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;The current state is end state&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 上下文类 - 它包含一个状态对象，可以根据状态对象调用不同的方法</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Context</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    State* state;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Context</span>(State* state) : <span class="built_in">state</span>(state) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">setState</span><span class="params">(State* state)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>-&gt;state = state;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">execute</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        state-&gt;<span class="built_in">handle</span>();</span><br><span class="line">        state = state-&gt;pnext;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/20/%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F/" data-id="clp6xfot80000j0uzhfsr24p9" data-title="状态模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2023/11/20/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          策略模式
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2023/11/19/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">观察者模式</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 10px;">设计模式</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/11/">November 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/10/">October 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/11/20/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/">策略模式</a>
+          </li>
+        
+          <li>
+            <a href="/2023/11/20/%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F/">状态模式</a>
+          </li>
+        
+          <li>
+            <a href="/2023/11/19/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/">观察者模式</a>
+          </li>
+        
+          <li>
+            <a href="/2023/11/19/%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F/">中介者模式</a>
+          </li>
+        
+          <li>
+            <a href="/2023/11/19/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F/">命令模式</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
