@@ -73,6 +73,52 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-模板方法模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/21/%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F/" class="article-date">
+  <time class="dt-published" datetime="2023-11-21T01:47:48.000Z" itemprop="datePublished">2023-11-21</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/11/21/%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F/">模板方法模式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="模板方法模式"><a href="#模板方法模式" class="headerlink" title="模板方法模式"></a>模板方法模式</h1><h3 id="1-何为模板方法模式"><a href="#1-何为模板方法模式" class="headerlink" title="1.何为模板方法模式"></a>1.何为模板方法模式</h3><p>​			定义一个操作中算法的骨架（稳定），而将一些步骤（变化）延迟到子类中。这使得我们可以在不改变算法结构的情况下，重写算法的某些步骤。</p>
+<h3 id="2-模板方法模式的意义和使用场景"><a href="#2-模板方法模式的意义和使用场景" class="headerlink" title="2.模板方法模式的意义和使用场景"></a>2.模板方法模式的意义和使用场景</h3><p>​			在软件构建中，对某一任务，它常常有稳定的算法结构，但子步骤经常变化（如框架和应用之间）。模板方法模式为算法提供了灵活的扩展点，是代码复用的基本操作。核心思想就是晚绑定，“不要调用我，让我调用你（框架开发人员如是说）”，即让框架去调用用户重写的代码。</p>
+<h3 id="3-模板方法的实现"><a href="#3-模板方法的实现" class="headerlink" title="3.模板方法的实现"></a>3.模板方法的实现</h3><p>​			将算法中某些变化的步骤声明为虚函数，使用者通过重写实现所需的步骤。</p>
+<p>​	</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 抽象基类 - 包含模板方法和具体方法</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AbstractClass</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">templateMethod</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 调用抽象方法，由子类实现</span></span><br><span class="line">        <span class="built_in">primitiveOperation1</span>();</span><br><span class="line">        <span class="comment">// 调用具体方法</span></span><br><span class="line">        <span class="built_in">concreteOperation</span>();</span><br><span class="line">        <span class="comment">// 调用抽象方法，由子类实现</span></span><br><span class="line">        <span class="built_in">primitiveOperation2</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">primitiveOperation1</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">primitiveOperation2</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">concreteOperation</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;This is a concrete operation&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 具体子类 - 实现抽象方法</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteClass</span> : <span class="keyword">public</span> AbstractClass &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">primitiveOperation1</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Concrete Class: Primitive Operation 1&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">primitiveOperation2</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Concrete Class: Primitive Operation 2&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/21/%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F/" data-id="clp7ot1ka0000ywuzckxh6h0t" data-title="模板方法模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-策略模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2023/11/20/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/" class="article-date">
@@ -479,52 +525,6 @@
 
 
   
-    <article id="post-组合模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/11/17/%E7%BB%84%E5%90%88%E6%A8%A1%E5%BC%8F/" class="article-date">
-  <time class="dt-published" datetime="2023-11-17T04:36:53.000Z" itemprop="datePublished">2023-11-17</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/11/17/%E7%BB%84%E5%90%88%E6%A8%A1%E5%BC%8F/">组合模式</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="组合模式"><a href="#组合模式" class="headerlink" title="组合模式"></a>组合模式</h1><h3 id="1-何为组合模式"><a href="#1-何为组合模式" class="headerlink" title="1.何为组合模式"></a>1.何为组合模式</h3><p>​				组合模式将对象组合成树形结构来表示“部分–整体”层次接口。它为单个对象和容器对象提供相同的接口，使得用户对于单个对象和对象集合的使用具有一致性（稳定）</p>
-<h3 id="2-组合模式的意义和使用场景"><a href="#2-组合模式的意义和使用场景" class="headerlink" title="2.组合模式的意义和使用场景"></a>2.组合模式的意义和使用场景</h3><p>​				将用户代码和复杂的容器结构解耦是组合模式的核心思想。解耦之后用户代码纯粹与抽象接口产生依赖，而非与容器内部的实现结构产生依赖，以此来应对变化。</p>
-<h3 id="3-组合模式的实现"><a href="#3-组合模式的实现" class="headerlink" title="3.组合模式的实现"></a>3.组合模式的实现</h3><p>​				由抽象基类继承出父节点类和子节点类，在重写父节点的方法时，遍历子节点去调用子节点的相应方法。以此，用户代码就只需要调用父节点的方法，就可以实现对子节点方法的调用。</p>
-<p>​		</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 组件抽象类（Component）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Component</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">operation</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">add</span><span class="params">(Component* component)</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">remove</span><span class="params">(Component* component)</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Component* <span class="title">getChild</span><span class="params">(<span class="type">int</span> index)</span> </span>&#123; <span class="keyword">return</span> <span class="literal">nullptr</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 叶子组件类（Leaf）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Leaf</span> : <span class="keyword">public</span> Component &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">operation</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 叶子节点的操作</span></span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Leaf operation&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 容器组件类（Composite）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Composite</span> : <span class="keyword">public</span> Component &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::list&lt;Component*&gt; children;	<span class="comment">//list中既可以是叶子节点也可以是普通节点</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">operation</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 容器节点的操作</span></span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Composite operation&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        <span class="comment">// 遍历所有子节点执行操作</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">auto</span> component : children) &#123;</span><br><span class="line">            component-&gt;<span class="built_in">operation</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">add</span><span class="params">(Component* component)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        children.<span class="built_in">push_back</span>(component);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">remove</span><span class="params">(Component* component)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        children.<span class="built_in">remove</span>(component);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function">Component* <span class="title">getChild</span><span class="params">(<span class="type">int</span> index)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Component* root = <span class="keyword">new</span> <span class="built_in">Composite</span>();</span><br><span class="line">    </span><br><span class="line">    Component* leaf1 = <span class="keyword">new</span> <span class="built_in">Leaf</span>();</span><br><span class="line">    Component* leaf2 = <span class="keyword">new</span> <span class="built_in">Leaf</span>();</span><br><span class="line">    Component* leaf3 = <span class="keyword">new</span> <span class="built_in">Leaf</span>();</span><br><span class="line">    </span><br><span class="line">    root-&gt;<span class="built_in">add</span>(leaf1);</span><br><span class="line">    </span><br><span class="line">    Component* subComposite = <span class="keyword">new</span> <span class="built_in">Composite</span>();</span><br><span class="line">    subComposite-&gt;<span class="built_in">add</span>(leaf2);</span><br><span class="line">    subComposite-&gt;<span class="built_in">add</span>(leaf3);</span><br><span class="line">    </span><br><span class="line">    root-&gt;<span class="built_in">add</span>(subComposite);</span><br><span class="line">    </span><br><span class="line">    root-&gt;<span class="built_in">operation</span>();</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/17/%E7%BB%84%E5%90%88%E6%A8%A1%E5%BC%8F/" data-id="clp26yutg00016guz3s6p6joq" data-title="组合模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
 
 
   <nav id="page-nav">
@@ -575,6 +575,10 @@
       <ul>
         
           <li>
+            <a href="/2023/11/21/%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F/">模板方法模式</a>
+          </li>
+        
+          <li>
             <a href="/2023/11/20/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/">策略模式</a>
           </li>
         
@@ -588,10 +592,6 @@
         
           <li>
             <a href="/2023/11/19/%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F/">中介者模式</a>
-          </li>
-        
-          <li>
-            <a href="/2023/11/19/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F/">命令模式</a>
           </li>
         
       </ul>
