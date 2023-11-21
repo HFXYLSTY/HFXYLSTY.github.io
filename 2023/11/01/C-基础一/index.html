@@ -6,16 +6,17 @@
   
   <title>C++基础一 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="c++基础一  1.多态的实现原理 c++中的多态分为静态多态和动态多态。 静态多态是编译时的多态，通过重载函数和模板实现。 动态多态是运行时的多态，通过虚函数和继承实现。   动态多态实现原理：为每个包含虚函数的类建立一个虚函数表。         虚函数表的项存储各个虚函数在内存中的入口地址。         在该类的每个对象中设置一个指向虚函数表的指针。">
+  <meta name="description" content="c++基础一  1.多态的实现原理 c++中的多态分为静态多态和动态多态。 静态多态是编译时的多态，通过重载函数和模板实现。 动态多态是运行时的多态，通过虚函数和继承实现。  ​	    动态多态实现原理：为每个包含虚函数的类建立一个虚函数表。            虚函数表的项存储各个虚函数在内存中的入口地址。            在该类的每个对象中设置一个指向">
 <meta property="og:type" content="article">
 <meta property="og:title" content="C++基础一">
 <meta property="og:url" content="http://example.com/2023/11/01/C-%E5%9F%BA%E7%A1%80%E4%B8%80/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="c++基础一  1.多态的实现原理 c++中的多态分为静态多态和动态多态。 静态多态是编译时的多态，通过重载函数和模板实现。 动态多态是运行时的多态，通过虚函数和继承实现。   动态多态实现原理：为每个包含虚函数的类建立一个虚函数表。         虚函数表的项存储各个虚函数在内存中的入口地址。         在该类的每个对象中设置一个指向虚函数表的指针。">
+<meta property="og:description" content="c++基础一  1.多态的实现原理 c++中的多态分为静态多态和动态多态。 静态多态是编译时的多态，通过重载函数和模板实现。 动态多态是运行时的多态，通过虚函数和继承实现。  ​	    动态多态实现原理：为每个包含虚函数的类建立一个虚函数表。            虚函数表的项存储各个虚函数在内存中的入口地址。            在该类的每个对象中设置一个指向">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2023-11-01T12:00:08.000Z">
-<meta property="article:modified_time" content="2023-11-01T12:15:41.139Z">
+<meta property="article:modified_time" content="2023-11-21T13:39:14.727Z">
 <meta property="article:author" content="John Doe">
+<meta property="article:tag" content="c++基础">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
@@ -103,14 +104,9 @@
 <pre><code>c++中的多态分为静态多态和动态多态。
 静态多态是编译时的多态，通过重载函数和模板实现。
 动态多态是运行时的多态，通过虚函数和继承实现。
-
-
-动态多态实现原理：为每个包含虚函数的类建立一个虚函数表。
-        虚函数表的项存储各个虚函数在内存中的入口地址。
-        在该类的每个对象中设置一个指向虚函数表的指针。
-        在调用虚函数时，先利用虚指针找到虚函数表，确认调用的虚函数的入口地址在表中的位置，获取入口地址后完成调用
-
-静态多态的实现原理：
+</code></pre>
+<p>​	<br>    动态多态实现原理：为每个包含虚函数的类建立一个虚函数表。<br>            虚函数表的项存储各个虚函数在内存中的入口地址。<br>            在该类的每个对象中设置一个指向虚函数表的指针。<br>            在调用虚函数时，先利用虚指针找到虚函数表，确认调用的虚函数的入口地址在表中的位置，获取入口地址后完成调用</p>
+<pre><code>静态多态的实现原理：
     函数重载：编译器用过函数调用的时候传递的参数类型和数量来确定合适的函数版本。
          在编译阶段，编译器检查函数调用的上下文，通过实际参数确定调用重载版本
     模板：模板允许我们编写通用的代码。编译器根据模板实例化的类型生成对应的代码
@@ -126,6 +122,8 @@
       
       
       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/c-%E5%9F%BA%E7%A1%80/" rel="tag">c++基础</a></li></ul>
+
     </footer>
   </div>
   
@@ -142,11 +140,6 @@
     </a>
   
   
-    <a href="/2023/10/31/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">我的第一篇博客文章</div>
-    </a>
-  
 </nav>
 
   
@@ -158,20 +151,13 @@
           <aside id="sidebar">
   
     
-  <div class="widget-wrap">
-    <h3 class="widget-title">Categories</h3>
-    <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">设计模式</a></li></ul>
-    </div>
-  </div>
-
 
   
     
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/c-%E5%9F%BA%E7%A1%80/" rel="tag">c++基础</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
     </div>
   </div>
 
@@ -181,7 +167,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 10px;">设计模式</a>
+      <a href="/tags/c-%E5%9F%BA%E7%A1%80/" style="font-size: 10px;">c++基础</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 15px;">计算机网络</a> <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 20px;">设计模式</a>
     </div>
   </div>
 
@@ -190,7 +176,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/11/">November 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/10/">October 2023</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/11/">November 2023</a></li></ul>
     </div>
   </div>
 
