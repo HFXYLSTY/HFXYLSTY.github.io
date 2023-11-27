@@ -73,6 +73,121 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-去除重复字母-力扣316" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/27/%E5%8E%BB%E9%99%A4%E9%87%8D%E5%A4%8D%E5%AD%97%E6%AF%8D-%E5%8A%9B%E6%89%A3316/" class="article-date">
+  <time class="dt-published" datetime="2023-11-27T11:43:30.000Z" itemprop="datePublished">2023-11-27</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/11/27/%E5%8E%BB%E9%99%A4%E9%87%8D%E5%A4%8D%E5%AD%97%E6%AF%8D-%E5%8A%9B%E6%89%A3316/">去除重复字母-力扣316</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="去除重复字母-力扣316"><a href="#去除重复字母-力扣316" class="headerlink" title="去除重复字母-力扣316"></a>去除重复字母-力扣316</h1><h3 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h3><p>​			给你一个字符串 <code>s</code> ，请你去除字符串中重复的字母，使得每个字母只出现一次。需保证 <strong>返回结果的字典序最小</strong>（要求不能打乱其他字符的相对位置）。</p>
+<p><strong>示例 1：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：s = &quot;bcabc&quot;</span><br><span class="line">输出：&quot;abc&quot;</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：s = &quot;cbacdcbc&quot;</span><br><span class="line">输出：&quot;acdb&quot;</span><br></pre></td></tr></table></figure>
+
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>1 &lt;= s.length &lt;= 104</code></li>
+<li><code>s</code> 由小写英文字母组成</li>
+</ul>
+<h2 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h2><p>​			思路：贪心+单调栈</p>
+<p>​			要解决这个题，首先得明白什么是字典序列。字典项就是对字符串的排序，从头开始，挨个比对每个字符，优先级从左到右依次降低，字符排在前面的字符串小。如abc &lt; acb，abcc&lt;acba,<strong>字典序大小和长度无关</strong>。</p>
+<p>​			先来看第一个样例，不要拿整个串来分析，我们一个一个看，逐步扩展得到答案。第一个字符是‘b’，如果只有它的话，那它自己就是答案，所以暂时不动。接下来再看“bc”，“bc”及是包含b，c两个字母的最小字典序，它也暂时不动。看“bca”，这时矛盾出现，“bca”不是最小字典序，所以如果a后面还有c，那么我们就应该抛弃a前面的c，这时“bca”–&gt;“ba”,同理，如果a后面还有b，我们也应该抛弃b。</p>
+<p>​			很明显，a前面的字符符合先进后出的规律，直接想到栈结构。此时我们相当于维护了一个<strong>栈内元素  分组 递增的栈</strong>，这便是<strong>单调栈</strong>。（实际上单调栈内元素不一定分组递增，满足单调性即可）</p>
+<p>​			再来看第二个样例，当我们按上面思路分析到d的时候，虽然这时字符串不是最小字典序，但是d只出现了一次，题目要求不能改变字符相对位置，所以对于只出现一次的字符，我们不能抛弃。这也就是为什么栈内元素是<strong>分组</strong>递增的</p>
+<p>​			最后说说贪心的体现：我们希望得到最小字典序，那么就要使答案字符串中位置靠前的字符尽可能地小，当我们从小到大扩展分析问题时，它的等价论述是<strong>要使答案字符串的尾字符尽可能的小</strong>，因为字符串中的每个字符都曾经是尾字符，所以二者等价。单调栈正是实现了这一点。</p>
+<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><p>​	</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">string <span class="title">removeDuplicateLetters</span><span class="params">(string s)</span> </span>&#123;</span><br><span class="line">        <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">vis</span><span class="params">(<span class="number">26</span>)</span>,<span class="title">num</span><span class="params">(<span class="number">26</span>)</span></span>;<span class="comment">//vis标记栈内的元素，num表示字符串中各个字符的出现次数</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">char</span> ch : s)</span><br><span class="line">        &#123;</span><br><span class="line">            num[ch-<span class="string">&#x27;a&#x27;</span>]++;</span><br><span class="line">        &#125;</span><br><span class="line">        string stk;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">char</span> ch:s)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(!vis[ch-<span class="string">&#x27;a&#x27;</span>])</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">while</span>(!stk.<span class="built_in">empty</span>()&amp;&amp;stk.<span class="built_in">back</span>()&gt;ch)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">if</span>(num[stk.<span class="built_in">back</span>()-<span class="string">&#x27;a&#x27;</span>]&gt;<span class="number">0</span>)</span><br><span class="line">                    &#123;</span><br><span class="line">                        vis[stk.<span class="built_in">back</span>()-<span class="string">&#x27;a&#x27;</span>] = <span class="number">0</span>;</span><br><span class="line">                        stk.<span class="built_in">pop_back</span>();</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">else</span></span><br><span class="line">                     <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                vis[ch-<span class="string">&#x27;a&#x27;</span>] = <span class="number">1</span>;</span><br><span class="line">                stk.<span class="built_in">push_back</span>(ch);</span><br><span class="line">            &#125;</span><br><span class="line">            num[ch-<span class="string">&#x27;a&#x27;</span>] -= <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> stk;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>​			</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/27/%E5%8E%BB%E9%99%A4%E9%87%8D%E5%A4%8D%E5%AD%97%E6%AF%8D-%E5%8A%9B%E6%89%A3316/" data-id="clpgxfq0l0001zwuzd89i6i3h" data-title="去除重复字母-力扣316" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" rel="tag">算法题</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-sql基础一" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/22/sql%E5%9F%BA%E7%A1%80%E4%B8%80/" class="article-date">
+  <time class="dt-published" datetime="2023-11-22T01:23:02.000Z" itemprop="datePublished">2023-11-22</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/11/22/sql%E5%9F%BA%E7%A1%80%E4%B8%80/">sql基础一</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="sql基础一"><a href="#sql基础一" class="headerlink" title="sql基础一"></a>sql基础一</h1><h3 id="一、一些基本概念"><a href="#一、一些基本概念" class="headerlink" title="一、一些基本概念"></a>一、一些基本概念</h3><p>​			属性：列；元组：行</p>
+<p>​			超码：一个或多个属性（列）的集合，它能唯一地标识出表中的某个行。</p>
+<p>​			候选码：最小的超码，即超码的最小真子集。</p>
+<p>​			主码（键）：表中用于区分不同元组的主要方式的候选码。注：候选码不一定是主码，主码一定是候选码。主码一般选择不变或很少变化的属性。主码也称为主码约束</p>
+<p>​			外码约束：A表的某属性是B表的<strong>主码</strong>。即<strong>A中该属性的所有值</strong>必须在<strong>B中该属性的取值集</strong>合中出现。此时A表中的该属性称为A引用B的外码。A表为引用表，B表为被引用表。</p>
+<p>​			引用完整性约束：外码约束的推广，<strong>A中该属性的所有值</strong>必须在<strong>B中该属性的取值集合</strong>中出现。但该属性不一定是B表的主码。实际上，外码约束可以看做是引用完整性约束的特例。</p>
+<h3 id="二、基础sql语句的组件"><a href="#二、基础sql语句的组件" class="headerlink" title="二、基础sql语句的组件"></a>二、基础sql语句的组件</h3><p>​			1.from：</p>
+<p>​			2.where</p>
+<p>​			3.聚合函数</p>
+<p>​			4.group by</p>
+<p>​			5.having</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/22/sql%E5%9F%BA%E7%A1%80%E4%B8%80/" data-id="clpgxfq0i0000zwuzbqiod7y7" data-title="sql基础一" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-模板方法模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2023/11/21/%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F/" class="article-date">
@@ -436,95 +551,6 @@
 
 
   
-    <article id="post-外观模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/11/18/%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8F/" class="article-date">
-  <time class="dt-published" datetime="2023-11-18T02:41:02.000Z" itemprop="datePublished">2023-11-18</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/11/18/%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8F/">外观模式</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="外观（门面）模式"><a href="#外观（门面）模式" class="headerlink" title="外观（门面）模式"></a>外观（门面）模式</h1><h3 id="1-何为外观模式"><a href="#1-何为外观模式" class="headerlink" title="1.何为外观模式"></a>1.何为外观模式</h3><p>​				为子系统中的一组接口提供一个一致、稳定的界面（中间层），外观模式定义了一个高层的接口，将子系统的变化隔离。</p>
-<h3 id="2-外观模式的意义和使用场景"><a href="#2-外观模式的意义和使用场景" class="headerlink" title="2.外观模式的意义和使用场景"></a>2.外观模式的意义和使用场景</h3><p>​					在组件构建时，接口间直接依赖可能会导致很多问题，这时，提供一个稳定的中间接口。如此便可以隔离子系统的变化，无论子系统实现如何改变，外部调用者只需要和中间层的稳定的接口打交道。这达到了解耦的效果—子系统内部的任何变化不会影响到中间层接口。</p>
-<h3 id="3-外观模式的实现"><a href="#3-外观模式的实现" class="headerlink" title="3.外观模式的实现"></a>3.外观模式的实现</h3><p>​					外观模式注重从架构的层次看待整个系统，而不是单个类的层次。它更多是一种架构设计模式。所以没有固定的代码实现，只需要封装一个中间层，隔离子系统和使用者。就像操作系统一样，隔离计算机使用者和计算机硬件，不论硬件如何变化，计算机的使用方式不变。</p>
-<p>​					值得注意的是，外观模式封装的子系统内部应该是相互耦合关系比较大的一组组件，而不是一个简单的功能集合。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/18/%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8F/" data-id="clp3scdcx0000uouzdpt74ecb" data-title="外观模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-装饰模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/11/17/%E8%A3%85%E9%A5%B0%E6%A8%A1%E5%BC%8F/" class="article-date">
-  <time class="dt-published" datetime="2023-11-17T08:34:41.000Z" itemprop="datePublished">2023-11-17</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/11/17/%E8%A3%85%E9%A5%B0%E6%A8%A1%E5%BC%8F/">装饰模式</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="装饰模式"><a href="#装饰模式" class="headerlink" title="装饰模式"></a>装饰模式</h1><h3 id="1-何为装饰模式"><a href="#1-何为装饰模式" class="headerlink" title="1.何为装饰模式"></a>1.何为装饰模式</h3><p>​				装饰模式动态地（组合）给一个对象增加一些额外的职责。就增加功能而言，它比继承更灵活。它能让我们在不修改原始类型也不产生大量派生类的情况下拓展功能（开闭原则）</p>
-<h3 id="2-装饰模式的意义和使用场景"><a href="#2-装饰模式的意义和使用场景" class="headerlink" title="2.装饰模式的意义和使用场景"></a>2.装饰模式的意义和使用场景</h3><p>​				某些情况下我们可能会“过度使用继承来扩展对象的功能”，这缺乏灵活性，会导致子类急剧膨胀。装饰器模式将继承拓展改为组合拓展，在运行时动态地去拓展对象功能，符合了开闭原则，增加了灵活性。</p>
-<h3 id="3-装饰模式的实现"><a href="#3-装饰模式的实现" class="headerlink" title="3.装饰模式的实现"></a>3.装饰模式的实现</h3><p>​				创建一个装饰基类，装饰类继承于它。装饰类中有要装饰的对象的抽象基类（组合），以此来支持对同一基类不同子类对象的装饰。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 基类流</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Stream</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">write</span><span class="params">(<span class="type">const</span> std::string&amp; data)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> std::string <span class="title">read</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 具体流实现 - 网络流</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">NetworkStream</span> : <span class="keyword">public</span> Stream &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">write</span><span class="params">(<span class="type">const</span> std::string&amp; data)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function">std::string <span class="title">read</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 具体流实现 - 文件流</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FileStream</span> : <span class="keyword">public</span> Stream &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">write</span><span class="params">(<span class="type">const</span> std::string&amp; data)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function">std::string <span class="title">read</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 具体流实现 - 内存流</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MemoryStream</span> : <span class="keyword">public</span> Stream &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">write</span><span class="params">(<span class="type">const</span> std::string&amp; data)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function">std::string <span class="title">read</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 装饰器基类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">StreamDecorator</span> : <span class="keyword">public</span> Stream &#123;	<span class="comment">//这里继承是为了继承stream的接口</span></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    Stream* stream;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 具体装饰器 - 加密</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">EncryptionDecorator</span> : <span class="keyword">public</span> StreamDecorator &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">EncryptionDecorator</span>(Stream* stream) : <span class="built_in">StreamDecorator</span>(stream) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">write</span><span class="params">(<span class="type">const</span> std::string&amp; data)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 在写入前对数据进行加密处理</span></span><br><span class="line">        stream-&gt;<span class="built_in">write</span>(encryptedData);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">std::string <span class="title">read</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 在读取后对数据进行解密处理</span></span><br><span class="line">        <span class="keyword">return</span> stream-&gt;<span class="built_in">read</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 具体装饰器 - 缓存</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CachingDecorator</span> : <span class="keyword">public</span> StreamDecorator &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">CachingDecorator</span>(Stream* stream) : <span class="built_in">StreamDecorator</span>(stream) &#123;&#125;</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="type">void</span> <span class="title">write</span><span class="params">(<span class="type">const</span> std::string&amp; data)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 在写入前对数据进行缓存处理</span></span><br><span class="line">        stream-&gt;<span class="built_in">write</span>(encryptedData);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">std::string <span class="title">read</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 在读取后对数据进行缓存处理</span></span><br><span class="line">        <span class="keyword">return</span> stream-&gt;<span class="built_in">read</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建具体流对象</span></span><br><span class="line">    Stream* networkStream = <span class="keyword">new</span> <span class="built_in">NetworkStream</span>();</span><br><span class="line">    Stream* fileStream = <span class="keyword">new</span> <span class="built_in">FileStream</span>();</span><br><span class="line">    Stream* memoryStream = <span class="keyword">new</span> <span class="built_in">MemoryStream</span>();</span><br><span class="line">    <span class="comment">// 使用装饰器进行加密和缓存</span></span><br><span class="line">    Stream* encryptedNetworkStream = <span class="keyword">new</span> <span class="built_in">EncryptionDecorator</span>(networkStream);</span><br><span class="line">    Stream* cachedFileStream = <span class="keyword">new</span> <span class="built_in">CachingDecorator</span>(fileStream);</span><br><span class="line">    <span class="comment">// 写入和读取数据</span></span><br><span class="line">    encryptedNetworkStream-&gt;<span class="built_in">write</span>(<span class="string">&quot;Data to encrypt and send over network&quot;</span>);</span><br><span class="line">    cachedFileStream-&gt;<span class="built_in">write</span>(<span class="string">&quot;Data to write in file and cache&quot;</span>);</span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/17/%E8%A3%85%E9%A5%B0%E6%A8%A1%E5%BC%8F/" data-id="clp3scdd20003uouzeiujcsnz" data-title="装饰模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
 
 
   <nav id="page-nav">
@@ -543,7 +569,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/c-%E5%9F%BA%E7%A1%80/" rel="tag">c++基础</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/c-%E5%9F%BA%E7%A1%80/" rel="tag">c++基础</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" rel="tag">算法题</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
     </div>
   </div>
 
@@ -553,7 +579,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/c-%E5%9F%BA%E7%A1%80/" style="font-size: 10px;">c++基础</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 15px;">计算机网络</a> <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 20px;">设计模式</a>
+      <a href="/tags/c-%E5%9F%BA%E7%A1%80/" style="font-size: 13.33px;">c++基础</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 10px;">数据库</a> <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" style="font-size: 10px;">算法题</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 16.67px;">计算机网络</a> <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 20px;">设计模式</a>
     </div>
   </div>
 
@@ -575,6 +601,14 @@
       <ul>
         
           <li>
+            <a href="/2023/11/27/%E5%8E%BB%E9%99%A4%E9%87%8D%E5%A4%8D%E5%AD%97%E6%AF%8D-%E5%8A%9B%E6%89%A3316/">去除重复字母-力扣316</a>
+          </li>
+        
+          <li>
+            <a href="/2023/11/22/sql%E5%9F%BA%E7%A1%80%E4%B8%80/">sql基础一</a>
+          </li>
+        
+          <li>
             <a href="/2023/11/21/%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F/">模板方法模式</a>
           </li>
         
@@ -584,14 +618,6 @@
         
           <li>
             <a href="/2023/11/20/%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F/">状态模式</a>
-          </li>
-        
-          <li>
-            <a href="/2023/11/19/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/">观察者模式</a>
-          </li>
-        
-          <li>
-            <a href="/2023/11/19/%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F/">中介者模式</a>
           </li>
         
       </ul>
