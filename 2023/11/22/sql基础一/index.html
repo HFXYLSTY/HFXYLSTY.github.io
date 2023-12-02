@@ -14,7 +14,7 @@
 <meta property="og:description" content="sql基础一一、一些基本概念​			属性：列；元组：行 ​			超码：一个或多个属性（列）的集合，它能唯一地标识出表中的某个行。 ​			候选码：最小的超码，即超码的最小真子集。 ​			主码（键）：表中用于区分不同元组的主要方式的候选码。注：候选码不一定是主码，主码一定是候选码。主码一般选择不变或很少变化的属性。主码也称为主码约束 ​			外码约束：A表的某属性是B表的主码。即A中该属性的所有值">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2023-11-22T01:23:02.000Z">
-<meta property="article:modified_time" content="2023-11-22T14:00:17.981Z">
+<meta property="article:modified_time" content="2023-11-28T05:42:06.347Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="数据库">
 <meta name="twitter:card" content="summary">
@@ -104,11 +104,26 @@
 <p>​			主码（键）：表中用于区分不同元组的主要方式的候选码。注：候选码不一定是主码，主码一定是候选码。主码一般选择不变或很少变化的属性。主码也称为主码约束</p>
 <p>​			外码约束：A表的某属性是B表的<strong>主码</strong>。即<strong>A中该属性的所有值</strong>必须在<strong>B中该属性的取值集</strong>合中出现。此时A表中的该属性称为A引用B的外码。A表为引用表，B表为被引用表。</p>
 <p>​			引用完整性约束：外码约束的推广，<strong>A中该属性的所有值</strong>必须在<strong>B中该属性的取值集合</strong>中出现。但该属性不一定是B表的主码。实际上，外码约束可以看做是引用完整性约束的特例。</p>
-<h3 id="二、基础sql语句的组件"><a href="#二、基础sql语句的组件" class="headerlink" title="二、基础sql语句的组件"></a>二、基础sql语句的组件</h3><p>​			1.from：</p>
-<p>​			2.where</p>
-<p>​			3.聚合函数</p>
-<p>​			4.group by</p>
-<p>​			5.having</p>
+<h3 id="二、基础sql语句的组件"><a href="#二、基础sql语句的组件" class="headerlink" title="二、基础sql语句的组件"></a>二、基础sql语句的组件</h3><p>​			1.from：定义一个在该子句中所列出关系（表）的笛卡尔积，等效代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="keyword">auto</span> t1 : 表一)</span><br><span class="line">      &#123;</span><br><span class="line">          <span class="keyword">for</span>(<span class="keyword">auto</span> t2:表<span class="number">2</span>)</span><br><span class="line">          &#123;</span><br><span class="line">              ....</span><br><span class="line">              <span class="keyword">for</span>(<span class="keyword">auto</span> tm:表m)</span><br><span class="line">              &#123;</span><br><span class="line">                  把t1，t2....tm连接成单个元组t</span><br><span class="line">                   把t加入结果集</span><br><span class="line">              &#125;</span><br><span class="line">                  </span><br><span class="line">              </span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br></pre></td></tr></table></figure>
+
+<p>​			2.where:查询谓词，限制from中的结果。</p>
+<p>​			3.聚合函数:聚合函数是以值集（集合或多重集合）为输入，并返回单个值的函数。<strong>注意，除了count（*）之外的聚集函数都忽略输入集合中的空值</strong></p>
+<p>​			4.group by：如果希望将聚合函数作用在一组元组上，我们可以使用group by子句。<strong>在分组子句中的所有属性取值上相同的元组将被放到一组。</strong>	如果使用了分组，聚合函数的作用对象将从单个元组变成元组集（分组）。<strong>注意：要确保出现在select语句中没有被聚集的属性只能是出现在group by子句中的属性。换句话说，任何没有出现在group by子句中的属性如果出现在select语句中，那它只能是聚合函数的参数</strong>	</p>
+<p>​				</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> dept_name,ID,<span class="built_in">avg</span>(salary)</span><br><span class="line"><span class="keyword">from</span> instructor</span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> dept_name</span><br><span class="line"><span class="operator">/</span><span class="operator">/</span>这是错误的查询语句，因为ID即不是<span class="keyword">group</span> <span class="keyword">by</span>子句里的属性，也不是聚合函数的参数</span><br></pre></td></tr></table></figure>
+
+<p>​			5.having：对分组限制条件。该限制不针对单个元组，只针对group by生成的每个元组集合（分组）<strong>。同样，任何出现在having子句中，但没有被聚集的属性必须出现在group by子句中。</strong></p>
+<h5 id="执行顺序"><a href="#执行顺序" class="headerlink" title="执行顺序"></a>执行顺序</h5><p>​					from-&gt;where-&gt;group by-&gt;having-&gt;select&#x2F;聚合函数</p>
+<h3 id="三、嵌套子查询"><a href="#三、嵌套子查询" class="headerlink" title="三、嵌套子查询"></a>三、嵌套子查询</h3><h4 id="1-where下的嵌套子查询"><a href="#1-where下的嵌套子查询" class="headerlink" title="1.where下的嵌套子查询"></a>1.where下的嵌套子查询</h4><p>​					通过将子查询嵌套在where中，可以用来执行<strong>对集合成员资格的测试、对集合的比较以及对集合基数的确定</strong>。</p>
+<p>​					（1）in：连接词in测试集合成员资格，这里集合指由select生成的一组值。A in B表示A在B中存在，not in同理</p>
+<p>​					（2）集合比较：some，表示至少比某一个要…。如A &lt;some B表示A至少比B中某一个小。A &lt;&gt;some B表示B中至少有一个				和A不等。&#x3D;some等价于in，&lt;&gt;some不等价于not in。</p>
+<p>​											   all，表示比所有的都…..，用法同some。&lt;&gt;all等价于not in，&#x3D;all不等价于in</p>
+<p>​					（3）对集合基数的确定：exists，在作为参数的子查询非空时返回true。用法：exists（子查询）。not exists同理。</p>
+<p>​																unique，在作为参数的子查询中没有重复元组时返回true，用法同exists。</p>
+<h4 id="2-from下的嵌套子查询"><a href="#2-from下的嵌套子查询" class="headerlink" title="2.from下的嵌套子查询"></a>2.from下的嵌套子查询</h4><p>​							正常使用即可。可以使用with子句来定义临时关系，这个定义只对包含with的子句有效，以此来使sql语句更简洁清晰。			用法：with 临时关系名 as (子查询)</p>
+<h4 id="3-标量子查询"><a href="#3-标量子查询" class="headerlink" title="3.标量子查询"></a>3.标量子查询</h4><p>​							当子查询只返回一个包含单个属性的元组，这样的子查询成为标量子查询。主要由子查询中使用聚合函数来实现。</p>
+<p>​			</p>
 
       
     </div>
@@ -167,7 +182,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/c-%E5%9F%BA%E7%A1%80/" style="font-size: 13.33px;">c++基础</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 10px;">数据库</a> <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" style="font-size: 10px;">算法题</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 16.67px;">计算机网络</a> <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 20px;">设计模式</a>
+      <a href="/tags/c-%E5%9F%BA%E7%A1%80/" style="font-size: 15px;">c++基础</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 12.5px;">数据库</a> <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" style="font-size: 10px;">算法题</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 17.5px;">计算机网络</a> <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 20px;">设计模式</a>
     </div>
   </div>
 
@@ -189,6 +204,10 @@
       <ul>
         
           <li>
+            <a href="/2023/11/30/SQL%E5%9F%BA%E7%A1%80%E4%BA%8C/">SQL基础二</a>
+          </li>
+        
+          <li>
             <a href="/2023/11/27/%E5%8E%BB%E9%99%A4%E9%87%8D%E5%A4%8D%E5%AD%97%E6%AF%8D-%E5%8A%9B%E6%89%A3316/">去除重复字母-力扣316</a>
           </li>
         
@@ -202,10 +221,6 @@
         
           <li>
             <a href="/2023/11/20/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/">策略模式</a>
-          </li>
-        
-          <li>
-            <a href="/2023/11/20/%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F/">状态模式</a>
           </li>
         
       </ul>
