@@ -73,6 +73,50 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-代理模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/18/%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F/" class="article-date">
+  <time class="dt-published" datetime="2023-11-18T08:59:08.000Z" itemprop="datePublished">2023-11-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/11/18/%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F/">代理模式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="代理模式"><a href="#代理模式" class="headerlink" title="代理模式"></a>代理模式</h1><h3 id="1-何为代理模式"><a href="#1-何为代理模式" class="headerlink" title="1.何为代理模式"></a>1.何为代理模式</h3><p>​				为其他对象提供一种代理以控制（隔离、使用接口）对这个对象的访问。代理模式与装饰模式的区别是，它不会拓展对象的功能，它只是强化现有对象的潜在行为。</p>
+<h3 id="2-代理模式的意义和使用场景"><a href="#2-代理模式的意义和使用场景" class="headerlink" title="2.代理模式的意义和使用场景"></a>2.代理模式的意义和使用场景</h3><p>​				有些对象由于某种原因（如创建开销大、需要安全加密、需要远程访问等），直接访问会带来许多问题，甚至不能直接访问。这是我们使用一个代理类，来访问该对象。如在分布式系统中，要访问存在于服务器的对象，无法直接访问。必须通过代理类，在代理类中封装网络通信的细节，实现服务器对象的访问。</p>
+<h3 id="3-代理模式的实现"><a href="#3-代理模式的实现" class="headerlink" title="3.代理模式的实现"></a>3.代理模式的实现</h3><p>​				代理模式的实现多种多样，核心是代理类的实现。代理类很多时候是框架自动生成的。有很多种代理类型，智能指针便是一种代理模式的实现。</p>
+<p>​				</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/18/%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F/" data-id="clp469b4000008kuz7hkz9nux" data-title="代理模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-享元模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2023/11/18/%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/" class="article-date">
@@ -483,54 +527,6 @@
 
 
   
-    <article id="post-TCP粘包问题" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/11/10/TCP%E7%B2%98%E5%8C%85%E9%97%AE%E9%A2%98/" class="article-date">
-  <time class="dt-published" datetime="2023-11-10T05:06:50.000Z" itemprop="datePublished">2023-11-10</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/11/10/TCP%E7%B2%98%E5%8C%85%E9%97%AE%E9%A2%98/">TCP粘包问题</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="TCP粘包问题"><a href="#TCP粘包问题" class="headerlink" title="TCP粘包问题"></a>TCP粘包问题</h1><h3 id="1-何为TCP粘包"><a href="#1-何为TCP粘包" class="headerlink" title="1.何为TCP粘包"></a>1.何为TCP粘包</h3><p>​			因为TCP是面向流，没有边界，而操作系统在发送TCP数据时，会通过缓冲区来进行优化，例如缓冲区为1024个字节大小。</p>
-<p>如果一次请求发送的数据量比较小，没达到缓冲区大小，TCP则会将多个请求合并为同一个请求进行发送，这就形成了粘包问题。</p>
-<h3 id="2-如何解决"><a href="#2-如何解决" class="headerlink" title="2.如何解决"></a>2.如何解决</h3><ul>
-<li>发送端将每个包都封装成固定的长度，比如100字节大小。如果不足100字节可通过补0或空等进行填充到指定长度；</li>
-<li>发送端在每个包的末尾使用固定的分隔符，例如\r\n。如果发生拆包需等待多个包发送过来之后再找到其中的\r\n进行合并；例如，FTP协议；</li>
-<li>将消息分为头部和消息体，头部中保存整个消息的长度，只有读取到足够长度的消息之后才算是读到了一个完整的消息；</li>
-<li>通过自定义协议进行粘包和拆包的处理</li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/10/TCP%E7%B2%98%E5%8C%85%E9%97%AE%E9%A2%98/" data-id="clos5r61m0000z4uzhd1va3f9" data-title="TCP粘包问题" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
 
 
   <nav id="page-nav">
@@ -559,7 +555,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/c-%E5%9F%BA%E7%A1%80/" style="font-size: 15px;">c++基础</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 12.5px;">数据库</a> <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" style="font-size: 10px;">算法题</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 17.5px;">计算机网络</a> <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 20px;">设计模式</a>
+      <a href="/tags/c-%E5%9F%BA%E7%A1%80/" style="font-size: 13.33px;">c++基础</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 13.33px;">数据库</a> <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" style="font-size: 10px;">算法题</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 16.67px;">计算机网络</a> <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 20px;">设计模式</a>
     </div>
   </div>
 
@@ -568,7 +564,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/11/">November 2023</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/12/">December 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/11/">November 2023</a></li></ul>
     </div>
   </div>
 
@@ -579,6 +575,10 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2023/12/03/%E7%B4%A2%E5%BC%95%E7%9A%84%E5%BA%94%E7%94%A8/">索引的应用</a>
+          </li>
         
           <li>
             <a href="/2023/11/30/SQL%E5%9F%BA%E7%A1%80%E4%BA%8C/">SQL基础二</a>
@@ -594,10 +594,6 @@
         
           <li>
             <a href="/2023/11/21/%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F/">模板方法模式</a>
-          </li>
-        
-          <li>
-            <a href="/2023/11/20/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/">策略模式</a>
           </li>
         
       </ul>
