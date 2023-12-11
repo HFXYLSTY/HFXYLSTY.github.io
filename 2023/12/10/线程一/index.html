@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>线程一 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="线程一一、什么是线程​			线程是进程轨迹的不同分支。进程拥有两个特点，一是资源所有权，即存放进程映像的虚拟地址空间；二是调度、分派的实体。线程将二者分离。我们称分派的单位称为线程，将资源所有权的单位成为进程。 二、多线程​			在多线程环境中，进程定义为资源分配单元和一个保护单元。 ​			一个进程中有一个或多个线程，每个线程拥有单独的栈和控制块。控制块中包含寄存器值、优先级和其他与线程相关的控">
+<meta property="og:type" content="article">
+<meta property="og:title" content="线程一">
+<meta property="og:url" content="http://example.com/2023/12/10/%E7%BA%BF%E7%A8%8B%E4%B8%80/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="线程一一、什么是线程​			线程是进程轨迹的不同分支。进程拥有两个特点，一是资源所有权，即存放进程映像的虚拟地址空间；二是调度、分派的实体。线程将二者分离。我们称分派的单位称为线程，将资源所有权的单位成为进程。 二、多线程​			在多线程环境中，进程定义为资源分配单元和一个保护单元。 ​			一个进程中有一个或多个线程，每个线程拥有单独的栈和控制块。控制块中包含寄存器值、优先级和其他与线程相关的控">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-12-10T06:41:08.000Z">
+<meta property="article:modified_time" content="2023-12-10T07:40:08.687Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="操作系统">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-线程一" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/12/10/%E7%BA%BF%E7%A8%8B%E4%B8%80/" class="article-date">
+  <time class="dt-published" datetime="2023-12-10T06:41:08.000Z" itemprop="datePublished">2023-12-10</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      线程一
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="线程一"><a href="#线程一" class="headerlink" title="线程一"></a>线程一</h1><h3 id="一、什么是线程"><a href="#一、什么是线程" class="headerlink" title="一、什么是线程"></a>一、什么是线程</h3><p>​			线程是进程轨迹的不同分支。进程拥有两个特点，一是资源所有权，即存放进程映像的虚拟地址空间；二是调度、分派的实体。线程将二者分离。我们称分派的单位称为线程，将资源所有权的单位成为进程。</p>
+<h2 id="二、多线程"><a href="#二、多线程" class="headerlink" title="二、多线程"></a>二、多线程</h2><p>​			在多线程环境中，进程定义为资源分配单元和一个保护单元。</p>
+<p>​			一个进程中有一个或多个线程，每个线程拥有单独的栈和控制块。控制块中包含寄存器值、优先级和其他与线程相关的控制信息。进程中的线程共享该进程的状态和资源。</p>
+<h4 id="线程的优点"><a href="#线程的优点" class="headerlink" title="线程的优点"></a>线程的优点</h4><p>​				1.同一进程内切换线程的时间要小于进程间切换的时间</p>
+<p>​						原因：此我们可以形象的认为线程是处在同一个屋檐下的，这里的屋檐就是虚拟地址空间，因此线程间切换无需虚拟地址空间的切换；而进程则不同，两个不同进程位于不同的屋檐下，即进程位于不同的虚拟地址空间，因此进程切换涉及到虚拟地址空间的切换，同时，线程切换需要保存的上下文内容要小于进程切换。这也是为什么<strong>进程切换要比线程切换慢</strong>。</p>
+<p>​				2、线程间通信效率高</p>
+<p>​								原因：线程可以使用条件变量和锁来通信，这种通信都在同一进程的用户地址空间中，共享内存和文件。不需要内核介入。</p>
+<h3 id="三、线程分类"><a href="#三、线程分类" class="headerlink" title="三、线程分类"></a>三、线程分类</h3><p>​			线程根据调度者的不同，可分为三类：用户级线程、内核级线程、混合调度线程。</p>
+<h4 id="1-用户级线程"><a href="#1-用户级线程" class="headerlink" title="1.用户级线程"></a>1.用户级线程</h4><p>​						用户级线程的管理工作都由应用程序完成，内核意识不到线程存在。当线程切换的时候，由线程库保存上下文，上下文包括：用户寄存器的内容、程序计数器、栈指针。</p>
+<p>​						当操作系统调度进程的时候，若进程阻塞，则其所有线程实际上是阻塞的。但在线程库看来，线程是运行态的。</p>
+<h5 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h5><p>​					1.线程切换不需要内核模式的特权，减少了两次状态转换（用户态-&gt;内核态，内核态-&gt;用户态），切换开销少</p>
+<p>​					2.可以为应用 程序量身定做调度算法，灵活度高</p>
+<p>​					3.跨平台性好，可以在任何操作系统中运行。</p>
+<h5 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h5><p>​						1.当进程执行系统调用的时候，所有线程都会被阻塞。</p>
+<p>​								解决办法：使用套管技术。把一个阻塞的系统调用变成非阻塞的系统调用。如使用一个应用级的IO套管例程，它先检查IO设备是否忙，若忙，则阻塞当前线程，切换另一个线程。这个线程重新获得控制权后，套管例程会再次检查IO设备</p>
+<p>​						2.内核一次只能把一个进程分配给一个处理器。所以单个进程的线程无法做到并行执行。</p>
+<h4 id="2-内核级线程"><a href="#2-内核级线程" class="headerlink" title="2.内核级线程"></a>2.内核级线程</h4><p>​							内核级线程所以管理工作均由操作系统完成。内核未进程和进程中的每个线程维护上下文信息。它克服了用户级线程的缺点，同时，内核例程也可以是多线程的。但用户级线程的优点变成了内核级线程的缺点。</p>
+<h3 id="四、一些面试题"><a href="#四、一些面试题" class="headerlink" title="四、一些面试题"></a>四、一些面试题</h3><h4 id="1-线程和进程之前共享那些资源"><a href="#1-线程和进程之前共享那些资源" class="headerlink" title="1.线程和进程之前共享那些资源"></a>1.线程和进程之前共享那些资源</h4><p>​							1.进程空间内开辟的，所以被共享</p>
+<p>​							2.全局变量。与某一函数无关，与特定线程无关</p>
+<p>​							3.静态变量。静态变量存放位置和全局变量一样，都存在于堆中开辟的.bss和.data段，是共享的</p>
+<p>​							4.其他一些共用资源，比如文件。</p>
+<p>​				同一进程的所有线程独享以下资源：</p>
+<p>​						1.栈。</p>
+<p>​						2.寄存器。</p>
+<p>​						3.程序计数器</p>
+<p>​				<strong>线程运行的本质就是函数的执行</strong>，而函数的执行总会有一个源头，这个源头叫做入口函数，cup从入口函数开始一步一步向下执行，这个过程就叫做线程。由于函数运行时信息是保存在栈中的，比如返回值，参数，局部变量等等，所以栈是私有的。</p>
+<p>​				cpu执行指令的信息会保存在寄存器中，这个寄存器叫做程序计数器。由于操作系统可以随时终止线程的运行，所以保存和恢复程序计数器的值就知道线程从哪里暂停的以及从哪里开始运行。</p>
+<h4 id="2-进程和线程的联系与区别"><a href="#2-进程和线程的联系与区别" class="headerlink" title="2.进程和线程的联系与区别"></a>2.进程和线程的联系与区别</h4><p>​						<strong>根本区别：进程是操作系统资源分配的基本单位，而线程是处理器任务调度和执行的基本单位</strong></p>
+<p>​						资源开销：每个进程都有独立的代码和数据空间（程序上下文），程序之间的切换会有较大的开销；线程可以看做轻量级的进程，同一类线程共享代码和数据空间，每个线程都有自己独立的运行栈和程序计数器（PC），线程之间切换的开销小。</p>
+<p>​						包含关系：如果一个进程内有多个线程，则执行过程不是一条线的，而是多条线（线程）共同完成的；线程是进程的一部分，所以线程也被称为轻权进程或者轻量级进程。</p>
+<p>​						内存分配：同一进程的线程共享本进程的地址空间和资源，而进程之间的地址空间和资源是相互独立的</p>
+<p>​						影响关系：一个进程崩溃后，在保护模式下不会对其他进程产生影响，但是一个线程崩溃整个进程都死掉。所以多进程要比多线程健壮。</p>
+<p>​						执行过程：每个独立的进程有程序运行的入口、顺序执行序列和程序出口。但是线程不能独立执行，必须依存在应用程序中，由应用程序提供多个线程执行控制，两者均可并发执行</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/12/10/%E7%BA%BF%E7%A8%8B%E4%B8%80/" data-id="clq0xq8ra0007kwuz9ley0hy9" data-title="线程一" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2023/12/11/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%80/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          虚拟内存一
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2023/12/09/%E8%BF%9B%E7%A8%8B%E5%BA%94%E7%94%A8/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">进程应用</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/c-%E5%9F%BA%E7%A1%80/" rel="tag">c++基础</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" rel="tag">算法题</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/c-%E5%9F%BA%E7%A1%80/" style="font-size: 12.5px;">c++基础</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 15px;">操作系统</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 17.5px;">数据库</a> <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" style="font-size: 10px;">算法题</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 15px;">计算机网络</a> <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 20px;">设计模式</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/12/">December 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/11/">November 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/12/11/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/11/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%80/">虚拟内存一</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/10/%E7%BA%BF%E7%A8%8B%E4%B8%80/">线程一</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/09/%E8%BF%9B%E7%A8%8B%E5%BA%94%E7%94%A8/">进程应用</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/09/%E8%BF%9B%E7%A8%8B%E4%BA%8C/">进程二</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

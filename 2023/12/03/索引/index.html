@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="索引一.索引的概念​				索引：索引实际上是一组键值对，键是表中的某些属性，值是指向相应文件内容的指针	 ​				顺序索引：基于值的顺序排序。 ​				散列索引：基于将值平均分布到若干桶中，一个值所属于哪个桶，是由一个散列函数决定的。（就是哈希表的思想） ​				搜索码：用于在文件中查找记录的属性或属性集。即索引的“键” 二.顺序索引​				顺序索引按照排好的顺序存储搜索码的值，并将每个">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2023/12/03/%E7%B4%A2%E5%BC%95/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="索引一.索引的概念​				索引：索引实际上是一组键值对，键是表中的某些属性，值是指向相应文件内容的指针	 ​				顺序索引：基于值的顺序排序。 ​				散列索引：基于将值平均分布到若干桶中，一个值所属于哪个桶，是由一个散列函数决定的。（就是哈希表的思想） ​				搜索码：用于在文件中查找记录的属性或属性集。即索引的“键” 二.顺序索引​				顺序索引按照排好的顺序存储搜索码的值，并将每个">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-12-03T02:00:07.000Z">
+<meta property="article:modified_time" content="2023-12-04T12:21:48.537Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="数据库">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-索引" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/12/03/%E7%B4%A2%E5%BC%95/" class="article-date">
+  <time class="dt-published" datetime="2023-12-03T02:00:07.000Z" itemprop="datePublished">2023-12-03</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h1><h3 id="一-索引的概念"><a href="#一-索引的概念" class="headerlink" title="一.索引的概念"></a>一.索引的概念</h3><p>​				索引：索引实际上是一组键值对，键是表中的某些属性，值是指向相应文件内容的指针	</p>
+<p>​				顺序索引：基于值的顺序排序。</p>
+<p>​				散列索引：基于将值平均分布到若干桶中，一个值所属于哪个桶，是由一个散列函数决定的。（就是哈希表的思想）</p>
+<p>​				搜索码：用于在文件中查找记录的属性或属性集。即索引的“键”</p>
+<h3 id="二-顺序索引"><a href="#二-顺序索引" class="headerlink" title="二.顺序索引"></a>二.顺序索引</h3><p>​				顺序索引按照排好的顺序存储搜索码的值，并将每个搜索码与包含该搜索码的记录关联起来。</p>
+<p>​				被搜索文件本身也可以按一定顺序来排列。</p>
+<p>​				聚集索引：搜索码排序和被搜索文件内容排序一致的索引，它定义了文件中内容的次序。</p>
+<p>​				非聚集索引（辅助索引）：搜索码排序与文件内容不一致</p>
+<h4 id="1-稠密索引"><a href="#1-稠密索引" class="headerlink" title="1.稠密索引"></a>1.稠密索引</h4><p>​					对于文件中的每个搜索码值都有一个索引，即对表中的每一个元组都有索引。索引项包括<strong>搜索码值</strong>和<strong>一个指向具有该搜索码值的第一条数据记录的指针</strong>，其他拥有相同搜索码值的数据会顺序存储在第一条之后。</p>
+<h4 id="2-稀疏索引"><a href="#2-稀疏索引" class="headerlink" title="2.稀疏索引"></a>2.稀疏索引</h4><p>​					在稀疏索引中，只为某些是搜索码建立索引值。只有当表中数据按搜索码依次排序存储的时候才能用稀疏索引。</p>
+<h4 id="3-多级索引"><a href="#3-多级索引" class="headerlink" title="3.多级索引"></a>3.多级索引</h4><p>​					为了<strong>提高查找效率</strong>，我们可以使用多级索引。先来看一下索引的大小对查找效率的影响，如果一个索引非常大，它不能被存入主存，那么我们就需要去磁盘上读取一些索引项，这会大大降低效率。</p>
+<p>​					所以我们引入了多级索引，我们在原始索引上构建一个稀疏的外层索引，这个过程可以多次重复。这样可以将磁盘io的次数降到最低。例：我们现在有两层索引，原始索引有100个块，每个块有100条数据，二级索引存储了指向这些块的指针，共100条，它在主存中。我们通过<strong>二分查找找到最大搜索码值小于等于要搜索的数据的搜索码的索引项</strong>，进而得到相应的块。将该块读入主存，再去遍历或二分搜索具体数据。这个过程只需要1次磁盘io。如果不用多级索引，直接在原始索引上二分，我们读log2 100 &#x3D; 7次磁盘io。</p>
+<h4 id="4-索引的增删"><a href="#4-索引的增删" class="headerlink" title="4.索引的增删"></a>4.索引的增删</h4><h5 id="插入"><a href="#插入" class="headerlink" title="插入"></a>插入</h5><p>​							稠密索引：如果该搜索码未出现在索引中，就在索引中的适当位置插入带有该搜索码的索引项。否则，如果索引项存储的是所有指向具有相同搜索码的数据的指针，那么就在该索引项中添加一个新的指针；如果索引项存储的是具有相同搜索码的第一条记录的指针，就将待插入记录放到具有相同搜索码值的其他记录之后。</p>
+<p>​							稀疏索引：如果它的值不在目前的块的范围内，那就新建一个块，它是新块中的第一个索引项。如果这条插入记录具有所在块的最小值，就更新指向块的索引项。否则不做改动。例：现在有稀疏索引 1、5、10，如果插入15，那么系统将新建一个块，它的第一个索引项是15；如果插入5，那么指向5-9块的索引项指针将被更新，指向这个新插入的索引项。其他情况，稀疏索引不动。</p>
+<h5 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h5><p>​						  稠密索引：如果要删除的记录是唯一记录，那就直接删。否则，如果索引项存储的是所有指向具有相同搜索码的数据的指针，那么就从索引项中删除指向待删除记录的指针。如果索引项存储的是具有相同搜索码的第一条记录的指针，如果待删除记录是具有该搜索码值的第一条记录，那就将索引项指向下一条记录。</p>
+<p>​							稀疏索引：如果索引值不包含具有待删除记录搜索码值的索引项，索引不动。否则，如果待删除记录是具有该搜索码值的唯一记录，就用下一个搜索码值的索引记录来替换相应的索引记录，如果下一个搜索码值已经有了一个索引项，那就删除而不是替换该索引项。如果它不是唯一记录，那就用具有相同搜索码值的下一条记录更新索引项。</p>
+<h4 id="5-辅助索引"><a href="#5-辅助索引" class="headerlink" title="5.辅助索引"></a>5.辅助索引</h4><p>​				辅助索引必须是稠密的。每个索引项需要包含指向所有具有该索引项搜索码值的记录的指针。</p>
+<h4 id="6-B-树索引文件"><a href="#6-B-树索引文件" class="headerlink" title="6.B+树索引文件"></a>6.B+树索引文件</h4><p>​				顺序索引文件一般被组织成B+树，它随着数据量的增长，具有比较稳定的性能。</p>
+<h4 id="7-非唯一性搜索码"><a href="#7-非唯一性搜索码" class="headerlink" title="7.非唯一性搜索码"></a>7.非唯一性搜索码</h4><p>​				由于搜索码可以是表中的任意属性，所以它不一定是候选码。为了保证效率和避免一些负责的问题，大多数据库的B+树都实现只处理唯一搜索码。它们会自动添加记录ID或其他属性，使得非唯一搜索码变得唯一。</p>
+<h3 id="二、散列索引"><a href="#二、散列索引" class="headerlink" title="二、散列索引"></a>二、散列索引</h3><p>​			散列是在主存中构建索引的常用技术。散列索引的组织结构等同于哈希表。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/12/03/%E7%B4%A2%E5%BC%95/" data-id="clq0xq8ra0006kwuz9u7u9a5j" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2023/12/03/%E7%B4%A2%E5%BC%95%E7%9A%84%E5%BA%94%E7%94%A8/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          索引的应用
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2023/11/30/SQL%E5%9F%BA%E7%A1%80%E4%BA%8C/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">SQL基础二</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/c-%E5%9F%BA%E7%A1%80/" rel="tag">c++基础</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" rel="tag">算法题</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/c-%E5%9F%BA%E7%A1%80/" style="font-size: 12.5px;">c++基础</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 15px;">操作系统</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 17.5px;">数据库</a> <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" style="font-size: 10px;">算法题</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 15px;">计算机网络</a> <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 20px;">设计模式</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/12/">December 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/11/">November 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/12/11/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/11/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%80/">虚拟内存一</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/10/%E7%BA%BF%E7%A8%8B%E4%B8%80/">线程一</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/09/%E8%BF%9B%E7%A8%8B%E5%BA%94%E7%94%A8/">进程应用</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/09/%E8%BF%9B%E7%A8%8B%E4%BA%8C/">进程二</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

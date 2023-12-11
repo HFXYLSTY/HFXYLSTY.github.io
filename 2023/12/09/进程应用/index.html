@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>进程应用 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="进程应用一、进程创建1.获取进程id​		 12pit_t getpid()	&#x2F;&#x2F;当前进程id   pit_t getppid()&#x2F;&#x2F;父进程id  2.创建和终止进程1pit_t fork() &#x2F;&#x2F;创建子进程  ​				新创建的子进程与父进程几乎但不完全相同。子进程拥有父进程用户级虚拟地址空间的副本和全部打开的文件描述符。 ​				fork函数调用一次，却返回两次。一次在父进程中返回子进程的P">
+<meta property="og:type" content="article">
+<meta property="og:title" content="进程应用">
+<meta property="og:url" content="http://example.com/2023/12/09/%E8%BF%9B%E7%A8%8B%E5%BA%94%E7%94%A8/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="进程应用一、进程创建1.获取进程id​		 12pit_t getpid()	&#x2F;&#x2F;当前进程id   pit_t getppid()&#x2F;&#x2F;父进程id  2.创建和终止进程1pit_t fork() &#x2F;&#x2F;创建子进程  ​				新创建的子进程与父进程几乎但不完全相同。子进程拥有父进程用户级虚拟地址空间的副本和全部打开的文件描述符。 ​				fork函数调用一次，却返回两次。一次在父进程中返回子进程的P">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-12-09T11:56:22.000Z">
+<meta property="article:modified_time" content="2023-12-09T12:22:54.278Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="操作系统">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-进程应用" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/12/09/%E8%BF%9B%E7%A8%8B%E5%BA%94%E7%94%A8/" class="article-date">
+  <time class="dt-published" datetime="2023-12-09T11:56:22.000Z" itemprop="datePublished">2023-12-09</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      进程应用
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="进程应用"><a href="#进程应用" class="headerlink" title="进程应用"></a>进程应用</h1><h3 id="一、进程创建"><a href="#一、进程创建" class="headerlink" title="一、进程创建"></a>一、进程创建</h3><h4 id="1-获取进程id"><a href="#1-获取进程id" class="headerlink" title="1.获取进程id"></a>1.获取进程id</h4><p>​		</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">pit_t</span> <span class="title">getpid</span><span class="params">()</span>	<span class="comment">//当前进程id</span></span></span><br><span class="line"><span class="function">   <span class="type">pit_t</span> <span class="title">getppid</span><span class="params">()</span><span class="comment">//父进程id</span></span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-创建和终止进程"><a href="#2-创建和终止进程" class="headerlink" title="2.创建和终止进程"></a>2.创建和终止进程</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">pit_t</span> <span class="title">fork</span><span class="params">()</span> <span class="comment">//创建子进程</span></span></span><br></pre></td></tr></table></figure>
+
+<p>​				新创建的子进程与父进程几乎但不完全相同。子进程拥有父进程用户级虚拟地址空间的副本和全部打开的文件描述符。</p>
+<p>​				<strong>fork函数调用一次，却返回两次</strong>。一次在父进程中返回子进程的PID，在子进程中返回0。</p>
+<h5 id="写时复制"><a href="#写时复制" class="headerlink" title="写时复制"></a>写时复制</h5><p>​							fork创建出的子进程，<strong>与父进程共享内存空间</strong>。也就是说，如果子进程<strong>不对内存空间进行写入操作的话，内存空间中的数据并不会复制给子进程</strong>，这样创建子进程的速度就很快了！。在fork之后exec之前两个进程 <strong>用的是相同的物理空间</strong>（内存区），子进程的代码段、数据段、堆栈都是指向父进程的物理空间，也就是说，两者的虚拟空间不同，但其对应的 <strong>物理空间是同一个</strong>。当父子进程中<strong>有更改相应段的行为发生时</strong>，再<strong>为子进程相应的段分配物理空间</strong>。这便是写时复制</p>
+<p>​							原理：fork()之后，kernel把父进程中所有的内存页的权限都设为read-only，然后子进程的地址空间指向父进程。当父子进程都只读内存时，相安无事。当其中某个进程写内存时，CPU硬件检测到内存页是read-only的，于是触发页异常中断（page-fault），陷入kernel的一个中断例程。中断例程中，kernel就会 把触发的异常的页复制一份，于是父子进程各自持有独立的一份。</p>
+<p>​							优点：</p>
+<p>​								1.可<strong>减少</strong>分配和复制大量资源时带来的<strong>瞬间延时</strong>。</p>
+<p>​								2.可减少<strong>不必要的资源分配</strong>。比如fork进程时，并不是所有的页面都需要复制，父进程的<strong>代码段和只读数据段都不被允许修改，所以无需复制</strong>。</p>
+<h4 id="4-回收子进程"><a href="#4-回收子进程" class="headerlink" title="4.回收子进程"></a>4.回收子进程</h4><p>​						当一个进程由于某种原因终止时，内核并不立刻把它清除。而是让它保持在已终止的状态，知道父进程回收它。</p>
+<p>​						父进程回收时，内核将子进程的退出状态传给父进程，然后抛弃已终止的进程。</p>
+<p>​						<strong>一个终止了但未回收的进程称为僵死进程</strong></p>
+<p>​						<strong>如果父进程终止了，子进程未回收，这样的子进程叫孤儿进程</strong>。内核会让init进程更为它的养父，并回收它们。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">			<span class="function"><span class="type">pid_t</span> <span class="title">waitpid</span><span class="params">(<span class="type">pit_t</span> pid,<span class="type">int</span>* statusp,<span class="type">int</span> options)</span></span>;</span><br><span class="line">			<span class="comment">//pid:等待集合的成员。pid&gt;0,等待集合是一个子进程，进程id就是pid</span></span><br><span class="line">			<span class="comment">//pid = -1 ，等待集合是所有子进程</span></span><br><span class="line">			<span class="comment">/*</span></span><br><span class="line"><span class="comment">				status:这个参数将保存子进程的状态信息，有了这个信息父进程就可以了解子进程为什么会退出，是正常退出还是出了什么错误。</span></span><br><span class="line"><span class="comment">宏	</span></span><br><span class="line"><span class="comment">WIFEXITED(status)	如果子进程正常结束，它就返回真；否则返回假。</span></span><br><span class="line"><span class="comment">WEXITSTATUS(status)	如果WIFEXITED(status)为真，则可以用该宏取得子进程exit()返回的结束代码。</span></span><br><span class="line"><span class="comment">WIFSIGNALED(status)	如果子进程因为一个未捕获的信号而终止，它就返回真；否则返回假。</span></span><br><span class="line"><span class="comment">WTERMSIG(status)	如果WIFSIGNALED(status)为真，则可以用该宏获得导致子进程终止的信号代码。</span></span><br><span class="line"><span class="comment">WIFSTOPPED(status)	如果当前子进程被暂停了，则返回真；否则返回假。</span></span><br><span class="line"><span class="comment">WSTOPSIG(status)	如果WIFSTOPPED(status)为真，则可以使用该宏获得导致子进程暂停的信号代码。</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">				options提供了一些另外的选项来控制waitpid()函数的行为。如果不想使用这些选项，则可以把这个参数设为0。</span></span><br><span class="line"><span class="comment">					WNOHANG	如果pid指定的子进程没有结束，则waitpid()函数立即返回0，而不是阻塞在这个函数上等待；如果结束					了，则返回该子进程的进程号。</span></span><br><span class="line"><span class="comment">					WUNTRACED	如果子进程进入暂停状态，则马上返回。</span></span><br><span class="line"><span class="comment">			*/</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="5-加载并运行程序"><a href="#5-加载并运行程序" class="headerlink" title="5.加载并运行程序"></a>5.加载并运行程序</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">execve</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* filename,<span class="type">const</span> <span class="type">char</span>* argv[],<span class="type">const</span> <span class="type">char</span>* envp[])</span></span></span><br></pre></td></tr></table></figure>
+
+<p>​				 execve函数加载并运行可执行目标文件filename，且带参数列表argv和环境变量envp。</p>
+<p>​				<strong>这个函数在当前进程的上下文中加载并运行一个新的程序，它会覆盖当前进程的地址空间，但并没有创建一个新进程。</strong>它同时继承了调用时已经打开的所有文件描述符。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/12/09/%E8%BF%9B%E7%A8%8B%E5%BA%94%E7%94%A8/" data-id="clq0xq8rd000fkwuzh59xb1sa" data-title="进程应用" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2023/12/10/%E7%BA%BF%E7%A8%8B%E4%B8%80/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          线程一
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2023/12/09/%E8%BF%9B%E7%A8%8B%E4%BA%8C/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">进程二</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/c-%E5%9F%BA%E7%A1%80/" rel="tag">c++基础</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" rel="tag">算法题</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/c-%E5%9F%BA%E7%A1%80/" style="font-size: 12.5px;">c++基础</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 15px;">操作系统</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 17.5px;">数据库</a> <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" style="font-size: 10px;">算法题</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 15px;">计算机网络</a> <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 20px;">设计模式</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/12/">December 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/11/">November 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/12/11/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/11/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%80/">虚拟内存一</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/10/%E7%BA%BF%E7%A8%8B%E4%B8%80/">线程一</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/09/%E8%BF%9B%E7%A8%8B%E5%BA%94%E7%94%A8/">进程应用</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/09/%E8%BF%9B%E7%A8%8B%E4%BA%8C/">进程二</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

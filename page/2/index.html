@@ -73,6 +73,486 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-SQL基础二" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/30/SQL%E5%9F%BA%E7%A1%80%E4%BA%8C/" class="article-date">
+  <time class="dt-published" datetime="2023-11-30T08:59:39.000Z" itemprop="datePublished">2023-11-30</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/11/30/SQL%E5%9F%BA%E7%A1%80%E4%BA%8C/">SQL基础二</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="SQL基础二"><a href="#SQL基础二" class="headerlink" title="SQL基础二"></a>SQL基础二</h1><h3 id="一、内连接"><a href="#一、内连接" class="headerlink" title="一、内连接"></a>一、内连接</h3><h5 id="1-自然连接"><a href="#1-自然连接" class="headerlink" title="1.自然连接"></a>1.自然连接</h5><p>​				自然连接运算作用于两个表，自然连接的结果包括在两个表中都出现的属性上的数值均相等的那些元组。如A,B两表均有id属性，那么A natural join B的结果等价于</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">from</span> A,B</span><br><span class="line"><span class="keyword">where</span> A.ID<span class="operator">=</span>B.ID</span><br></pre></td></tr></table></figure>
+
+<h5 id="2-连接条件"><a href="#2-连接条件" class="headerlink" title="2.连接条件"></a>2.连接条件</h5><p>​					可以使用on来指定连接的条件。即按on子句指定的谓词进行连接。在内连接中，带on条件的连接表达式可以用不带on的表达式等价替换。但是在外连接中，on条件的表现和where不同</p>
+<p>​		</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> </span><br><span class="line"><span class="keyword">from</span> A <span class="keyword">join</span> B <span class="keyword">on</span> A.ID<span class="operator">=</span>B.ID</span><br></pre></td></tr></table></figure>
+
+<p>​			</p>
+<h3 id="二、外连接"><a href="#二、外连接" class="headerlink" title="二、外连接"></a>二、外连接</h3><p>​				在内连接中，如果有一个表中的连接属性（即两表都具有的属性）取值为null，那么该元组不会被加入内连接的结果集。此时就需要外连接。</p>
+<p>​				外连接运算在内连接的结果中创建包含null的元组，来保留内些在连接中丢失的元组。</p>
+<p>​				外连接包括左外连接（left outer join）、右外连接、全外连接三种。左外连接保留在运算左边的关系中的元组，右外连接相反。全外连接都保留。</p>
+<p>​				对于左外连接（<code>LEFT JOIN</code>），如果在连接过程中发现左侧表中的某些行无法与右侧表匹配，则这些行仍然会出现在最终结果集中，但是右侧表相关的列将会被设置为 NULL 值。</p>
+<h5 id="on对外连接的影响"><a href="#on对外连接的影响" class="headerlink" title="on对外连接的影响"></a>on对外连接的影响</h5><p>​				首先，来看下面的SQL查询语句	</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> </span><br><span class="line"> <span class="operator">*</span></span><br><span class="line"><span class="keyword">from</span> a <span class="keyword">left</span> <span class="keyword">join</span> b <span class="keyword">on</span> a.id <span class="operator">=</span> b.a_id</span><br><span class="line"><span class="keyword">where</span> b.name<span class="operator">=</span><span class="string">&#x27;apple&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">我期望的结果是：表a的数据全部展示出来，不符合表b条件的数据字段用<span class="literal">null</span>填充。</span><br></pre></td></tr></table></figure>
+
+<p>​			但是，答案却出乎我的意料，所有数据都被过滤掉了，最终结果并不符合left join的语义，表a是主表，无论如何是应该展示出来的，但是并没有。<br>         问题出在哪里呢？</p>
+<p>​			这里牵扯到的是sql语句中on后的条件和where后的条件的执行顺序问题。</p>
+<blockquote>
+<p>​		数据库在通过连接两张或多张表返回记录时，首先根据连接条件生成一张临时表，然后，where条件过滤临时表，最后，将结果返回给用户。<br>​		 这里就说的很明白了，SQL语句执行先使用on条件，然后，使用where条件。</p>
+</blockquote>
+<p>​			这里，有必要再次明确一下left join…on… 语法的准确含义。</p>
+<blockquote>
+<p>​		LEFT JOIN 关键字从左表（table1）返回所有的行，即使右表（table2）中没有匹配。如果右表中没有匹配，则右表结果用 NULL填充。<br>​		 展开来解释一下就是：左表是主表，总是全部返回，而右表的结果是根据on条件来决定的。如果on条件为真，那么，就返回匹配上的右表结果，如果on条件为假，那么就把右表的结果用null填充。<br>这里的on条件不仅限于一个，也可以是多个。</p>
+</blockquote>
+<p>有了上面的基础知识，就可以进一步去理解阐述了。</p>
+<ul>
+<li>如果<code>b.name=&#39;apple&#39;</code>作为where条件，那么，按照sql语句的执行流程，首先生成<code>连接查询</code>临时表结果，这一步是没有问题的，然后使用where条件过滤，这时候，b表中并没有符合条件的数据，这样，所有数据就被过滤掉了。返回的结果，就不符合预期了。</li>
+<li>如果<code>b.name=&#39;apple&#39;</code>作为on条件，那么，按照sql语句的执行流程，首先生成<code>连接查询</code>临时表结果，这一步也是没有问题的，依然，能达到我们的预期。</li>
+</ul>
+<h3 id="三、视图"><a href="#三、视图" class="headerlink" title="三、视图"></a>三、视图</h3><p>​		视图是一种“虚拟关系”，概念上包括查询的结果。实质上就是存储了一条sql语句，当使用视图时，去运行该sql语句计算结果。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">view</span> v <span class="keyword">as</span> 查询表达式</span><br></pre></td></tr></table></figure>
+
+<h5 id="物化视图"><a href="#物化视图" class="headerlink" title="物化视图"></a>物化视图</h5><p>​				物化视图的结果会存储在数据库中，当用于定义视图的表发生改变，视图也跟着修改并保持最新。</p>
+<p>​		一般不使用试图进行修改操作</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/30/SQL%E5%9F%BA%E7%A1%80%E4%BA%8C/" data-id="clpnqbu7l0000louzcogqdlmu" data-title="SQL基础二" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-去除重复字母-力扣316" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/27/%E5%8E%BB%E9%99%A4%E9%87%8D%E5%A4%8D%E5%AD%97%E6%AF%8D-%E5%8A%9B%E6%89%A3316/" class="article-date">
+  <time class="dt-published" datetime="2023-11-27T11:43:30.000Z" itemprop="datePublished">2023-11-27</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/11/27/%E5%8E%BB%E9%99%A4%E9%87%8D%E5%A4%8D%E5%AD%97%E6%AF%8D-%E5%8A%9B%E6%89%A3316/">去除重复字母-力扣316</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="去除重复字母-力扣316"><a href="#去除重复字母-力扣316" class="headerlink" title="去除重复字母-力扣316"></a>去除重复字母-力扣316</h1><h3 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h3><p>​			给你一个字符串 <code>s</code> ，请你去除字符串中重复的字母，使得每个字母只出现一次。需保证 <strong>返回结果的字典序最小</strong>（要求不能打乱其他字符的相对位置）。</p>
+<p><strong>示例 1：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：s = &quot;bcabc&quot;</span><br><span class="line">输出：&quot;abc&quot;</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：s = &quot;cbacdcbc&quot;</span><br><span class="line">输出：&quot;acdb&quot;</span><br></pre></td></tr></table></figure>
+
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>1 &lt;= s.length &lt;= 104</code></li>
+<li><code>s</code> 由小写英文字母组成</li>
+</ul>
+<h2 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h2><p>​			思路：贪心+单调栈</p>
+<p>​			要解决这个题，首先得明白什么是字典序列。字典项就是对字符串的排序，从头开始，挨个比对每个字符，优先级从左到右依次降低，字符排在前面的字符串小。如abc &lt; acb，abcc&lt;acba,<strong>字典序大小和长度无关</strong>。</p>
+<p>​			先来看第一个样例，不要拿整个串来分析，我们一个一个看，逐步扩展得到答案。第一个字符是‘b’，如果只有它的话，那它自己就是答案，所以暂时不动。接下来再看“bc”，“bc”及是包含b，c两个字母的最小字典序，它也暂时不动。看“bca”，这时矛盾出现，“bca”不是最小字典序，所以如果a后面还有c，那么我们就应该抛弃a前面的c，这时“bca”–&gt;“ba”,同理，如果a后面还有b，我们也应该抛弃b。</p>
+<p>​			很明显，a前面的字符符合先进后出的规律，直接想到栈结构。此时我们相当于维护了一个<strong>栈内元素  分组 递增的栈</strong>，这便是<strong>单调栈</strong>。（实际上单调栈内元素不一定分组递增，满足单调性即可）</p>
+<p>​			再来看第二个样例，当我们按上面思路分析到d的时候，虽然这时字符串不是最小字典序，但是d只出现了一次，题目要求不能改变字符相对位置，所以对于只出现一次的字符，我们不能抛弃。这也就是为什么栈内元素是<strong>分组</strong>递增的</p>
+<p>​			最后说说贪心的体现：我们希望得到最小字典序，那么就要使答案字符串中位置靠前的字符尽可能地小，当我们从小到大扩展分析问题时，它的等价论述是<strong>要使答案字符串的尾字符尽可能的小</strong>，因为字符串中的每个字符都曾经是尾字符，所以二者等价。单调栈正是实现了这一点。</p>
+<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><p>​	</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">string <span class="title">removeDuplicateLetters</span><span class="params">(string s)</span> </span>&#123;</span><br><span class="line">        <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">vis</span><span class="params">(<span class="number">26</span>)</span>,<span class="title">num</span><span class="params">(<span class="number">26</span>)</span></span>;<span class="comment">//vis标记栈内的元素，num表示字符串中各个字符的出现次数</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">char</span> ch : s)</span><br><span class="line">        &#123;</span><br><span class="line">            num[ch-<span class="string">&#x27;a&#x27;</span>]++;</span><br><span class="line">        &#125;</span><br><span class="line">        string stk;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">char</span> ch:s)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(!vis[ch-<span class="string">&#x27;a&#x27;</span>])</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">while</span>(!stk.<span class="built_in">empty</span>()&amp;&amp;stk.<span class="built_in">back</span>()&gt;ch)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">if</span>(num[stk.<span class="built_in">back</span>()-<span class="string">&#x27;a&#x27;</span>]&gt;<span class="number">0</span>)</span><br><span class="line">                    &#123;</span><br><span class="line">                        vis[stk.<span class="built_in">back</span>()-<span class="string">&#x27;a&#x27;</span>] = <span class="number">0</span>;</span><br><span class="line">                        stk.<span class="built_in">pop_back</span>();</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">else</span></span><br><span class="line">                     <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                vis[ch-<span class="string">&#x27;a&#x27;</span>] = <span class="number">1</span>;</span><br><span class="line">                stk.<span class="built_in">push_back</span>(ch);</span><br><span class="line">            &#125;</span><br><span class="line">            num[ch-<span class="string">&#x27;a&#x27;</span>] -= <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> stk;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>​			</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/27/%E5%8E%BB%E9%99%A4%E9%87%8D%E5%A4%8D%E5%AD%97%E6%AF%8D-%E5%8A%9B%E6%89%A3316/" data-id="clpgxfq0l0001zwuzd89i6i3h" data-title="去除重复字母-力扣316" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" rel="tag">算法题</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-sql基础一" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/22/sql%E5%9F%BA%E7%A1%80%E4%B8%80/" class="article-date">
+  <time class="dt-published" datetime="2023-11-22T01:23:02.000Z" itemprop="datePublished">2023-11-22</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/11/22/sql%E5%9F%BA%E7%A1%80%E4%B8%80/">sql基础一</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="sql基础一"><a href="#sql基础一" class="headerlink" title="sql基础一"></a>sql基础一</h1><h3 id="一、一些基本概念"><a href="#一、一些基本概念" class="headerlink" title="一、一些基本概念"></a>一、一些基本概念</h3><p>​			属性：列；元组：行</p>
+<p>​			超码：一个或多个属性（列）的集合，它能唯一地标识出表中的某个行。</p>
+<p>​			候选码：最小的超码，即超码的最小真子集。</p>
+<p>​			主码（键）：表中用于区分不同元组的主要方式的候选码。注：候选码不一定是主码，主码一定是候选码。主码一般选择不变或很少变化的属性。主码也称为主码约束</p>
+<p>​			外码约束：A表的某属性是B表的<strong>主码</strong>。即<strong>A中该属性的所有值</strong>必须在<strong>B中该属性的取值集</strong>合中出现。此时A表中的该属性称为A引用B的外码。A表为引用表，B表为被引用表。</p>
+<p>​			引用完整性约束：外码约束的推广，<strong>A中该属性的所有值</strong>必须在<strong>B中该属性的取值集合</strong>中出现。但该属性不一定是B表的主码。实际上，外码约束可以看做是引用完整性约束的特例。</p>
+<h3 id="二、基础sql语句的组件"><a href="#二、基础sql语句的组件" class="headerlink" title="二、基础sql语句的组件"></a>二、基础sql语句的组件</h3><p>​			1.from：定义一个在该子句中所列出关系（表）的笛卡尔积，等效代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="keyword">auto</span> t1 : 表一)</span><br><span class="line">      &#123;</span><br><span class="line">          <span class="keyword">for</span>(<span class="keyword">auto</span> t2:表<span class="number">2</span>)</span><br><span class="line">          &#123;</span><br><span class="line">              ....</span><br><span class="line">              <span class="keyword">for</span>(<span class="keyword">auto</span> tm:表m)</span><br><span class="line">              &#123;</span><br><span class="line">                  把t1，t2....tm连接成单个元组t</span><br><span class="line">                   把t加入结果集</span><br><span class="line">              &#125;</span><br><span class="line">                  </span><br><span class="line">              </span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br></pre></td></tr></table></figure>
+
+<p>​			2.where:查询谓词，限制from中的结果。</p>
+<p>​			3.聚合函数:聚合函数是以值集（集合或多重集合）为输入，并返回单个值的函数。<strong>注意，除了count（*）之外的聚集函数都忽略输入集合中的空值</strong></p>
+<p>​			4.group by：如果希望将聚合函数作用在一组元组上，我们可以使用group by子句。<strong>在分组子句中的所有属性取值上相同的元组将被放到一组。</strong>	如果使用了分组，聚合函数的作用对象将从单个元组变成元组集（分组）。<strong>注意：要确保出现在select语句中没有被聚集的属性只能是出现在group by子句中的属性。换句话说，任何没有出现在group by子句中的属性如果出现在select语句中，那它只能是聚合函数的参数</strong>	</p>
+<p>​				</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> dept_name,ID,<span class="built_in">avg</span>(salary)</span><br><span class="line"><span class="keyword">from</span> instructor</span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> dept_name</span><br><span class="line"><span class="operator">/</span><span class="operator">/</span>这是错误的查询语句，因为ID即不是<span class="keyword">group</span> <span class="keyword">by</span>子句里的属性，也不是聚合函数的参数</span><br></pre></td></tr></table></figure>
+
+<p>​			5.having：对分组限制条件。该限制不针对单个元组，只针对group by生成的每个元组集合（分组）<strong>。同样，任何出现在having子句中，但没有被聚集的属性必须出现在group by子句中。</strong></p>
+<h5 id="执行顺序"><a href="#执行顺序" class="headerlink" title="执行顺序"></a>执行顺序</h5><p>​					from-&gt;where-&gt;group by-&gt;having-&gt;select&#x2F;聚合函数</p>
+<h3 id="三、嵌套子查询"><a href="#三、嵌套子查询" class="headerlink" title="三、嵌套子查询"></a>三、嵌套子查询</h3><h4 id="1-where下的嵌套子查询"><a href="#1-where下的嵌套子查询" class="headerlink" title="1.where下的嵌套子查询"></a>1.where下的嵌套子查询</h4><p>​					通过将子查询嵌套在where中，可以用来执行<strong>对集合成员资格的测试、对集合的比较以及对集合基数的确定</strong>。</p>
+<p>​					（1）in：连接词in测试集合成员资格，这里集合指由select生成的一组值。A in B表示A在B中存在，not in同理</p>
+<p>​					（2）集合比较：some，表示至少比某一个要…。如A &lt;some B表示A至少比B中某一个小。A &lt;&gt;some B表示B中至少有一个				和A不等。&#x3D;some等价于in，&lt;&gt;some不等价于not in。</p>
+<p>​											   all，表示比所有的都…..，用法同some。&lt;&gt;all等价于not in，&#x3D;all不等价于in</p>
+<p>​					（3）对集合基数的确定：exists，在作为参数的子查询非空时返回true。用法：exists（子查询）。not exists同理。</p>
+<p>​																unique，在作为参数的子查询中没有重复元组时返回true，用法同exists。</p>
+<h4 id="2-from下的嵌套子查询"><a href="#2-from下的嵌套子查询" class="headerlink" title="2.from下的嵌套子查询"></a>2.from下的嵌套子查询</h4><p>​							正常使用即可。可以使用with子句来定义临时关系，这个定义只对包含with的子句有效，以此来使sql语句更简洁清晰。			用法：with 临时关系名 as (子查询)</p>
+<h4 id="3-标量子查询"><a href="#3-标量子查询" class="headerlink" title="3.标量子查询"></a>3.标量子查询</h4><p>​							当子查询只返回一个包含单个属性的元组，这样的子查询成为标量子查询。主要由子查询中使用聚合函数来实现。</p>
+<p>​			</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/22/sql%E5%9F%BA%E7%A1%80%E4%B8%80/" data-id="clpgxfq0i0000zwuzbqiod7y7" data-title="sql基础一" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-模板方法模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/21/%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F/" class="article-date">
+  <time class="dt-published" datetime="2023-11-21T01:47:48.000Z" itemprop="datePublished">2023-11-21</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/11/21/%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F/">模板方法模式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="模板方法模式"><a href="#模板方法模式" class="headerlink" title="模板方法模式"></a>模板方法模式</h1><h3 id="1-何为模板方法模式"><a href="#1-何为模板方法模式" class="headerlink" title="1.何为模板方法模式"></a>1.何为模板方法模式</h3><p>​			定义一个操作中算法的骨架（稳定），而将一些步骤（变化）延迟到子类中。这使得我们可以在不改变算法结构的情况下，重写算法的某些步骤。</p>
+<h3 id="2-模板方法模式的意义和使用场景"><a href="#2-模板方法模式的意义和使用场景" class="headerlink" title="2.模板方法模式的意义和使用场景"></a>2.模板方法模式的意义和使用场景</h3><p>​			在软件构建中，对某一任务，它常常有稳定的算法结构，但子步骤经常变化（如框架和应用之间）。模板方法模式为算法提供了灵活的扩展点，是代码复用的基本操作。核心思想就是晚绑定，“不要调用我，让我调用你（框架开发人员如是说）”，即让框架去调用用户重写的代码。</p>
+<h3 id="3-模板方法的实现"><a href="#3-模板方法的实现" class="headerlink" title="3.模板方法的实现"></a>3.模板方法的实现</h3><p>​			将算法中某些变化的步骤声明为虚函数，使用者通过重写实现所需的步骤。</p>
+<p>​	</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 抽象基类 - 包含模板方法和具体方法</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AbstractClass</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">templateMethod</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 调用抽象方法，由子类实现</span></span><br><span class="line">        <span class="built_in">primitiveOperation1</span>();</span><br><span class="line">        <span class="comment">// 调用具体方法</span></span><br><span class="line">        <span class="built_in">concreteOperation</span>();</span><br><span class="line">        <span class="comment">// 调用抽象方法，由子类实现</span></span><br><span class="line">        <span class="built_in">primitiveOperation2</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">primitiveOperation1</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">primitiveOperation2</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">concreteOperation</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;This is a concrete operation&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 具体子类 - 实现抽象方法</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteClass</span> : <span class="keyword">public</span> AbstractClass &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">primitiveOperation1</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Concrete Class: Primitive Operation 1&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">primitiveOperation2</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Concrete Class: Primitive Operation 2&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/21/%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F/" data-id="clp7ot1ka0000ywuzckxh6h0t" data-title="模板方法模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-策略模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/20/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/" class="article-date">
+  <time class="dt-published" datetime="2023-11-20T12:35:25.000Z" itemprop="datePublished">2023-11-20</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/11/20/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/">策略模式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="策略模式"><a href="#策略模式" class="headerlink" title="策略模式"></a>策略模式</h1><h3 id="1-何为策略模式"><a href="#1-何为策略模式" class="headerlink" title="1.何为策略模式"></a>1.何为策略模式</h3><p>​				定义一系列算法，把它们封装起来，并使它们可以互相替换（变化），该模式使得算法可以独立于它的客户程序（稳定）而变化（拓展、子类化）。本质上是允许我们定义通用的算法框架，然后以组件的形式提供框架内部流程的具体实现。</p>
+<h3 id="2-策略模式的意义和使用场景"><a href="#2-策略模式的意义和使用场景" class="headerlink" title="2.策略模式的意义和使用场景"></a>2.策略模式的意义和使用场景</h3><p>​				在软件构建中，某些对象使用的算法可能多种多样，十分不稳定。策略模式将算法和对象本身解耦。策略模式为组件提供了一系列可重用的算法，从而可以使组件在运行时根据需要在各个算法直接切换，十分灵活。它消除提供了条件判断语句之外的另一种选择，这就是在解耦。根据性能需要，算法本身可以使用单例模式。</p>
+<h3 id="3-策略模式的实现。"><a href="#3-策略模式的实现。" class="headerlink" title="3.策略模式的实现。"></a>3.策略模式的实现。</h3><p>​				在抽象策略基类中定义算法接口。具体算法继承于该基类，去实现不同的算法。在组件中包含抽象策略基类的指针，创建对象时将具体算法传递给组件即可。</p>
+<p>​		</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 抽象策略类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Strategy</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">int</span> <span class="title">doOperation</span><span class="params">(<span class="type">int</span> num1, <span class="type">int</span> num2)</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 具体策略类 - 加法策略</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AddStrategy</span> : <span class="keyword">public</span> Strategy &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">doOperation</span><span class="params">(<span class="type">int</span> num1, <span class="type">int</span> num2)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> num1 + num2;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 具体策略类 - 减法策略</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SubtractStrategy</span> : <span class="keyword">public</span> Strategy &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">doOperation</span><span class="params">(<span class="type">int</span> num1, <span class="type">int</span> num2)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> num1 - num2;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 上下文类 - 它包含一个策略对象，可以根据策略对象调用不同的方法</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Context</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Strategy* strategy;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Context</span>(Strategy* strategy) : <span class="built_in">strategy</span>(strategy) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">setStrategy</span><span class="params">(Strategy* strategy)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>-&gt;strategy = strategy;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">executeStrategy</span><span class="params">(<span class="type">int</span> num1, <span class="type">int</span> num2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> strategy-&gt;<span class="built_in">doOperation</span>(num1, num2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/20/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/" data-id="clp6xfotb0001j0uz7azm3zwc" data-title="策略模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-状态模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/20/%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F/" class="article-date">
+  <time class="dt-published" datetime="2023-11-20T05:29:26.000Z" itemprop="datePublished">2023-11-20</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/11/20/%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F/">状态模式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="状态模式"><a href="#状态模式" class="headerlink" title="状态模式"></a>状态模式</h1><h3 id="1-何为状态模式"><a href="#1-何为状态模式" class="headerlink" title="1.何为状态模式"></a>1.何为状态模式</h3><p>​				允许一个对象在其内部状态改变时改变它的行为。从而使对象看似修改了它的行为。本质上是将状态封装为对象。</p>
+<h3 id="2-状态模式的意义和使用场景"><a href="#2-状态模式的意义和使用场景" class="headerlink" title="2.状态模式的意义和使用场景"></a>2.状态模式的意义和使用场景</h3><p>​				在软件构建过程中，某些对象的行为会随着状态的变化而变化。而状态通常是不稳定的（可能增加、变化），状态模式通过将状态封装为对象实现在<strong>运行时</strong>根据对象的状态改变对象的行为，实现了具体行为和状态转换之间的解耦。为不同状态创建不同状态对象同时使得状态转换更加明确。</p>
+<h3 id="3-状态模式的实现"><a href="#3-状态模式的实现" class="headerlink" title="3.状态模式的实现"></a>3.状态模式的实现</h3><p>​				创建一个状态抽象基类，在抽象基类中定义接口。具体状态从该基类继承而来，并重写接口。在需要使用状态的对象内部包含状态抽象基类指针，实现运行时根据对象的状态改变对象的行为。可以结合单例模式来节约内存。</p>
+<p>​			</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 抽象状态类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">State</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    State* pnext;<span class="comment">//下一状态</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">handle</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 具体状态类 - 开始状态</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">StartState</span> : <span class="keyword">public</span> State &#123;	<span class="comment">//这个继承是继承接口</span></span><br><span class="line">    <span class="type">static</span> State* m_state;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> State* <span class="title">getInstance</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(m_state == <span class="literal">nullptr</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            m_state = <span class="keyword">new</span> <span class="built_in">StartState</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> m_state;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">handle</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;The current state is start state&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        pnext = EndState::<span class="built_in">getInstance</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 具体状态类 - 结束状态</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">EndState</span> : <span class="keyword">public</span> State &#123;</span><br><span class="line">    tatic State* m_state;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">        <span class="function"><span class="type">static</span> State* <span class="title">getInstance</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(m_state == <span class="literal">nullptr</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            m_state = <span class="keyword">new</span> <span class="built_in">EndState</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> m_state;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">handle</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;The current state is end state&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 上下文类 - 它包含一个状态对象，可以根据状态对象调用不同的方法</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Context</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    State* state;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Context</span>(State* state) : <span class="built_in">state</span>(state) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">setState</span><span class="params">(State* state)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>-&gt;state = state;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">execute</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        state-&gt;<span class="built_in">handle</span>();</span><br><span class="line">        state = state-&gt;pnext;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/20/%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F/" data-id="clp6xfot80000j0uzhfsr24p9" data-title="状态模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-观察者模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/19/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/" class="article-date">
+  <time class="dt-published" datetime="2023-11-19T11:18:17.000Z" itemprop="datePublished">2023-11-19</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/11/19/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/">观察者模式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="观察者模式"><a href="#观察者模式" class="headerlink" title="观察者模式"></a>观察者模式</h1><h3 id="1-何为观察者模式"><a href="#1-何为观察者模式" class="headerlink" title="1.何为观察者模式"></a>1.何为观察者模式</h3><p>​				观察者模式定义了一种一对多（变化）的依赖关系，以便当一个对象发生变化时，所有依赖与它的对象都能接受到通知并做出相应更新。</p>
+<h3 id="2-观察者模式的意义和使用场景"><a href="#2-观察者模式的意义和使用场景" class="headerlink" title="2.观察者模式的意义和使用场景"></a>2.观察者模式的意义和使用场景</h3><p>​				在软件构建中，我们可能需要对一些对象建立一种“通知依赖关系”，当一个对象（目标对象）的状态发生了改变，，所有依赖对象（观察者）都能收到通知。观察者模式解开了二者之间的耦合，使得我们可以独立地改变目标和观察者。这是依赖倒置原则的体现。</p>
+<h3 id="3-观察者模式的实现"><a href="#3-观察者模式的实现" class="headerlink" title="3.观察者模式的实现"></a>3.观察者模式的实现</h3><p>​				创建一个观察者基类，所有观察者继承于该基类，去实现对不同状态的观察。在目标对象中包含一个观察者集合，代表订阅当前对象的观察者，当目标变化发生时，无需指定某个观察者，通知（可以携带通知信息作为参数）将自动传播到所有订阅观察者。观察者自己决定是否订阅，目标对象对此一无所知。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 抽象观察者类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Observer</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">update</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 具体观察者类 - 学生</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Student</span> : <span class="keyword">public</span> Observer &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::string name;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Student</span>(<span class="type">const</span> std::string&amp; name) : <span class="built_in">name</span>(name) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">update</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; name &lt;&lt; <span class="string">&quot; received a notification&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 抽象主题类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Subject</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::vector&lt;Observer*&gt; observers;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">// 注册观察者</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">attach</span><span class="params">(Observer* observer)</span> </span>&#123;</span><br><span class="line">        observers.<span class="built_in">push_back</span>(observer);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 取消注册观察者</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">detach</span><span class="params">(Observer* observer)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">auto</span> it = observers.<span class="built_in">begin</span>(); it != observers.<span class="built_in">end</span>(); ++it) &#123;</span><br><span class="line">            <span class="keyword">if</span> (*it == observer) &#123;</span><br><span class="line">                observers.<span class="built_in">erase</span>(it);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 通知所有观察者</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">notify</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (Observer* observer : observers) &#123;</span><br><span class="line">            observer-&gt;<span class="built_in">update</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 具体主题类 - 教师</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Teacher</span> : <span class="keyword">public</span> Subject &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">teach</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Teacher is teaching&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        <span class="built_in">notify</span>(); <span class="comment">// 通知所有观察者</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>​		</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/19/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/" data-id="clp5eh9yd0001p8uz0cq4brye" data-title="观察者模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-中介者模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/19/%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F/" class="article-date">
+  <time class="dt-published" datetime="2023-11-19T05:50:36.000Z" itemprop="datePublished">2023-11-19</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/11/19/%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F/">中介者模式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="中介者模式"><a href="#中介者模式" class="headerlink" title="中介者模式"></a>中介者模式</h1><h3 id="1-何为中介者模式"><a href="#1-何为中介者模式" class="headerlink" title="1.何为中介者模式"></a>1.何为中介者模式</h3><p>​				使用一个中介对象来封装（封装变化）一系列的对象交互。它使得各个对象不需要显示地相互引用（编译时依赖–&gt;运行时依赖），从而达到解耦的目的，而且可以独立地改变它们的交互</p>
+<h3 id="2-中介者模式的意义和使用场景"><a href="#2-中介者模式的意义和使用场景" class="headerlink" title="2.中介者模式的意义和使用场景"></a>2.中介者模式的意义和使用场景</h3><p>​				在软件系统中，经常会出现一系列对象相互引用的情况，这种紧耦合非常不利于应对变化。中介者模式本质上提出引入中间组件，使将多个对象间的控制逻辑进行集中，把“多个对象相互关联”转为“多个对象和一个中介者关联”，实现了解耦。值得注意的是，外观模式是解耦<strong>系统间</strong>（单向）的对象关联关系，中介者模式是解耦<strong>系统内</strong>各个对象间（双向）的关联关系</p>
+<h3 id="3-中介者模式的实现"><a href="#3-中介者模式的实现" class="headerlink" title="3.中介者模式的实现"></a>3.中介者模式的实现</h3><p>​				中介者模式的实现多种多样，中介组件内部可能非常复杂。但究其本质都是使系统中的各个成员都引用该中间组件，并通过它来相互通信。当中介者过于复杂的 时候，考虑拆分成多个中介者。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/19/%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F/" data-id="clp5eh9ya0000p8uz0osebd7z" data-title="中介者模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-命令模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/11/19/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F/" class="article-date">
+  <time class="dt-published" datetime="2023-11-19T02:21:43.000Z" itemprop="datePublished">2023-11-19</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/11/19/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F/">命令模式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="命令模式"><a href="#命令模式" class="headerlink" title="命令模式"></a>命令模式</h1><h3 id="1-何为命令模式"><a href="#1-何为命令模式" class="headerlink" title="1.何为命令模式"></a>1.何为命令模式</h3><p>​				将一个请求封装为一个对象，向对象发送命令来指导它们做事，从而可用不同的请求来指导对象不同的行为。如此可以实现请求排队、记录请求日志、撤销请求、事务等操作。实现“行为”和“组件”的解耦。</p>
+<h3 id="2-命令模式的意义和使用场景"><a href="#2-命令模式的意义和使用场景" class="headerlink" title="2.命令模式的意义和使用场景"></a>2.命令模式的意义和使用场景</h3><p>​				在软件构建过程中，行为请求者和行为实现者通常是紧耦合关系，但在某些场合需要对请求进行记录、撤销、事务等操作，这种耦合是不合适的。所以将操作指令封装为一个命令对象，用于对象之间的通信，比通过函数参数通信更方便、灵活。</p>
+<h3 id="3-命令模式的实现"><a href="#3-命令模式的实现" class="headerlink" title="3.命令模式的实现"></a>3.命令模式的实现</h3><p>​				设计一个命令抽象基类，然后通过继承实现各种命令。也可以实现复合命令，即命令对象中用一个数组存放命令集。还可以将 查询命令和请求命令分开，就像sql一样。</p>
+<p>​				</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 命令基类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Command</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">execute</span><span class="params">()</span> </span>= <span class="number">0</span>;<span class="comment">//执行</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">undo</span><span class="params">()</span> </span>= <span class="number">0</span>;<span class="comment">//撤销</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 命令接收者</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Light</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">turnOn</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Light is ON&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">turnOff</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Light is OFF&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 具体命令</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TurnOnLightCommand</span> : <span class="keyword">public</span> Command &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Light&amp; light;</span><br><span class="line">	string args;<span class="comment">//命令参数</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">TurnOnLightCommand</span>(Light&amp; l,arg) : <span class="built_in">light</span>(l),<span class="built_in">args</span>(arg) &#123;&#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">execute</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        light.<span class="built_in">turnOn</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">undo</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        light.<span class="built_in">turnOff</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 具体命令</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TurnOffLightCommand</span> : <span class="keyword">public</span> Command &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Light&amp; light;</span><br><span class="line">    string args;<span class="comment">//命令参数</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">TurnOffLightCommand</span>(Light&amp; l) : <span class="built_in">light</span>(l),<span class="built_in">args</span>(arg) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">execute</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        light.<span class="built_in">turnOff</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">undo</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        light.<span class="built_in">turnOn</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//复合命令</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">LightCommands</span> : <span class="keyword">public</span> Command &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    vector&lt;Command*&gt; commands;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">TurnOffLightCommand</span>() &#123;&#125;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">addcommand</span><span class="params">(Command* cmd)</span></span></span><br><span class="line"><span class="function">    <span class="type">void</span> <span class="title">execute</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">auto</span> i : commands)</span><br><span class="line">        &#123;</span><br><span class="line">            i-&gt;<span class="built_in">execute</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>需要指出的是，在c++中由于性能的需求，实际应用中，许多命令模式被范式编程+仿函数代替。命令模式用接口-实现来定义行为接口规范，更严格，但性能有所损失。函数对象（仿函数）以函数签名定义行为规范，更灵活，性能高。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/11/19/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F/" data-id="clp4vxnto0000k4uz5zz0455w" data-title="命令模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-代理模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2023/11/18/%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F/" class="article-date">
@@ -117,421 +597,11 @@
 
 
   
-    <article id="post-享元模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/11/18/%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/" class="article-date">
-  <time class="dt-published" datetime="2023-11-18T05:35:35.000Z" itemprop="datePublished">2023-11-18</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/11/18/%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/">享元模式</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="享元模式"><a href="#享元模式" class="headerlink" title="享元模式"></a>享元模式</h1><h3 id="1-何为享元模式"><a href="#1-何为享元模式" class="headerlink" title="1.何为享元模式"></a>1.何为享元模式</h3><p>​				运用共享技术有效地支持大量细粒度对象，本质上是一种节约内存空间的技术，具体实现多种多样。池化技术便是享元模式的应用。</p>
-<h3 id="2-享元模式的意义和使用场景"><a href="#2-享元模式的意义和使用场景" class="headerlink" title="2.享元模式的意义和使用场景"></a>2.享元模式的意义和使用场景</h3><p>​				享元模式通常用于具有大量非常相似的对象的场景。它使用对象共享的方法来避免创建大量的对象，从而节约内存。</p>
-<h3 id="3-享元模式的实现"><a href="#3-享元模式的实现" class="headerlink" title="3.享元模式的实现"></a>3.享元模式的实现</h3><p>​				享元模式的实现多种多样，核心是对象共享。要注意对象状态的处理。下面是一种实现</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 抽象享元类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">draw</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 具体享元类 - 圆形</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span> : <span class="keyword">public</span> Shape &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">int</span> x, y, radius;</span><br><span class="line">    std::string color;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">draw</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 享元工厂类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ShapeFactory</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::map&lt;std::string, Shape*&gt; shapes; <span class="comment">// 存储已经创建的享元对象</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">// 获取一个圆形享元对象</span></span><br><span class="line">    <span class="function">Shape* <span class="title">getCircle</span><span class="params">(<span class="type">const</span> std::string&amp; color)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (shapes.<span class="built_in">find</span>(color) == shapes.<span class="built_in">end</span>()) &#123;</span><br><span class="line">            <span class="comment">// 如果还没有指定颜色的圆形对象，则创建一个新的，并添加到已创建的对象中</span></span><br><span class="line">            shapes[color] = <span class="keyword">new</span> <span class="built_in">Circle</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, color);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> shapes[color];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/18/%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/" data-id="clp3scdd00001uouzb826h5c1" data-title="享元模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-外观模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/11/18/%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8F/" class="article-date">
-  <time class="dt-published" datetime="2023-11-18T02:41:02.000Z" itemprop="datePublished">2023-11-18</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/11/18/%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8F/">外观模式</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="外观（门面）模式"><a href="#外观（门面）模式" class="headerlink" title="外观（门面）模式"></a>外观（门面）模式</h1><h3 id="1-何为外观模式"><a href="#1-何为外观模式" class="headerlink" title="1.何为外观模式"></a>1.何为外观模式</h3><p>​				为子系统中的一组接口提供一个一致、稳定的界面（中间层），外观模式定义了一个高层的接口，将子系统的变化隔离。</p>
-<h3 id="2-外观模式的意义和使用场景"><a href="#2-外观模式的意义和使用场景" class="headerlink" title="2.外观模式的意义和使用场景"></a>2.外观模式的意义和使用场景</h3><p>​					在组件构建时，接口间直接依赖可能会导致很多问题，这时，提供一个稳定的中间接口。如此便可以隔离子系统的变化，无论子系统实现如何改变，外部调用者只需要和中间层的稳定的接口打交道。这达到了解耦的效果—子系统内部的任何变化不会影响到中间层接口。</p>
-<h3 id="3-外观模式的实现"><a href="#3-外观模式的实现" class="headerlink" title="3.外观模式的实现"></a>3.外观模式的实现</h3><p>​					外观模式注重从架构的层次看待整个系统，而不是单个类的层次。它更多是一种架构设计模式。所以没有固定的代码实现，只需要封装一个中间层，隔离子系统和使用者。就像操作系统一样，隔离计算机使用者和计算机硬件，不论硬件如何变化，计算机的使用方式不变。</p>
-<p>​					值得注意的是，外观模式封装的子系统内部应该是相互耦合关系比较大的一组组件，而不是一个简单的功能集合。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/18/%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8F/" data-id="clp3scdcx0000uouzdpt74ecb" data-title="外观模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-装饰模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/11/17/%E8%A3%85%E9%A5%B0%E6%A8%A1%E5%BC%8F/" class="article-date">
-  <time class="dt-published" datetime="2023-11-17T08:34:41.000Z" itemprop="datePublished">2023-11-17</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/11/17/%E8%A3%85%E9%A5%B0%E6%A8%A1%E5%BC%8F/">装饰模式</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="装饰模式"><a href="#装饰模式" class="headerlink" title="装饰模式"></a>装饰模式</h1><h3 id="1-何为装饰模式"><a href="#1-何为装饰模式" class="headerlink" title="1.何为装饰模式"></a>1.何为装饰模式</h3><p>​				装饰模式动态地（组合）给一个对象增加一些额外的职责。就增加功能而言，它比继承更灵活。它能让我们在不修改原始类型也不产生大量派生类的情况下拓展功能（开闭原则）</p>
-<h3 id="2-装饰模式的意义和使用场景"><a href="#2-装饰模式的意义和使用场景" class="headerlink" title="2.装饰模式的意义和使用场景"></a>2.装饰模式的意义和使用场景</h3><p>​				某些情况下我们可能会“过度使用继承来扩展对象的功能”，这缺乏灵活性，会导致子类急剧膨胀。装饰器模式将继承拓展改为组合拓展，在运行时动态地去拓展对象功能，符合了开闭原则，增加了灵活性。</p>
-<h3 id="3-装饰模式的实现"><a href="#3-装饰模式的实现" class="headerlink" title="3.装饰模式的实现"></a>3.装饰模式的实现</h3><p>​				创建一个装饰基类，装饰类继承于它。装饰类中有要装饰的对象的抽象基类（组合），以此来支持对同一基类不同子类对象的装饰。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 基类流</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Stream</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">write</span><span class="params">(<span class="type">const</span> std::string&amp; data)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> std::string <span class="title">read</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 具体流实现 - 网络流</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">NetworkStream</span> : <span class="keyword">public</span> Stream &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">write</span><span class="params">(<span class="type">const</span> std::string&amp; data)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function">std::string <span class="title">read</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 具体流实现 - 文件流</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FileStream</span> : <span class="keyword">public</span> Stream &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">write</span><span class="params">(<span class="type">const</span> std::string&amp; data)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function">std::string <span class="title">read</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 具体流实现 - 内存流</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MemoryStream</span> : <span class="keyword">public</span> Stream &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">write</span><span class="params">(<span class="type">const</span> std::string&amp; data)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function">std::string <span class="title">read</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 装饰器基类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">StreamDecorator</span> : <span class="keyword">public</span> Stream &#123;	<span class="comment">//这里继承是为了继承stream的接口</span></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    Stream* stream;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 具体装饰器 - 加密</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">EncryptionDecorator</span> : <span class="keyword">public</span> StreamDecorator &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">EncryptionDecorator</span>(Stream* stream) : <span class="built_in">StreamDecorator</span>(stream) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">write</span><span class="params">(<span class="type">const</span> std::string&amp; data)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 在写入前对数据进行加密处理</span></span><br><span class="line">        stream-&gt;<span class="built_in">write</span>(encryptedData);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">std::string <span class="title">read</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 在读取后对数据进行解密处理</span></span><br><span class="line">        <span class="keyword">return</span> stream-&gt;<span class="built_in">read</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 具体装饰器 - 缓存</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CachingDecorator</span> : <span class="keyword">public</span> StreamDecorator &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">CachingDecorator</span>(Stream* stream) : <span class="built_in">StreamDecorator</span>(stream) &#123;&#125;</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="type">void</span> <span class="title">write</span><span class="params">(<span class="type">const</span> std::string&amp; data)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 在写入前对数据进行缓存处理</span></span><br><span class="line">        stream-&gt;<span class="built_in">write</span>(encryptedData);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">std::string <span class="title">read</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 在读取后对数据进行缓存处理</span></span><br><span class="line">        <span class="keyword">return</span> stream-&gt;<span class="built_in">read</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建具体流对象</span></span><br><span class="line">    Stream* networkStream = <span class="keyword">new</span> <span class="built_in">NetworkStream</span>();</span><br><span class="line">    Stream* fileStream = <span class="keyword">new</span> <span class="built_in">FileStream</span>();</span><br><span class="line">    Stream* memoryStream = <span class="keyword">new</span> <span class="built_in">MemoryStream</span>();</span><br><span class="line">    <span class="comment">// 使用装饰器进行加密和缓存</span></span><br><span class="line">    Stream* encryptedNetworkStream = <span class="keyword">new</span> <span class="built_in">EncryptionDecorator</span>(networkStream);</span><br><span class="line">    Stream* cachedFileStream = <span class="keyword">new</span> <span class="built_in">CachingDecorator</span>(fileStream);</span><br><span class="line">    <span class="comment">// 写入和读取数据</span></span><br><span class="line">    encryptedNetworkStream-&gt;<span class="built_in">write</span>(<span class="string">&quot;Data to encrypt and send over network&quot;</span>);</span><br><span class="line">    cachedFileStream-&gt;<span class="built_in">write</span>(<span class="string">&quot;Data to write in file and cache&quot;</span>);</span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/17/%E8%A3%85%E9%A5%B0%E6%A8%A1%E5%BC%8F/" data-id="clp3scdd20003uouzeiujcsnz" data-title="装饰模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-组合模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/11/17/%E7%BB%84%E5%90%88%E6%A8%A1%E5%BC%8F/" class="article-date">
-  <time class="dt-published" datetime="2023-11-17T04:36:53.000Z" itemprop="datePublished">2023-11-17</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/11/17/%E7%BB%84%E5%90%88%E6%A8%A1%E5%BC%8F/">组合模式</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="组合模式"><a href="#组合模式" class="headerlink" title="组合模式"></a>组合模式</h1><h3 id="1-何为组合模式"><a href="#1-何为组合模式" class="headerlink" title="1.何为组合模式"></a>1.何为组合模式</h3><p>​				组合模式将对象组合成树形结构来表示“部分–整体”层次接口。它为单个对象和容器对象提供相同的接口，使得用户对于单个对象和对象集合的使用具有一致性（稳定）</p>
-<h3 id="2-组合模式的意义和使用场景"><a href="#2-组合模式的意义和使用场景" class="headerlink" title="2.组合模式的意义和使用场景"></a>2.组合模式的意义和使用场景</h3><p>​				将用户代码和复杂的容器结构解耦是组合模式的核心思想。解耦之后用户代码纯粹与抽象接口产生依赖，而非与容器内部的实现结构产生依赖，以此来应对变化。</p>
-<h3 id="3-组合模式的实现"><a href="#3-组合模式的实现" class="headerlink" title="3.组合模式的实现"></a>3.组合模式的实现</h3><p>​				由抽象基类继承出父节点类和子节点类，在重写父节点的方法时，遍历子节点去调用子节点的相应方法。以此，用户代码就只需要调用父节点的方法，就可以实现对子节点方法的调用。</p>
-<p>​		</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 组件抽象类（Component）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Component</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">operation</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">add</span><span class="params">(Component* component)</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">remove</span><span class="params">(Component* component)</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Component* <span class="title">getChild</span><span class="params">(<span class="type">int</span> index)</span> </span>&#123; <span class="keyword">return</span> <span class="literal">nullptr</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 叶子组件类（Leaf）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Leaf</span> : <span class="keyword">public</span> Component &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">operation</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 叶子节点的操作</span></span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Leaf operation&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 容器组件类（Composite）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Composite</span> : <span class="keyword">public</span> Component &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::list&lt;Component*&gt; children;	<span class="comment">//list中既可以是叶子节点也可以是普通节点</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">operation</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 容器节点的操作</span></span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Composite operation&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        <span class="comment">// 遍历所有子节点执行操作</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">auto</span> component : children) &#123;</span><br><span class="line">            component-&gt;<span class="built_in">operation</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">add</span><span class="params">(Component* component)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        children.<span class="built_in">push_back</span>(component);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">remove</span><span class="params">(Component* component)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        children.<span class="built_in">remove</span>(component);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function">Component* <span class="title">getChild</span><span class="params">(<span class="type">int</span> index)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Component* root = <span class="keyword">new</span> <span class="built_in">Composite</span>();</span><br><span class="line">    </span><br><span class="line">    Component* leaf1 = <span class="keyword">new</span> <span class="built_in">Leaf</span>();</span><br><span class="line">    Component* leaf2 = <span class="keyword">new</span> <span class="built_in">Leaf</span>();</span><br><span class="line">    Component* leaf3 = <span class="keyword">new</span> <span class="built_in">Leaf</span>();</span><br><span class="line">    </span><br><span class="line">    root-&gt;<span class="built_in">add</span>(leaf1);</span><br><span class="line">    </span><br><span class="line">    Component* subComposite = <span class="keyword">new</span> <span class="built_in">Composite</span>();</span><br><span class="line">    subComposite-&gt;<span class="built_in">add</span>(leaf2);</span><br><span class="line">    subComposite-&gt;<span class="built_in">add</span>(leaf3);</span><br><span class="line">    </span><br><span class="line">    root-&gt;<span class="built_in">add</span>(subComposite);</span><br><span class="line">    </span><br><span class="line">    root-&gt;<span class="built_in">operation</span>();</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/17/%E7%BB%84%E5%90%88%E6%A8%A1%E5%BC%8F/" data-id="clp26yutg00016guz3s6p6joq" data-title="组合模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-桥接模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/11/17/%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/" class="article-date">
-  <time class="dt-published" datetime="2023-11-17T02:03:37.000Z" itemprop="datePublished">2023-11-17</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="桥接模式"><a href="#桥接模式" class="headerlink" title="桥接模式"></a>桥接模式</h1><h3 id="1-何为桥接模式"><a href="#1-何为桥接模式" class="headerlink" title="1.何为桥接模式"></a>1.何为桥接模式</h3><p>​				桥接模式通常作为连接器或粘合剂，将两个“不相关的组件“连接起来。抽象的使用允许组件之间在不了解具体实现的情况下彼此交换（使用多态）。将抽象部分（业务功能）和实现部分（平台实现）分离，使它们可以独自变化</p>
-<h3 id="2-桥接模式的意义和使用场景"><a href="#2-桥接模式的意义和使用场景" class="headerlink" title="2.桥接模式的意义和使用场景"></a>2.桥接模式的意义和使用场景</h3><p>​				有些类由于其实现逻辑，会有两个乃至多个维度的变化。这会导致类的数量急剧膨胀，耦合增强。如有n个业务类，m个平台实现类，那么就需要n*m个子类来实现这两个类的功能。桥接模式使用“对象间的组合关系”解耦了抽象和实现间的耦合。</p>
-<h3 id="3-桥接模式的实现"><a href="#3-桥接模式的实现" class="headerlink" title="3.桥接模式的实现"></a>3.桥接模式的实现</h3><p>​				在业务实现类里包含平台实现抽象基类，业务实现类继承自业务抽象基类。用不同平台对象去初始化业务实现对象就可以得到不同功能的实现。于是我们将n*m个功能子类转换成了n+m个子类。同时实现了业务功能和平台实现的独立变化（解耦）</p>
-<p>​	</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 实现部分的接口（Implementor）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Implementor</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">operationImpl</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 具体实现类A（Concrete Implementor A）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteImplementorA</span> : <span class="keyword">public</span> Implementor &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">operationImpl</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 实现A的操作</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 具体实现类B（Concrete Implementor B）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteImplementorB</span> : <span class="keyword">public</span> Implementor &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">operationImpl</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 实现B的操作</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 抽象部分的接口（Abstraction）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Abstraction</span> &#123;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    Implementor* implementor;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Abstraction</span>(Implementor* impl) : <span class="built_in">implementor</span>(impl) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">operation</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 扩展抽象部分的类（Refined Abstraction）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">RefinedAbstraction</span> : <span class="keyword">public</span> Abstraction &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">RefinedAbstraction</span>(Implementor* impl) : <span class="built_in">Abstraction</span>(impl) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">operation</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 执行其他操作</span></span><br><span class="line">        implementor-&gt;<span class="built_in">operationImpl</span>();</span><br><span class="line">        <span class="comment">// 执行其他操作</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Implementor* implementorA = <span class="keyword">new</span> <span class="built_in">ConcreteImplementorA</span>();</span><br><span class="line">    Abstraction* abstractionA = <span class="keyword">new</span> <span class="built_in">RefinedAbstraction</span>(implementorA);</span><br><span class="line">    </span><br><span class="line">    abstractionA-&gt;<span class="built_in">operation</span>();</span><br><span class="line">    </span><br><span class="line">    Implementor* implementorB = <span class="keyword">new</span> <span class="built_in">ConcreteImplementorB</span>();</span><br><span class="line">    Abstraction* abstractionB = <span class="keyword">new</span> <span class="built_in">RefinedAbstraction</span>(implementorB);</span><br><span class="line">    </span><br><span class="line">    abstractionB-&gt;<span class="built_in">operation</span>();</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">delete</span> abstractionA;</span><br><span class="line">    <span class="keyword">delete</span> implementorA;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">delete</span> abstractionB;</span><br><span class="line">    <span class="keyword">delete</span> implementorB;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>​			</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/17/%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/" data-id="clp26yutc00006guzaggyc4zt" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-适配器模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/11/16/%E9%80%82%E9%85%8D%E5%99%A8%E6%A8%A1%E5%BC%8F/" class="article-date">
-  <time class="dt-published" datetime="2023-11-16T11:46:56.000Z" itemprop="datePublished">2023-11-16</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/11/16/%E9%80%82%E9%85%8D%E5%99%A8%E6%A8%A1%E5%BC%8F/">适配器模式</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="适配器模式"><a href="#适配器模式" class="headerlink" title="适配器模式"></a>适配器模式</h1><h3 id="1-何为适配器模式"><a href="#1-何为适配器模式" class="headerlink" title="1.何为适配器模式"></a>1.何为适配器模式</h3><p>​				将一个类的接口转换成另一种用户需要的接口，根据已有的接口来得到另一个不同的接口，来满足我们的需要</p>
-<h3 id="2-适配器模式的意义和使用场景"><a href="#2-适配器模式的意义和使用场景" class="headerlink" title="2.适配器模式的意义和使用场景"></a>2.适配器模式的意义和使用场景</h3><p>​				在软件系统中，由于应用环境的变化，可能需要将现有的对象放到新的环境中使用。而现有对象的接口无法满足使用需求。这时我们需要使用适配器来完成新旧接口的转换。使得一个类的接口转换成另一种希望的接口，来满足我们的需要。</p>
-<h3 id="3-适配器模式的实现"><a href="#3-适配器模式的实现" class="headerlink" title="3.适配器模式的实现"></a>3.适配器模式的实现</h3><p>​				只需要定义一个适配器抽象基类，在定义好新的接口，再用已有的接口去实现子类中相应的新接口即可。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 目标接口（Target）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Target</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">request</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 需要适配的类（Adaptee）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Adaptee</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">specificRequest</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 进行特殊的操作</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 适配器类（Adapter）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Adapter</span> : <span class="keyword">public</span> Target &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Adaptee* adaptee;<span class="comment">//这里可能有很多需要适配的类</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Adapter</span>(Adaptee* a) : <span class="built_in">adaptee</span>(a) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">request</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        adaptee-&gt;<span class="built_in">specificRequest</span>();</span><br><span class="line">        <span class="comment">// 进行其他适配操作</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/16/%E9%80%82%E9%85%8D%E5%99%A8%E6%A8%A1%E5%BC%8F/" data-id="clp150xbj0000ewuzgux4dhhc" data-title="适配器模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-单例模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/11/16/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" class="article-date">
-  <time class="dt-published" datetime="2023-11-16T07:14:55.000Z" itemprop="datePublished">2023-11-16</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/11/16/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/">单例模式</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h1><h3 id="1-何为单例模式"><a href="#1-何为单例模式" class="headerlink" title="1.何为单例模式"></a>1.何为单例模式</h3><p>​				单例模式的理念是，应用程序中只能有一个特定组件的实例。保证一个类只有一个实例，并提供一个该实例的全局访问点。</p>
-<h3 id="2-单例模式的意义和使用场景"><a href="#2-单例模式的意义和使用场景" class="headerlink" title="2.单例模式的意义和使用场景"></a>2.单例模式的意义和使用场景</h3><p>​				有的类需要保证只有一个实例才能确保其逻辑正确性以及保持良好的效率。</p>
-<h3 id="3-单例模式的实现"><a href="#3-单例模式的实现" class="headerlink" title="3.单例模式的实现"></a>3.单例模式的实现</h3><p>​				只需要将单例模式的构造函数、拷贝构造函数、移动构造函数、拷贝赋值函数删除，再提供一个返回唯一实例的指针的函数就可以了。</p>
-<h3 id="4-多线程下的单例模式"><a href="#4-多线程下的单例模式" class="headerlink" title="4.多线程下的单例模式"></a>4.多线程下的单例模式</h3><h5 id="单例模式的两种实现方式"><a href="#单例模式的两种实现方式" class="headerlink" title="单例模式的两种实现方式"></a>单例模式的两种实现方式</h5><p>​					1.饿汉式：唯一实例在定义时就初始化，这种方式是线程安全的。但是它会使程序启动事件增加，浪费资源。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Singleton</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">static</span> Singleton* instance;</span><br><span class="line">    <span class="built_in">Singleton</span>() &#123;&#125;  <span class="comment">// 将构造函数设为私有，禁止外部实例化</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> Singleton* <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Singleton* Singleton::instance = <span class="keyword">new</span> <span class="built_in">Singleton</span>();  <span class="comment">// 在定义静态成员变量时直接初始化</span></span><br></pre></td></tr></table></figure>
-
-<p>​				2.懒汉式：延迟初始化的方式，即在首次使用时才创建单例对象。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">class Singleton &#123;</span><br><span class="line">private:</span><br><span class="line">    static Singleton* instance;</span><br><span class="line">    Singleton() &#123;&#125;  // 将构造函数设为私有，禁止外部实例化</span><br><span class="line"></span><br><span class="line">public:</span><br><span class="line">    static Singleton* getInstance() &#123;</span><br><span class="line">        if (instance == nullptr) &#123;</span><br><span class="line">            instance = new Singleton();</span><br><span class="line">        &#125;</span><br><span class="line">        return instance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Singleton* Singleton::instance = nullptr;  // 初始化静态成员变量</span><br></pre></td></tr></table></figure>
-
-<p>​				这种形式的创建存在线程安全问题，有两种解决方案。一是在 getInstance()函数的第一行上锁，但这种方式十分浪费资源，在高并发环境下不可取。</p>
-<p>​				第二种是使用<strong>双重校验锁</strong>。这种双重校验锁在c++11前会出现问题，因为编译器优化可能会分配内存后直接将地址返回给指针。导致在一段时间内，指针指向未完全初始化的内存。而其他线程可能会将这个未初始化完成的内存返回。</p>
-<p>​				C++11标准对静态局部变量的初始化进行了明确规定：静态局部变量在第一次访问时进行初始化，且只有一个线程能够执行初始化过程。这确保了静态局部变量的线程安全性。</p>
-<p>​					</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">static Singleton* getInstance() &#123;</span><br><span class="line">       if (instance == nullptr) &#123;</span><br><span class="line">           std::lock_guard&lt;std::mutex&gt; lock(mtx);  // 加锁</span><br><span class="line">           if (instance == nullptr) &#123;  // 双重检查</span><br><span class="line">               instance = new Singleton();</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">       return instance;</span><br></pre></td></tr></table></figure>
-
-<p>​	</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/16/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" data-id="clp0wtomw0000asuzhjqdhcl5" data-title="单例模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-原型模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/11/16/%E5%8E%9F%E5%9E%8B%E6%A8%A1%E5%BC%8F/" class="article-date">
-  <time class="dt-published" datetime="2023-11-16T01:54:02.000Z" itemprop="datePublished">2023-11-16</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/11/16/%E5%8E%9F%E5%9E%8B%E6%A8%A1%E5%BC%8F/">原型模式</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="原型模式"><a href="#原型模式" class="headerlink" title="原型模式"></a>原型模式</h1><h3 id="1-何为原型模式"><a href="#1-何为原型模式" class="headerlink" title="1.何为原型模式"></a>1.何为原型模式</h3><p>​				使用原型实例来制定创建对象的种类，然后拷贝这些原型来创造新的对象。</p>
-<h3 id="2-原型模式的意义和使用场景"><a href="#2-原型模式的意义和使用场景" class="headerlink" title="2.原型模式的意义和使用场景"></a>2.原型模式的意义和使用场景</h3><p>​				在生产中，存在一些比较负责的类，它们经常会发生改变，用原型克隆的方式来创建这样的类的对象。它可是使我们灵活地动态创建某些拥有稳定接口的新对象。所需的工作仅仅是注册一个新对象（原型），然后在任何需要的地方进行克隆。</p>
-<h3 id="3-如何使用"><a href="#3-如何使用" class="headerlink" title="3.如何使用"></a>3.如何使用</h3><p>​				在抽象基类中定义一个clone接口，然后每当有新类继承于该抽象类，就去实现相应的clone接口。当需要创建该类对象时，传入原型（即一个已经创建好的该类对象），然后调用clone函数创建</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/16/%E5%8E%9F%E5%9E%8B%E6%A8%A1%E5%BC%8F/" data-id="clp0wton50003asuzgfnhfxw2" data-title="原型模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-工厂方法" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/11/14/%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95/" class="article-date">
-  <time class="dt-published" datetime="2023-11-14T11:13:29.000Z" itemprop="datePublished">2023-11-14</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/11/14/%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95/">工厂方法</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="设计模式—工厂方法"><a href="#设计模式—工厂方法" class="headerlink" title="设计模式—工厂方法"></a>设计模式—工厂方法</h1><h3 id="1-何为工厂方法"><a href="#1-何为工厂方法" class="headerlink" title="1.何为工厂方法"></a>1.何为工厂方法</h3><p>​			定义一个用来创建对象的接口，让子类来决定实例化哪一个类。工厂方法将一个类的实例化延迟到子类。</p>
-<h3 id="2-工厂方法的意义和使用场景"><a href="#2-工厂方法的意义和使用场景" class="headerlink" title="2.工厂方法的意义和使用场景"></a>2.工厂方法的意义和使用场景</h3><p>​			工厂方法隔离了类对象的使用者和具体类型之间的耦合关系。面对一个经常变化的类型，紧耦合（new）会导致软件脆弱。它体现了单一责任原则和开闭原则。</p>
-<p>​			工厂模式解决“单个对象”的需求变化，缺点在于要求创建方法&#x2F;参数相同。</p>
-<h3 id="3-工厂方法的实现"><a href="#3-工厂方法的实现" class="headerlink" title="3.工厂方法的实现"></a>3.工厂方法的实现</h3><p>​			工厂方法使用一个工厂基类来定义一个创建对象的接口，需要创建具体对象时，去实现具体的对象创建工厂来创建对象。这样，每当有新的类出现时，只需要去实现新的工厂就行了（开闭原则，对修改封闭，对拓展开放）。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">		<span class="comment">//分割器抽象类（稳定）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ISplitter</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">split</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">virtual</span> ~<span class="built_in">ISplitter</span>()&#123;&#125;</span><br><span class="line">	</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//分割器工厂抽象类（稳定）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SplitterFactory</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span>  ISplitter* <span class="title">create</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">virtual</span> ~<span class="built_in">SplitterFactory</span>()&#123;&#125;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//文本分割器（变化）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">textSplitter</span> :<span class="keyword">public</span> ISplitter</span><br><span class="line">&#123;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">split</span><span class="params">()</span> </span>&#123;&#125;;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">textSplitterFactory</span> :<span class="keyword">public</span>  SplitterFactory</span><br><span class="line">&#123;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span>  ISplitter* <span class="title">create</span><span class="params">()</span> </span>&#123;&#125;;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//工厂生产对象的过程</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MainForm</span></span><br><span class="line">&#123;</span><br><span class="line">	SplitterFactory* myfactory;</span><br><span class="line">	<span class="built_in">MainForm</span>(SplitterFactory* factory)</span><br><span class="line">	&#123;</span><br><span class="line">		myfactory = factory;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">fun</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		ISplitter* splitter = myfactory-&gt;<span class="built_in">create</span>();	<span class="comment">//实现了多态new，根据工厂的不同创建不同的splitter</span></span><br><span class="line">		splitter-&gt;<span class="built_in">split</span>();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<h3 id="4-工厂方法的其他作用"><a href="#4-工厂方法的其他作用" class="headerlink" title="4.工厂方法的其他作用"></a>4.工厂方法的其他作用</h3><p>​			1.可以在创建对象的时候加入对参数的验证，当参数不满足条件时拒绝创建对象</p>
-<p>​			2.可以在工厂中创建一个vector，来跟踪记录已经创建好的对象。</p>
-<h3 id="5-抽象工厂"><a href="#5-抽象工厂" class="headerlink" title="5.抽象工厂"></a>5.抽象工厂</h3><p>​			抽象工厂是提供一个接口，把<strong>一系列相关的、相互依赖的对象</strong>的创建交给工厂来做，而无需指定具体的类。</p>
-<p>​			如一个数据库对象需要连接、命令、数据结果三个对象，使用一个工厂将相匹配的三个对象一起创建。这样即实现了解耦，又避免了用工厂方法一个一个创建对象可能造成的不匹配问题。（如创建了mysql连接，却又创建了redis命令来搭配使用），抽象工厂将这三个对象的创建封装在一起，保证了正确性。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/14/%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95/" data-id="clp0wton70004asuz4tyy4tn3" data-title="工厂方法" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
 
 
   <nav id="page-nav">
     
-    <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/">Next &raquo;</a>
+    <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/3/">Next &raquo;</a>
   </nav>
 
 </section>
@@ -545,7 +615,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/c-%E5%9F%BA%E7%A1%80/" rel="tag">c++基础</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" rel="tag">算法题</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/c-%E5%9F%BA%E7%A1%80/" rel="tag">c++基础</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" rel="tag">算法题</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
     </div>
   </div>
 
@@ -555,7 +625,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/c-%E5%9F%BA%E7%A1%80/" style="font-size: 13.33px;">c++基础</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 13.33px;">数据库</a> <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" style="font-size: 10px;">算法题</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 16.67px;">计算机网络</a> <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 20px;">设计模式</a>
+      <a href="/tags/c-%E5%9F%BA%E7%A1%80/" style="font-size: 12.5px;">c++基础</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 15px;">操作系统</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 17.5px;">数据库</a> <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" style="font-size: 10px;">算法题</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 15px;">计算机网络</a> <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 20px;">设计模式</a>
     </div>
   </div>
 
@@ -577,23 +647,23 @@
       <ul>
         
           <li>
-            <a href="/2023/12/03/%E7%B4%A2%E5%BC%95%E7%9A%84%E5%BA%94%E7%94%A8/">索引的应用</a>
+            <a href="/2023/12/11/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
           </li>
         
           <li>
-            <a href="/2023/11/30/SQL%E5%9F%BA%E7%A1%80%E4%BA%8C/">SQL基础二</a>
+            <a href="/2023/12/11/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%80/">虚拟内存一</a>
           </li>
         
           <li>
-            <a href="/2023/11/27/%E5%8E%BB%E9%99%A4%E9%87%8D%E5%A4%8D%E5%AD%97%E6%AF%8D-%E5%8A%9B%E6%89%A3316/">去除重复字母-力扣316</a>
+            <a href="/2023/12/10/%E7%BA%BF%E7%A8%8B%E4%B8%80/">线程一</a>
           </li>
         
           <li>
-            <a href="/2023/11/22/sql%E5%9F%BA%E7%A1%80%E4%B8%80/">sql基础一</a>
+            <a href="/2023/12/09/%E8%BF%9B%E7%A8%8B%E5%BA%94%E7%94%A8/">进程应用</a>
           </li>
         
           <li>
-            <a href="/2023/11/21/%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F/">模板方法模式</a>
+            <a href="/2023/12/09/%E8%BF%9B%E7%A8%8B%E4%BA%8C/">进程二</a>
           </li>
         
       </ul>
