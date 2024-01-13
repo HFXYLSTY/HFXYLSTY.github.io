@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>IO管理和磁盘调度 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="IO管理和磁盘调度一、IO功能的组织​			程序控制IO：处理器代表一个进程给IO模块发送一个命令，进程进入忙等待，直到操作完成 ​			中断控制IO：处理器代表一个进程给IO模块发送一个命令，若IO是非阻塞的，处理器继续执行进程，若是阻塞的，进程被置为阻塞态。 ​			直接内存访问(DMA):一个DMA模块控制内存和IO模块之间的数据交换。处理器给DMA发请求，且只有在整个数据块传输完毕后，它才">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IO管理和磁盘调度">
+<meta property="og:url" content="http://example.com/2023/12/14/IO%E7%AE%A1%E7%90%86%E5%92%8C%E7%A3%81%E7%9B%98%E8%B0%83%E5%BA%A6/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="IO管理和磁盘调度一、IO功能的组织​			程序控制IO：处理器代表一个进程给IO模块发送一个命令，进程进入忙等待，直到操作完成 ​			中断控制IO：处理器代表一个进程给IO模块发送一个命令，若IO是非阻塞的，处理器继续执行进程，若是阻塞的，进程被置为阻塞态。 ​			直接内存访问(DMA):一个DMA模块控制内存和IO模块之间的数据交换。处理器给DMA发请求，且只有在整个数据块传输完毕后，它才">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjEyOTMw,size_16,color_FFFFFF,t_70.png">
+<meta property="og:image" content="http://example.com/images/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjEyOTMw,size_16,color_FFFFFF,t_70-17025539507361.png">
+<meta property="og:image" content="http://example.com/images/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjEyOTMw,size_16,color_FFFFFF,t_70-17025539507362.png">
+<meta property="og:image" content="http://example.com/images/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjEyOTMw,size_16,color_FFFFFF,t_70-17025539507363.png">
+<meta property="og:image" content="http://example.com/images/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjEyOTMw,size_16,color_FFFFFF,t_70-17025539507364.png">
+<meta property="article:published_time" content="2023-12-14T08:40:39.000Z">
+<meta property="article:modified_time" content="2023-12-14T11:41:24.643Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="操作系统">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjEyOTMw,size_16,color_FFFFFF,t_70.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-IO管理和磁盘调度" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/12/14/IO%E7%AE%A1%E7%90%86%E5%92%8C%E7%A3%81%E7%9B%98%E8%B0%83%E5%BA%A6/" class="article-date">
+  <time class="dt-published" datetime="2023-12-14T08:40:39.000Z" itemprop="datePublished">2023-12-14</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      IO管理和磁盘调度
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="IO管理和磁盘调度"><a href="#IO管理和磁盘调度" class="headerlink" title="IO管理和磁盘调度"></a>IO管理和磁盘调度</h1><h3 id="一、IO功能的组织"><a href="#一、IO功能的组织" class="headerlink" title="一、IO功能的组织"></a>一、IO功能的组织</h3><p>​			程序控制IO：处理器代表一个进程给IO模块发送一个命令，进程进入忙等待，直到操作完成</p>
+<p>​			中断控制IO：处理器代表一个进程给IO模块发送一个命令，若IO是非阻塞的，处理器继续执行进程，若是阻塞的，进程被置为阻塞态。</p>
+<p>​			直接内存访问(DMA):一个DMA模块控制内存和IO模块之间的数据交换。处理器给DMA发请求，且只有在整个数据块传输完毕后，它才被中断。</p>
+<p>​			在IO设备发展的历程中，cpu逐步从IO任务中解脱，提高了性能。现在IO模块有自己的处理器和局部存储器，本质上就是一个计算机，受cpu调度。</p>
+<h4 id="1-直接内存访问（DMA）"><a href="#1-直接内存访问（DMA）" class="headerlink" title="1.直接内存访问（DMA）"></a>1.直接内存访问（DMA）</h4><p>​					DMA单元能模拟cpu，且实际上能像cpu一样获得系统总线的控制权。</p>
+<p>​					工作流程：1.处理器通过读写控制线发送读或写信号</p>
+<p>​										2.通过数据线传输相关IO设备地址、读写的起始地址（存在地址寄存器里）、读写长度（存在数据计数寄存器里）</p>
+<p>​										3.处理器进行其他工作，DMA模块和IO设备进行交互，数据传输结束后，DMA给处理器发送中断信号。</p>
+<p>​					使用DMA,只有数据传送开始和结束的时候才需要cpu</p>
+<p>​		![屏幕截图 2023-12-14 193320](&#x2F;..&#x2F;..&#x2F;images&#x2F;屏幕截图 2023-12-14 193320.png)</p>
+<h5 id="DMA配置方式"><a href="#DMA配置方式" class="headerlink" title="DMA配置方式"></a>DMA配置方式</h5><p>​				![屏幕截图 2023-12-14 193413](&#x2F;..&#x2F;..&#x2F;images&#x2F;屏幕截图 2023-12-14 193413.png)</p>
+<h3 id="二、IO缓冲"><a href="#二、IO缓冲" class="headerlink" title="二、IO缓冲"></a>二、IO缓冲</h3><p>​				缓冲 IO 也被成为标准 IO，大多数的文件系统系统默认都是以缓冲 IO 的方式来工作的。在Linux的缓冲I&#x2F;O机制中，数据先从磁盘复制到内核空间的缓冲区，然后从内核空间缓冲区复制到应用程序的地址空间。</p>
+<p>接下来我们看看缓冲 IO 下读写操作是如何进行？</p>
+<ul>
+<li><strong>读操作：</strong></li>
+</ul>
+<p>操作系统检查内核的缓冲区有没有需要的数据，如果已经缓冲了，那么就直接从缓冲中返回；否则从磁盘中读取到内核缓冲中，然后再复制到用户空间缓冲中。</p>
+<ul>
+<li><strong>写操作：</strong></li>
+</ul>
+<p>将数据从用户空间复制到内核空间的缓冲中。这时对用户程序来说写操作就已经完成，至于什么时候再写到磁盘中由操作系统决定，除非显示地调用了sync同步命令。</p>
+<p><strong>缓冲I&#x2F;O的优点：</strong></p>
+<ol>
+<li>在一定程度上分离了内核空间和用户空间，保护系统本身的运行安全；</li>
+<li>因为内核中有缓冲，可以减少读盘的次数，从而提高性能。</li>
+<li>可以平滑IO需求的峰值</li>
+</ol>
+<p><strong>缓冲I&#x2F;O的缺点：</strong></p>
+<p>​			在缓冲 I&#x2F;O 机制中，DMA 方式可以将数据直接从磁盘读到内核空间页缓冲中，或者将数据从内核空间页缓冲直接写回到磁盘上，而不能直接在用户地址空间和磁盘之间进行数据传输，这样数据在传输过程中需要在<strong>应用程序地址空间（用户空间）和内核缓冲（内核空间）之间进行多次数据拷贝操作</strong>，这些数据拷贝操作所带来的CPU以及内存开销是非常大的。</p>
+<h3 id="三、磁盘调度"><a href="#三、磁盘调度" class="headerlink" title="三、磁盘调度"></a>三、磁盘调度</h3><h4 id="1-FCFS-调度-先来先服务"><a href="#1-FCFS-调度-先来先服务" class="headerlink" title="1. FCFS 调度(先来先服务)"></a>1. FCFS 调度(<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E5%85%88%E6%9D%A5%E5%85%88%E6%9C%8D%E5%8A%A1&spm=1001.2101.3001.7020">先来先服务</a>)</h4><p><a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E7%A3%81%E7%9B%98%E8%B0%83%E5%BA%A6&spm=1001.2101.3001.7020">						磁盘调度</a>的最简单形式当然是先来先服务（FCFS）算法。虽然这种算法比较公平，但是它通常并不提供最快的服务。</p>
+<p>例如，考虑一个磁盘队列，其 I&#x2F;O 请求块的柱面的顺序如下：<br>                            <strong>98,183,37,122,14,124,65,67</strong></p>
+<p>​							如果磁头开始位于柱面 53，那么它首先从 53 移到 98，接着再到 183、37、122、14、124、65，最后到 67，磁头移动柱面的总数为 640。这种调度如图 1 所示。<br><img src="/../../images/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjEyOTMw,size_16,color_FFFFFF,t_70.png" alt="在这里插入图片描述"><br>​						从 122 到 14 再到 124 的<strong>大摆动说明了这种调度的问题</strong>。如果对柱面 37 和 14 的请求一起处理，不管是在 122 和 124 之前或之后，总的磁头移动会大大减少，并且性能也会因此得以改善。</p>
+<h4 id="2-SSTF调度-最短寻道时间优先"><a href="#2-SSTF调度-最短寻道时间优先" class="headerlink" title="2.SSTF调度(最短寻道时间优先)"></a>2.SSTF调度(最短寻道时间优先)</h4><p>​						在移动磁头到别处以便处理其他请求之前，处理靠近当前磁头位置的所有请求可能较为合理。这个假设是最短寻道时间优先（SSTF）算法的基础。</p>
+<p>​						SSTF 算法选择处理距离当前磁头位置的最短寻道时间的请求。换句话说，SSTF 选择最接近磁头位置的待处理请求。</p>
+<p>对于上面请求队列的示例，与开始磁头位置（53）的最近请求位于柱面 65。一旦位于柱面 65，下个最近请求位于柱面 67。从那里，由于柱面 37 比 98 还要近，所以下次处理 37。如此，会处理位于柱面 14 的请求，接着 98，122，124，最后183（图 2）。<br><img src="/../../images/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjEyOTMw,size_16,color_FFFFFF,t_70-17025539507361.png" alt="在这里插入图片描述"></p>
+<p>​						这种调度算法的磁头移动只有 236 个柱面，约为 FCFS 调度算法的磁头移动总数的三分之一多一点。显然，这种算法大大提高了性能。</p>
+<p>​						SSTF 调度本质上是一种最短作业优先（SJF）调度；与 SJF 调度一样，它可能会导致一些请求的饥饿。请记住，请求可能随时到达。假设在队列中有两个请求，分别针对柱面 14 和 186，而当处理来自 14 的请求时，另一个靠近 14 的请求来了，这个新的请求会下次处理，这样位于 186 的请求需要等待。当处理该请求时，另一个 14 附近的请求可能到达。</p>
+<p>​					理论上，相互接近的一些请求会连续不断地到达，这样位于 186 上的请求可能永远得不到服务。当等待处理请求队列较长时，这种情况就很可能出现了。</p>
+<p>​				虽然 SSTF 算法比 FCFS 算法有了相当改进，但是并非最优的。对于这个例子，还可以做得更好：移动磁头从 53 到 37（虽然 37 并不是最近的），再到 14，再到 65、67、98、122、124、183。这种策略的磁头移动的柱面总数为 208。</p>
+<h4 id="3-SCAN-调度-电梯算法"><a href="#3-SCAN-调度-电梯算法" class="headerlink" title="3. SCAN 调度(电梯算法)"></a>3. SCAN 调度(电梯算法)</h4><p>​					对于扫描算法，磁臂从磁盘的一端开始，向另一端移动；在移过每个柱面时，处理请求。当到达磁盘的另一端时，磁头移动方向反转，并继续处理。磁头连续来回扫描磁盘。SCAN 算法有时称为电梯算法，因为磁头的行为就像大楼里面的电梯，先处理所有向上的请求，然后再处理相反方向的请求。</p>
+<p>​					下面回到前面的例子来说明。在采用 SCAN 来调度柱面 98、183、37、122、14、124、65 和 67 的请求之前，除了磁头的当前位置，还需知道磁头的移动方向。</p>
+<p><img src="/../../images/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjEyOTMw,size_16,color_FFFFFF,t_70-17025539507362.png" alt="在这里插入图片描述"></p>
+<p>​						假设磁头朝 0 移动并且磁头初始位置还是 53，磁头接下来处理 37，然后 14。在柱面 0 时，磁头会反转，移向磁盘的另一端，并处理柱面 65、67、98、122、124、183（图 3）上的请求。如果请求刚好在磁头前方加入队列，则它几乎马上就会得到服务；如果请求刚好在磁头后方加入队列，则它必须等待，直到磁头移到磁盘的另一端，反转方向，并返回。</p>
+<p>​						假设请求柱面的分布是均匀的，考虑当磁头移到磁盘一端并且反转方向时的请求密度。这时，紧靠磁头前方的请求相对较少，因为最近处理过这些柱面。磁盘另一端的请求密度却是最多。这些请求的等待时间也最长，那么为什么不先去那里？这就是下一个算法的想法。</p>
+<h4 id="4-C-SCAN-调度-循环扫描"><a href="#4-C-SCAN-调度-循环扫描" class="headerlink" title="4. C-SCAN 调度(循环扫描)"></a>4. C-SCAN 调度(循环扫描)</h4><p>​						对于扫描算法，磁臂从磁盘的一端开始，向另一端移动；在移过每个柱面时，处理请求。当到达磁盘的另一端时，磁头移动方向反转，并继续处理。磁头连续来回扫描磁盘。SCAN 算法有时称为电梯算法，因为磁头的行为就像大楼里面的电梯，先处理所有向上的请求，然后再处理相反方向的请求。</p>
+<p>​						下面回到前面的例子来说明。在采用 SCAN 来调度柱面 98、183、37、122、14、124、65 和 67 的请求之前，除了磁头的当前位置，还需知道磁头的移动方向。</p>
+<p><img src="/../../images/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjEyOTMw,size_16,color_FFFFFF,t_70-17025539507363.png" alt="在这里插入图片描述"><br>                        C-SCAN 调度算法基本上将这些柱面作为一个环链，将最后柱面连到首个柱面。</p>
+<h4 id="5-LOOK-调度"><a href="#5-LOOK-调度" class="headerlink" title="5. LOOK 调度"></a>5. LOOK 调度</h4><p>​					正如以上所述，SCAN 和 C-SCAN 在磁盘的整个宽度内移动磁臂。实际上，这两种算法通常都不是按这种方式实施的。更常见的是，磁臂只需移到一个方向的最远请求为止。</p>
+<p>​					遵循这种模式的 SCAN 算法和 C-SCAN 算法分别称为 LOOK 和 C-LOOK 调度，因为它们在向特定方向移动时查看是否会有请求（图 5）。<br><img src="/../../images/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjEyOTMw,size_16,color_FFFFFF,t_70-17025539507364.png" alt="在这里插入图片描述"></p>
+<p>​			</p>
+<p>​			</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/12/14/IO%E7%AE%A1%E7%90%86%E5%92%8C%E7%A3%81%E7%9B%98%E8%B0%83%E5%BA%A6/" data-id="clrbmrg3c00003kuz14h75cmj" data-title="IO管理和磁盘调度" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2023/12/14/%E5%8D%95%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">单处理器调度</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/c-%E5%9F%BA%E7%A1%80/" rel="tag">c++基础</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" rel="tag">算法题</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/c-%E5%9F%BA%E7%A1%80/" style="font-size: 12px;">c++基础</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 18px;">操作系统</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 16px;">数据库</a> <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" style="font-size: 10px;">算法题</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 14px;">计算机网络</a> <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 20px;">设计模式</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/12/">December 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/11/">November 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/12/14/IO%E7%AE%A1%E7%90%86%E5%92%8C%E7%A3%81%E7%9B%98%E8%B0%83%E5%BA%A6/">IO管理和磁盘调度</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/14/%E5%8D%95%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6/">单处理器调度</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/13/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%89/">虚拟内存三</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/13/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%BA%8C/">虚拟内存二</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/11/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

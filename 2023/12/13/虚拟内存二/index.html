@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>虚拟内存二 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="虚拟内存二一、读取策略​			读取策略决定某页合适读入内存 1.请求分页​						请求分页是只有当访问到某页中的一个单元时才将页读入内存。进程开始时会出现大量缺页中断，随着读入页的增加，根据局部性原理，要访问的数据多数是最近读取的页，缺页中断率会减少到一个稳定水平。 2.预先分页​						预先分页是一次读取包含请求页的多个页。因为通常磁盘中一个进程的页是连续存储的，连续读取比单次读取效率高">
+<meta property="og:type" content="article">
+<meta property="og:title" content="虚拟内存二">
+<meta property="og:url" content="http://example.com/2023/12/13/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%BA%8C/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="虚拟内存二一、读取策略​			读取策略决定某页合适读入内存 1.请求分页​						请求分页是只有当访问到某页中的一个单元时才将页读入内存。进程开始时会出现大量缺页中断，随着读入页的增加，根据局部性原理，要访问的数据多数是最近读取的页，缺页中断率会减少到一个稳定水平。 2.预先分页​						预先分页是一次读取包含请求页的多个页。因为通常磁盘中一个进程的页是连续存储的，连续读取比单次读取效率高">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-12-13T08:13:43.000Z">
+<meta property="article:modified_time" content="2023-12-13T12:11:03.246Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="操作系统">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-虚拟内存二" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/12/13/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%BA%8C/" class="article-date">
+  <time class="dt-published" datetime="2023-12-13T08:13:43.000Z" itemprop="datePublished">2023-12-13</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      虚拟内存二
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="虚拟内存二"><a href="#虚拟内存二" class="headerlink" title="虚拟内存二"></a>虚拟内存二</h1><h3 id="一、读取策略"><a href="#一、读取策略" class="headerlink" title="一、读取策略"></a>一、读取策略</h3><p>​			读取策略决定某页合适读入内存</p>
+<h4 id="1-请求分页"><a href="#1-请求分页" class="headerlink" title="1.请求分页"></a>1.请求分页</h4><p>​						请求分页是只有当访问到某页中的一个单元时才将页读入内存。进程开始时会出现大量缺页中断，随着读入页的增加，根据局部性原理，要访问的数据多数是最近读取的页，缺页中断率会减少到一个稳定水平。</p>
+<h4 id="2-预先分页"><a href="#2-预先分页" class="headerlink" title="2.预先分页"></a>2.预先分页</h4><p>​						预先分页是一次读取包含请求页的多个页。因为通常磁盘中一个进程的页是连续存储的，连续读取比单次读取效率高。但如果大多额外读取的页没被cpu使用，那就是低效的。</p>
+<p>​				通常进程启动时使用预先分页，读取一定的页。发生缺页中断时使用请求分页。</p>
+<h3 id="二、置换策略"><a href="#二、置换策略" class="headerlink" title="二、置换策略"></a>二、置换策略</h3><p>​			置换策略在决定置换的页集中，选择换出哪一页。所有策略的目标都是换出最近最不可能访问的页。</p>
+<p>​			页框锁定：内存中某些页框被锁定，无法置换。如内核页框</p>
+<h4 id="1-最佳（OPT）策略"><a href="#1-最佳（OPT）策略" class="headerlink" title="1.最佳（OPT）策略"></a>1.最佳（OPT）策略</h4><p>​					OPT策略选择置换<strong>下次访问距离当前时间最长的那些页</strong>，这种算法造成的缺页中断最少，但由于它需要预知未来，因此不可实现。但它可以作为衡量标准。</p>
+<h4 id="2-最近最少使用（LRU）策略"><a href="#2-最近最少使用（LRU）策略" class="headerlink" title="2.最近最少使用（LRU）策略"></a>2.最近最少使用（LRU）策略</h4><p>​					LRU策略置换内存中最长时间未被引用的页。这种方法实现起来比较困难，开销大。</p>
+<p>​					一种是给每页添加一个最后一次访问的时间戳，每次访问的时候更新；另一个是维护访问页的栈。</p>
+<h4 id="3-先进先出（FIFO）策略"><a href="#3-先进先出（FIFO）策略" class="headerlink" title="3.先进先出（FIFO）策略"></a>3.先进先出（FIFO）策略</h4><p>​						FIFO策略把分配给进程的页框视为一个循环缓冲区，并按循环的方式移动页。</p>
+<p>​						它使用一个指针，每次对页框进行读入或置换的时候指针都往下移动，当移动到边界时循环到开头。每次读入或置换页面都对指针所指的页框进行操作。	</p>
+<p>​						它的隐含的逻辑是置换驻留在内存中时间最长的页。</p>
+<p>​						这个方法性能最差。</p>
+<h4 id="4-时钟（Clock）策略"><a href="#4-时钟（Clock）策略" class="headerlink" title="4.时钟（Clock）策略"></a>4.时钟（Clock）策略</h4><p>​						Clock策略给每个页框增加一个称为<strong>使用位</strong>的附件位。每次cpu读取其中内容时，附加位置为1。对于用于置换的页框集，它被视为一个循环缓冲区，并有一个指针与其关联。需要置换一页时，操作系统扫描缓冲区，查找一个使用位为0的页框并置换。若途中遇到使用位为1的页框，则将其使用位置为0。若所有页框使用位都为1，则算法把所有使用位都置为0，并停留在初始位置上，置换该页框中的页。</p>
+<p>​						这个策略优于FIFO，差于LRU，若增加使用位的位数，可以提高效率。</p>
+<h3 id="三、页缓冲"><a href="#三、页缓冲" class="headerlink" title="三、页缓冲"></a>三、页缓冲</h3><p>​				置换一个修改过的页，比置换未修改过的页的代价更大。因为修改过的页要写回给磁盘。</p>
+<p>​				为了提高效率，页缓冲算法不丢弃置换出的页。而是将它们分配到两个表中。</p>
+<p>​				若未被修改，则分配到空闲页链表中，若被修改，则分配到修改页链表中。注意：内存中的页不会物理移动，移动的是页表项。</p>
+<p>​				页缓冲技术在任何时候保留一小部分空闲页框。</p>
+<p>​				空闲页链表里包含一系列可以读入的页框。需要从虚存读入一页时，使用位于空闲页链表头部的页框，置换原本在那个位置的页。</p>
+<p>​				由于被置换的页仍然留在内存中，当进程再次访问时，效率很高。当修改队列达到一定长度时，集体写回修改页，它一次性写回多个页，减少了IO操作的次数，进而减少了磁盘访问的时间。</p>
+<h3 id="四、驻留集管理"><a href="#四、驻留集管理" class="headerlink" title="四、驻留集管理"></a>四、驻留集管理</h3><p>​					驻留集管理考虑两个问题：驻留集大小和置换范围。</p>
+<h5 id="驻留集大小"><a href="#驻留集大小" class="headerlink" title="驻留集大小"></a>驻留集大小</h5><p>​						驻留集大小即分配给进程的内存空间。分配的内存越少，驻留在内存中的进程越多，增加了操作系统至少找到一个就绪进程的可能性，减少了由于交换而消耗的处理器时间，但缺页率高。</p>
+<p>​						固定分配策略:为一个进程分配固定数量的页框。一旦发生缺页中断，该进程的一页就被它所需要的页面置换</p>
+<p>​						可变分配策略：运行分配给进程的页框不断变化。</p>
+<h5 id="置换范围"><a href="#置换范围" class="headerlink" title="置换范围"></a>置换范围</h5><p>​						局部置换：仅在发生缺页中断的进程的驻留集中选择页来置换。</p>
+<p>​						全局置换：把内存中所有未锁定的页都作为置换的候选页。</p>
+<h4 id="1-固定分配，局部范围置换"><a href="#1-固定分配，局部范围置换" class="headerlink" title="1.固定分配，局部范围置换"></a>1.固定分配，局部范围置换</h4><p>​							缺点：一个进程的总页数分配过少时，产生很高缺页率。分配过多时，内存中进程太少，cpu把大量时间浪费在交换上。</p>
+<h4 id="2-可变分配，全局范围"><a href="#2-可变分配，全局范围" class="headerlink" title="2.可变分配，全局范围"></a>2.可变分配，全局范围</h4><p>​							这种方式最容易实现。每个进程分配到一定页框，操作系统维护一个空闲页框列表。发生一次缺页中断时，一个空闲页框被添加进进程的驻留集，并读入该页。</p>
+<p>​							这种方式的难点在于如何选择置换页。引入页缓冲技术可以解决这个问题。</p>
+<h4 id="3-可变分配，局部范围"><a href="#3-可变分配，局部范围" class="headerlink" title="3.可变分配，局部范围"></a>3.可变分配，局部范围</h4><p>​							这种方法的关键是不停地重新评估进程页框的分配情况，增加或减少分配该它的页框，以此来提高性能。</p>
+<p>​							比较常见方案的是工作集策略。但是它的开销比较大，一般使用近似算法替代。</p>
+<p>​							通过监视缺页率来评估进程的运行情况。若一个进程的缺页率低于某个最小阈值，则可以给进程分配一个较小的驻留集，但并不降低进程的性能（缺页率增加），使系统中其他进程受益；若进程的缺页率高于某个最高阈值，则在不降低整个系统性能的情况下，增大进程的驻留集。</p>
+<p>​							遵循该策略的一种算法是<strong>缺页中断频率算法</strong>。</p>
+<h5 id="缺页中断频率算法"><a href="#缺页中断频率算法" class="headerlink" title="缺页中断频率算法"></a>缺页中断频率算法</h5><p>​								某页被访问时，使用位置为1。发生一次缺页中断时，操作系统记录该进程从上次缺页中断到现在的虚拟时间，这通过维护一个页访问计数器实现。定义阈值F，若从上一次缺页中断到这次缺页中断时间小于F，则把该页加到进程的驻留集中；否则淘汰所有使用位为0的页，缩减驻留集大小。同时，把其余页的使用位重新置为0。</p>
+<h3 id="五、清除策略"><a href="#五、清除策略" class="headerlink" title="五、清除策略"></a>五、清除策略</h3><p>​			清除策略用于确定何时将已修改的一页写回辅存。</p>
+<h4 id="1-请求式清除"><a href="#1-请求式清除" class="headerlink" title="1.请求式清除"></a>1.请求式清除</h4><p>​							只有当一页被选择用于置换的时候才被写回辅存。</p>
+<p>​							缺点：写回一页和读入一页是成对出现的，虽然这样可以减少写回操作。但发生缺页中断的进程在接触阻塞之前必须等待两次页传送（写回一次，读入一次），降低处理器利用率。</p>
+<h4 id="2-预约式请除"><a href="#2-预约式请除" class="headerlink" title="2.预约式请除"></a>2.预约式请除</h4><p>​							将已经修改的多页在需要使用它们所占据的页框之前成批写回辅存。</p>
+<p>​							缺点:写回的页可能仍然在驻留集中，可能之后又被修改，会造成无意义的磁盘IO。</p>
+<p>​			    一种较好的方式是结合使用页缓冲技术。只清除用于置换的页，但去除了清除和置换操作的成对关系，即异步写回。被置换的页可以放在两个表（队列）中：修改表和未修改表。修改表中的页周期性地成批写出，并移到未修改表中。未修改表中的一页要么因为被访问而被回收到驻留集，要么在其页框分配给另一页时被淘汰。							</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/12/13/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%BA%8C/" data-id="clrbmrg3i00063kuz8kyb1yw9" data-title="虚拟内存二" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2023/12/13/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%89/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          虚拟内存三
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2023/12/11/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">内存管理</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/c-%E5%9F%BA%E7%A1%80/" rel="tag">c++基础</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" rel="tag">算法题</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/c-%E5%9F%BA%E7%A1%80/" style="font-size: 12px;">c++基础</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 18px;">操作系统</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 16px;">数据库</a> <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" style="font-size: 10px;">算法题</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 14px;">计算机网络</a> <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 20px;">设计模式</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/12/">December 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/11/">November 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/12/14/IO%E7%AE%A1%E7%90%86%E5%92%8C%E7%A3%81%E7%9B%98%E8%B0%83%E5%BA%A6/">IO管理和磁盘调度</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/14/%E5%8D%95%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6/">单处理器调度</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/13/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%89/">虚拟内存三</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/13/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%BA%8C/">虚拟内存二</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/11/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

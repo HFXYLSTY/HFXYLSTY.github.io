@@ -73,6 +73,324 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-IO管理和磁盘调度" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/12/14/IO%E7%AE%A1%E7%90%86%E5%92%8C%E7%A3%81%E7%9B%98%E8%B0%83%E5%BA%A6/" class="article-date">
+  <time class="dt-published" datetime="2023-12-14T08:40:39.000Z" itemprop="datePublished">2023-12-14</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/12/14/IO%E7%AE%A1%E7%90%86%E5%92%8C%E7%A3%81%E7%9B%98%E8%B0%83%E5%BA%A6/">IO管理和磁盘调度</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="IO管理和磁盘调度"><a href="#IO管理和磁盘调度" class="headerlink" title="IO管理和磁盘调度"></a>IO管理和磁盘调度</h1><h3 id="一、IO功能的组织"><a href="#一、IO功能的组织" class="headerlink" title="一、IO功能的组织"></a>一、IO功能的组织</h3><p>​			程序控制IO：处理器代表一个进程给IO模块发送一个命令，进程进入忙等待，直到操作完成</p>
+<p>​			中断控制IO：处理器代表一个进程给IO模块发送一个命令，若IO是非阻塞的，处理器继续执行进程，若是阻塞的，进程被置为阻塞态。</p>
+<p>​			直接内存访问(DMA):一个DMA模块控制内存和IO模块之间的数据交换。处理器给DMA发请求，且只有在整个数据块传输完毕后，它才被中断。</p>
+<p>​			在IO设备发展的历程中，cpu逐步从IO任务中解脱，提高了性能。现在IO模块有自己的处理器和局部存储器，本质上就是一个计算机，受cpu调度。</p>
+<h4 id="1-直接内存访问（DMA）"><a href="#1-直接内存访问（DMA）" class="headerlink" title="1.直接内存访问（DMA）"></a>1.直接内存访问（DMA）</h4><p>​					DMA单元能模拟cpu，且实际上能像cpu一样获得系统总线的控制权。</p>
+<p>​					工作流程：1.处理器通过读写控制线发送读或写信号</p>
+<p>​										2.通过数据线传输相关IO设备地址、读写的起始地址（存在地址寄存器里）、读写长度（存在数据计数寄存器里）</p>
+<p>​										3.处理器进行其他工作，DMA模块和IO设备进行交互，数据传输结束后，DMA给处理器发送中断信号。</p>
+<p>​					使用DMA,只有数据传送开始和结束的时候才需要cpu</p>
+<p>​		![屏幕截图 2023-12-14 193320](&#x2F;..&#x2F;..&#x2F;images&#x2F;屏幕截图 2023-12-14 193320.png)</p>
+<h5 id="DMA配置方式"><a href="#DMA配置方式" class="headerlink" title="DMA配置方式"></a>DMA配置方式</h5><p>​				![屏幕截图 2023-12-14 193413](&#x2F;..&#x2F;..&#x2F;images&#x2F;屏幕截图 2023-12-14 193413.png)</p>
+<h3 id="二、IO缓冲"><a href="#二、IO缓冲" class="headerlink" title="二、IO缓冲"></a>二、IO缓冲</h3><p>​				缓冲 IO 也被成为标准 IO，大多数的文件系统系统默认都是以缓冲 IO 的方式来工作的。在Linux的缓冲I&#x2F;O机制中，数据先从磁盘复制到内核空间的缓冲区，然后从内核空间缓冲区复制到应用程序的地址空间。</p>
+<p>接下来我们看看缓冲 IO 下读写操作是如何进行？</p>
+<ul>
+<li><strong>读操作：</strong></li>
+</ul>
+<p>操作系统检查内核的缓冲区有没有需要的数据，如果已经缓冲了，那么就直接从缓冲中返回；否则从磁盘中读取到内核缓冲中，然后再复制到用户空间缓冲中。</p>
+<ul>
+<li><strong>写操作：</strong></li>
+</ul>
+<p>将数据从用户空间复制到内核空间的缓冲中。这时对用户程序来说写操作就已经完成，至于什么时候再写到磁盘中由操作系统决定，除非显示地调用了sync同步命令。</p>
+<p><strong>缓冲I&#x2F;O的优点：</strong></p>
+<ol>
+<li>在一定程度上分离了内核空间和用户空间，保护系统本身的运行安全；</li>
+<li>因为内核中有缓冲，可以减少读盘的次数，从而提高性能。</li>
+<li>可以平滑IO需求的峰值</li>
+</ol>
+<p><strong>缓冲I&#x2F;O的缺点：</strong></p>
+<p>​			在缓冲 I&#x2F;O 机制中，DMA 方式可以将数据直接从磁盘读到内核空间页缓冲中，或者将数据从内核空间页缓冲直接写回到磁盘上，而不能直接在用户地址空间和磁盘之间进行数据传输，这样数据在传输过程中需要在<strong>应用程序地址空间（用户空间）和内核缓冲（内核空间）之间进行多次数据拷贝操作</strong>，这些数据拷贝操作所带来的CPU以及内存开销是非常大的。</p>
+<h3 id="三、磁盘调度"><a href="#三、磁盘调度" class="headerlink" title="三、磁盘调度"></a>三、磁盘调度</h3><h4 id="1-FCFS-调度-先来先服务"><a href="#1-FCFS-调度-先来先服务" class="headerlink" title="1. FCFS 调度(先来先服务)"></a>1. FCFS 调度(<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E5%85%88%E6%9D%A5%E5%85%88%E6%9C%8D%E5%8A%A1&spm=1001.2101.3001.7020">先来先服务</a>)</h4><p><a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E7%A3%81%E7%9B%98%E8%B0%83%E5%BA%A6&spm=1001.2101.3001.7020">						磁盘调度</a>的最简单形式当然是先来先服务（FCFS）算法。虽然这种算法比较公平，但是它通常并不提供最快的服务。</p>
+<p>例如，考虑一个磁盘队列，其 I&#x2F;O 请求块的柱面的顺序如下：<br>                            <strong>98,183,37,122,14,124,65,67</strong></p>
+<p>​							如果磁头开始位于柱面 53，那么它首先从 53 移到 98，接着再到 183、37、122、14、124、65，最后到 67，磁头移动柱面的总数为 640。这种调度如图 1 所示。<br><img src="/../../images/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjEyOTMw,size_16,color_FFFFFF,t_70.png" alt="在这里插入图片描述"><br>​						从 122 到 14 再到 124 的<strong>大摆动说明了这种调度的问题</strong>。如果对柱面 37 和 14 的请求一起处理，不管是在 122 和 124 之前或之后，总的磁头移动会大大减少，并且性能也会因此得以改善。</p>
+<h4 id="2-SSTF调度-最短寻道时间优先"><a href="#2-SSTF调度-最短寻道时间优先" class="headerlink" title="2.SSTF调度(最短寻道时间优先)"></a>2.SSTF调度(最短寻道时间优先)</h4><p>​						在移动磁头到别处以便处理其他请求之前，处理靠近当前磁头位置的所有请求可能较为合理。这个假设是最短寻道时间优先（SSTF）算法的基础。</p>
+<p>​						SSTF 算法选择处理距离当前磁头位置的最短寻道时间的请求。换句话说，SSTF 选择最接近磁头位置的待处理请求。</p>
+<p>对于上面请求队列的示例，与开始磁头位置（53）的最近请求位于柱面 65。一旦位于柱面 65，下个最近请求位于柱面 67。从那里，由于柱面 37 比 98 还要近，所以下次处理 37。如此，会处理位于柱面 14 的请求，接着 98，122，124，最后183（图 2）。<br><img src="/../../images/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjEyOTMw,size_16,color_FFFFFF,t_70-17025539507361.png" alt="在这里插入图片描述"></p>
+<p>​						这种调度算法的磁头移动只有 236 个柱面，约为 FCFS 调度算法的磁头移动总数的三分之一多一点。显然，这种算法大大提高了性能。</p>
+<p>​						SSTF 调度本质上是一种最短作业优先（SJF）调度；与 SJF 调度一样，它可能会导致一些请求的饥饿。请记住，请求可能随时到达。假设在队列中有两个请求，分别针对柱面 14 和 186，而当处理来自 14 的请求时，另一个靠近 14 的请求来了，这个新的请求会下次处理，这样位于 186 的请求需要等待。当处理该请求时，另一个 14 附近的请求可能到达。</p>
+<p>​					理论上，相互接近的一些请求会连续不断地到达，这样位于 186 上的请求可能永远得不到服务。当等待处理请求队列较长时，这种情况就很可能出现了。</p>
+<p>​				虽然 SSTF 算法比 FCFS 算法有了相当改进，但是并非最优的。对于这个例子，还可以做得更好：移动磁头从 53 到 37（虽然 37 并不是最近的），再到 14，再到 65、67、98、122、124、183。这种策略的磁头移动的柱面总数为 208。</p>
+<h4 id="3-SCAN-调度-电梯算法"><a href="#3-SCAN-调度-电梯算法" class="headerlink" title="3. SCAN 调度(电梯算法)"></a>3. SCAN 调度(电梯算法)</h4><p>​					对于扫描算法，磁臂从磁盘的一端开始，向另一端移动；在移过每个柱面时，处理请求。当到达磁盘的另一端时，磁头移动方向反转，并继续处理。磁头连续来回扫描磁盘。SCAN 算法有时称为电梯算法，因为磁头的行为就像大楼里面的电梯，先处理所有向上的请求，然后再处理相反方向的请求。</p>
+<p>​					下面回到前面的例子来说明。在采用 SCAN 来调度柱面 98、183、37、122、14、124、65 和 67 的请求之前，除了磁头的当前位置，还需知道磁头的移动方向。</p>
+<p><img src="/../../images/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjEyOTMw,size_16,color_FFFFFF,t_70-17025539507362.png" alt="在这里插入图片描述"></p>
+<p>​						假设磁头朝 0 移动并且磁头初始位置还是 53，磁头接下来处理 37，然后 14。在柱面 0 时，磁头会反转，移向磁盘的另一端，并处理柱面 65、67、98、122、124、183（图 3）上的请求。如果请求刚好在磁头前方加入队列，则它几乎马上就会得到服务；如果请求刚好在磁头后方加入队列，则它必须等待，直到磁头移到磁盘的另一端，反转方向，并返回。</p>
+<p>​						假设请求柱面的分布是均匀的，考虑当磁头移到磁盘一端并且反转方向时的请求密度。这时，紧靠磁头前方的请求相对较少，因为最近处理过这些柱面。磁盘另一端的请求密度却是最多。这些请求的等待时间也最长，那么为什么不先去那里？这就是下一个算法的想法。</p>
+<h4 id="4-C-SCAN-调度-循环扫描"><a href="#4-C-SCAN-调度-循环扫描" class="headerlink" title="4. C-SCAN 调度(循环扫描)"></a>4. C-SCAN 调度(循环扫描)</h4><p>​						对于扫描算法，磁臂从磁盘的一端开始，向另一端移动；在移过每个柱面时，处理请求。当到达磁盘的另一端时，磁头移动方向反转，并继续处理。磁头连续来回扫描磁盘。SCAN 算法有时称为电梯算法，因为磁头的行为就像大楼里面的电梯，先处理所有向上的请求，然后再处理相反方向的请求。</p>
+<p>​						下面回到前面的例子来说明。在采用 SCAN 来调度柱面 98、183、37、122、14、124、65 和 67 的请求之前，除了磁头的当前位置，还需知道磁头的移动方向。</p>
+<p><img src="/../../images/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjEyOTMw,size_16,color_FFFFFF,t_70-17025539507363.png" alt="在这里插入图片描述"><br>                        C-SCAN 调度算法基本上将这些柱面作为一个环链，将最后柱面连到首个柱面。</p>
+<h4 id="5-LOOK-调度"><a href="#5-LOOK-调度" class="headerlink" title="5. LOOK 调度"></a>5. LOOK 调度</h4><p>​					正如以上所述，SCAN 和 C-SCAN 在磁盘的整个宽度内移动磁臂。实际上，这两种算法通常都不是按这种方式实施的。更常见的是，磁臂只需移到一个方向的最远请求为止。</p>
+<p>​					遵循这种模式的 SCAN 算法和 C-SCAN 算法分别称为 LOOK 和 C-LOOK 调度，因为它们在向特定方向移动时查看是否会有请求（图 5）。<br><img src="/../../images/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjEyOTMw,size_16,color_FFFFFF,t_70-17025539507364.png" alt="在这里插入图片描述"></p>
+<p>​			</p>
+<p>​			</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/12/14/IO%E7%AE%A1%E7%90%86%E5%92%8C%E7%A3%81%E7%9B%98%E8%B0%83%E5%BA%A6/" data-id="clrbmrg3c00003kuz14h75cmj" data-title="IO管理和磁盘调度" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-单处理器调度" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/12/14/%E5%8D%95%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6/" class="article-date">
+  <time class="dt-published" datetime="2023-12-14T05:20:01.000Z" itemprop="datePublished">2023-12-14</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/12/14/%E5%8D%95%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6/">单处理器调度</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="单处理器调度"><a href="#单处理器调度" class="headerlink" title="单处理器调度"></a>单处理器调度</h1><h3 id="一、调度类型"><a href="#一、调度类型" class="headerlink" title="一、调度类型"></a>一、调度类型</h3><p>​				长程调度：决定是否把进程加入当前活跃的进程集中。创建进程时发生。</p>
+<p>​				中程调度：它是交换过程的一部分，它决定是否把进程添加到就绪队列或阻塞、挂起队列中</p>
+<p>​				短程调度：决定处理器执行哪个可运行的进程</p>
+<p>​				IO调度：决定可用IO设备处理哪个进程的IO请求</p>
+<h3 id="二、短程调度"><a href="#二、短程调度" class="headerlink" title="二、短程调度"></a>二、短程调度</h3><h4 id="1-调度规则"><a href="#1-调度规则" class="headerlink" title="1.调度规则"></a>1.调度规则</h4><p>​								面向用户：与单个用户或进程感知到的系统行为有关。如交互式程序的响应时间，这是用户可以感受到的，面向用户调度力求降低响应时间。</p>
+<p>​								面向系统：重点是提高处理器的使用效果和效率</p>
+<h5 id="一些名词"><a href="#一些名词" class="headerlink" title="一些名词"></a>一些名词</h5><p>​									周转时间：一个进程从提交到完成的时间。包括实际执行时间和等待资源（处理器资源、IO资源等）时间</p>
+<p>​									归一化周转时间：周转时间与实际执行时间的比值</p>
+<p>​									响应时间：交互式进程从提交请求到得到相应所经过的时间	</p>
+<p>​									吞吐量：单位时间内完成的进程数量</p>
+<p>​									处理器利用率：处理器处于忙状态的百分比</p>
+<h4 id="2-优先级"><a href="#2-优先级" class="headerlink" title="2.优先级"></a>2.优先级</h4><p>​								许多系统中，每个进程被指定一个优先级，调度程序优先选择优先级高的进程调度。系统通常维护一组优先级队列，一个优先级维护一个队列。纯优先级调度会出现优先级低的进程饥饿的问题、</p>
+<h4 id="3-决策模式"><a href="#3-决策模式" class="headerlink" title="3.决策模式"></a>3.决策模式</h4><p>​								抢占：当前中运行的进程可能被操作系统中断，并转为就绪态。如出现时间中断时，需要进行抢占决策</p>
+<p>​								非抢占：一旦进程处于运行态，它会一直执行到终止。除非出现等待IO或系统调用而阻塞。</p>
+<h3 id="三、调度算法"><a href="#三、调度算法" class="headerlink" title="三、调度算法"></a>三、调度算法</h3><h4 id="1-先来先服务（FCFS）"><a href="#1-先来先服务（FCFS）" class="headerlink" title="1.先来先服务（FCFS）"></a>1.先来先服务（FCFS）</h4><p>​											这种方法十分简单，每个进程就绪后加入就绪队列，系统从队列中依次取出进程执行。FCFS更适用于长进程。</p>
+<p>​											FCFS更有利于处理器密集型进程。若一个IO密集进程因等待IO被阻塞，调度算法选择了一个处理器密集型进程来执行。在执行过程中，可能IO完成了，但IO密集进程只能等待。导致大多IO设备空闲。</p>
+<h4 id="2-轮转"><a href="#2-轮转" class="headerlink" title="2.轮转"></a>2.轮转</h4><p>​										轮转算法是基于时钟的抢占策略。系统给每个进程分配一个时间片，时间片结束，进执行中的进程被抢占，按FCFS在就绪队列中选择一个进程来执行。</p>
+<p>​										时间片长度最好略大于一个经典交互的时间，但不能过大。</p>
+<p>​										这种方式在分时系统或事务处理系统中很有效。但由于IO密集型进程短时间使用处理器后便会阻塞，而处理器密集型进程可以用完整个时间片。所以这种算法对IO密集进程不公平，使得进程性能 降低。</p>
+<h5 id="虚拟轮转法"><a href="#虚拟轮转法" class="headerlink" title="虚拟轮转法"></a>虚拟轮转法</h5><p>​										为了优化上述问题，虚拟轮转法加入了一个辅助队列。由于等待IO而阻塞的进程阻塞结束后会加入辅助队列，进行调度时，辅助队列中的进程优先于就绪队列</p>
+<h4 id="3-最短进程优先（SPN）"><a href="#3-最短进程优先（SPN）" class="headerlink" title="3.最短进程优先（SPN）"></a>3.最短进程优先（SPN）</h4><p>​									这是一个非抢占策略，它的原则是下次选择预计处理时间最短的进程。</p>
+<p>​									对短作业有利，对长作业不利。可能产生饥饿现象。另外，进程&#x2F;作业的运行时间都是由用户提供的，并不一定真实，不一定能做到真正的短作业优先。</p>
+<h4 id="4-最短剩余时间（SRT）"><a href="#4-最短剩余时间（SRT）" class="headerlink" title="4.最短剩余时间（SRT）"></a>4.最短剩余时间（SRT）</h4><p>​									在SPN算法中增加了抢占机制。调度程序总是选择预期剩余时间最短的进程。	</p>
+<p>​									每当有进程加入就绪队列改变时就需要调度，如果新到达的进程剩余时间比当前运行的进程剩余时间更短，则由新进程抢占处理器，当前运行进程重新回到就绪队列。另外,当一个进程完成时也需要调度。</p>
+<p>​									同样有长进程饥饿风险</p>
+<h4 id="5-最高响应比优先（HRRN）"><a href="#5-最高响应比优先（HRRN）" class="headerlink" title="5.最高响应比优先（HRRN）"></a>5.最高响应比优先（HRRN）</h4><p>​										响应比即归一化周转时间</p>
+<p>​										响应比R &#x3D; (w+s）&#x2F; s</p>
+<p>​										w:等待处理器的时间			s：预计服务时间</p>
+<p>​									当前进程完成或阻塞时，选择响应比最大的进程。它相对于前两种算法，比较公平。因为它反映了进程的年龄。偏向短进程时，长进程由于得不到服务，等待时间一直增加，R变大，最终赢过短进程。</p>
+<h4 id="6-反馈法"><a href="#6-反馈法" class="headerlink" title="6.反馈法"></a>6.反馈法</h4><p>​									反馈法触发运行时间较长的进程。调度基于抢占原则并使用动态优先级机制。一个进程刚进入系统时，优先级最高，之后每被抢占一次，优先级下降一级。短进程会很快执行完毕，长进程会 多次降级。因此新进程和短进程会优于老进程和长进程。</p>
+<p>优先级降到最低后不会再降，会重复返回到最低优先级队列。</p>
+<p>​									为了避免老进程和长进程饥饿，当一个进程在当前队列中等待服务的时间超过一定时间后，就把它的优先级提高一级	</p>
+<h4 id="7-总结"><a href="#7-总结" class="headerlink" title="7.总结"></a>7.总结</h4><h4 id="屏幕截图-2023-12-14-141059-images-屏幕截图-2023-12-14-141059-png"><a href="#屏幕截图-2023-12-14-141059-images-屏幕截图-2023-12-14-141059-png" class="headerlink" title="![屏幕截图 2023-12-14 141059](&#x2F;..&#x2F;..&#x2F;images&#x2F;屏幕截图 2023-12-14 141059.png)"></a>![屏幕截图 2023-12-14 141059](&#x2F;..&#x2F;..&#x2F;images&#x2F;屏幕截图 2023-12-14 141059.png)</h4><p>​						</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/12/14/%E5%8D%95%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6/" data-id="clrbmrg3h00023kuzhaiubexs" data-title="单处理器调度" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-虚拟内存三" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/12/13/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%89/" class="article-date">
+  <time class="dt-published" datetime="2023-12-13T12:37:29.000Z" itemprop="datePublished">2023-12-13</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/12/13/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%89/">虚拟内存三</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="虚拟内存三"><a href="#虚拟内存三" class="headerlink" title="虚拟内存三"></a>虚拟内存三</h1><h3 id="一、内存映射"><a href="#一、内存映射" class="headerlink" title="一、内存映射"></a>一、内存映射</h3><p>​			Linux通过将一个虚拟内存区域和一个磁盘上的对象关联起来，以初始化这个虚拟内存区域的内容，这个过程叫内存映射。</p>
+<h4 id="1-映射对象"><a href="#1-映射对象" class="headerlink" title="1.映射对象"></a>1.映射对象</h4><p>​							<strong>Linux文件系统中的普通文件</strong>：一个区域可以映射到一个普通磁盘文件的连续部分，如一个可执行文件。文件区被分成页大小的片，每一片初始化一个虚拟页的内容。（不发生数据传输）按需进行页面调度，文件并不进入物理内存中。直到cpu第一次引用到页面。（即发射一个虚拟地址，落在地址空间这个页面的范围之内）</p>
+<p>​							<strong>匿名文件</strong>：一个区域页可以映射到一个匿名文件。匿名文件是由内核创建的，包含的全是二进制0。cpu第一次引用这样的页面时，内核在物理内存中找一个合适的牺牲页面，若它被修改过，就将它换出，并用二进制零覆盖并更新页表。注意磁盘和内存之间没有数据传输。因此，有时映射到匿名文件区域中的页面也叫<strong>请求二进制零的页</strong></p>
+<p>​							无论哪种情况，一旦一个虚拟页面被初始化了，它就在内核维护的一个交换文件之间换来换去。</p>
+<h4 id="2-共享对象和私有对象"><a href="#2-共享对象和私有对象" class="headerlink" title="2.共享对象和私有对象"></a>2.共享对象和私有对象</h4><p>​							一个对象可以被映射到虚拟内存的一个区域，要么作为共享对象，要么作为私有对象。如果一个进程将共享对象映射到它的虚拟地址空间，那它对该对象的写操作会反映到其他引用该对象的进程上和磁盘原始文件上。</p>
+<p>​							因为每个共享文件只有一个文件名，所以内核可以很清楚地知道这个文件是否被共享。<strong>所以即使对象被映射到了多个共享区域，物理内存中也只有共享对象的一个副本。</strong></p>
+<p>​							对私有对象的写操作不会反映到其他引用该对象的进程，也不会反映到磁盘原始文件上。</p>
+<p>​							私有对象一开始的管理行为和共享文件相同，即使对象被映射到了多个私有区域，物理内存中也只有私有对象的一个副本。但它采用写时复制技术。<strong>即内存中的相应区域是只读的，当有进程对其进行写操作时，发生保护故障，异常处理程序发现这块内存是写时复制的，它会在物理内存中创建这个页面的一个副本，更新页表条目执行这个新的副本，然后恢复可写权限</strong>。避免了不必要的复制。</p>
+<h5 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h5><p>​							许多程序运行时需要访问相同的代码副本，例如标准C库，我们将这些共享库作为共享对象映射到进程虚拟地址空间中，内存中就只需要保留一份相关代码副本，节约空间。	</p>
+<h4 id="3-用户级内存映射—-mmap"><a href="#3-用户级内存映射—-mmap" class="headerlink" title="3.用户级内存映射—-mmap"></a>3.用户级内存映射—-mmap</h4><p>​						Linux进程可以使用mmap函数来创建新的虚拟内存区域，并将这些对象映射到这些区域中。</p>
+<p>​			</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span>* <span class="title">mmap</span><span class="params">(<span class="type">void</span>* start,<span class="type">size_t</span> length,<span class="type">int</span> prot,<span class="type">int</span> flags.<span class="type">int</span> fd,<span class="type">off_t</span> offset)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>​						mmap要求内核创建一个新的虚拟内存区域，从地址start开始。并将fd指定的对象的一个连续的片映射到这个区域，片大小为length，从距文件偏移量offset字节开始。注意：start只是一个暗示，通常为NULL，由内核选定地址。</p>
+<p>​						参数prot：映射区域的保护方式。可以为以下几种方式的组合：</p>
+<blockquote>
+<p>​									PROT_EXEC 映射区域可被执行<br>​									PROT_READ 映射区域可被读取<br>​									PROT_WRITE 映射区域可被写入<br>​									PROT_NONE 映射区域不能存取</p>
+<p>​				参数flags：影响映射区域的各种特性。在调用mmap()时必须要指定MAP_SHARED 或MAP_PRIVATE。</p>
+<p>​							MAP_FIXED 如果参数start所指的地址无法成功建立映射时，则放弃映射，不对地址做修正。通常不鼓励用此旗标。<br>​							MAP_SHARED对映射区域的写入数据会复制回文件内，而且允许其他映射该文件的进程共享。<br>​							MAP_PRIVATE 对映射区域的写入操作会产生一个映射文件的复制，即私人的“写入时复制”（copy on write）对此区域作的任何修改都不会写回原来的文件内容。<br>​							MAP_ANONYMOUS建立匿名映射。此时会忽略参数fd，不涉及文件，而且映射区域无法和其他进程共享。<br>​							MAP_DENYWRITE只允许对映射区域的写入操作，其他对文件直接写入的操作将会被拒绝。<br>​							MAP_LOCKED 将映射区域锁定住，这表示该区域不会被置换（swap）</p>
+</blockquote>
+<h4 id="4-mmap和普通文件读写的区别"><a href="#4-mmap和普通文件读写的区别" class="headerlink" title="4.mmap和普通文件读写的区别"></a>4.mmap和普通文件读写的区别</h4><p>​					常规文件系统操作（调用read&#x2F;fread等类函数）中，函数的调用过程：</p>
+<p>​						1、进程发起读文件请求。</p>
+<p>​						2、内核通过查找进程文件符表，定位到内核已打开文件集上的文件信息，从而找到此文件的inode。</p>
+<p>​						3、inode在address_space上查找要请求的文件页是否已经缓存在页缓存中。如果存在，则直接返回这片文件页的内容。</p>
+<p>​						4、如果不存在，则通过inode定位到文件磁盘地址，将数据从磁盘复制到页缓存。之后再次发起读页面过程，进而将页缓存中的数据发给用户进程。</p>
+<p>​						总结来说，常规文件操作为了提高读写效率和保护磁盘，使用了页缓存机制。这样造成读文件时需要先将文件页从磁盘拷贝到页缓存中，由于页缓存处在内核空间，不能被用户进程直接寻址，所以还需要将页缓存中数据页再次拷贝到内存对应的用户空间中。这样，通过了两次数据拷贝过程，才能完成进程对文件内容的获取任务。写操作也是一样，待写入的buffer在内核空间不能直接访问，必须要先拷贝至内核空间对应的主存，再写回磁盘中（延迟写回），也是需要两次数据拷贝。</p>
+<p>​						而使用mmap操作文件中，创建新的虚拟内存区域和建立文件磁盘地址和虚拟内存区域映射这两步，没有任何文件拷贝操作。而之后访问数据时发现内存中并无数据而发起的缺页异常过程，可以通过已经建立好的映射关系，只使用一次数据拷贝，就从磁盘中将数据传入内存的用户空间中，供进程使用。</p>
+<p>​					总而言之，<strong>常规文件操作需要从磁盘到页缓存再到用户主存的两次数据拷贝。而mmap操控文件，只需要从磁盘到用户主存的一次数据拷贝过程。说白了，mmap的关键点是实现了用户空间和内核空间的数据直接交互而省去了空间不同数据不通的繁琐过程。因此mmap效率更高。</strong></p>
+<h4 id="5-内存映射的好处"><a href="#5-内存映射的好处" class="headerlink" title="5.内存映射的好处"></a>5.内存映射的好处</h4><p>​							1、对文件的读取操作跨过了页缓存，减少了数据的拷贝次数，用内存读写取代I&#x2F;O读写，提高了文件读取效率。</p>
+<p>​							2、实现了用户空间和内核空间的高效交互方式。两空间的各自修改操作可以直接反映在映射的区域内，从而被对方空间及时捕捉。</p>
+<p>​							3、提供进程间共享内存及相互通信的方式。不管是父子进程还是无亲缘关系的进程，都可以将自身用户空间映射到同一个文件或匿名映射到同一片区域。从而通过各自对映射区域的改动，达到进程间通信和进程间共享的目的。</p>
+<p>​						 同时，如果进程A和进程B都映射了区域C，当A第一次读取C时通过缺页从磁盘复制文件页到内存中；但当B再读C的相同页面时，虽然也会产生缺页异常，但是不再需要从磁盘中复制文件过来，而可直接使用已经保存在内存中的文件数据。</p>
+<p>​						4、可用于实现高效的大规模数据传输。内存空间不足，是制约大数据操作的一个方面，解决方案往往是借助硬盘空间协助操作，补充内存的不足。但是进一步会造成大量的文件I&#x2F;O操作，极大影响效率。这个问题可以通过mmap映射很好的解决。换句话说，但凡是需要用磁盘空间代替内存的时候，mmap都可以发挥其功效。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/12/13/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%89/" data-id="clrbmrg3i00043kuz1gpxe77g" data-title="虚拟内存三" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-虚拟内存二" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/12/13/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%BA%8C/" class="article-date">
+  <time class="dt-published" datetime="2023-12-13T08:13:43.000Z" itemprop="datePublished">2023-12-13</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/12/13/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%BA%8C/">虚拟内存二</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="虚拟内存二"><a href="#虚拟内存二" class="headerlink" title="虚拟内存二"></a>虚拟内存二</h1><h3 id="一、读取策略"><a href="#一、读取策略" class="headerlink" title="一、读取策略"></a>一、读取策略</h3><p>​			读取策略决定某页合适读入内存</p>
+<h4 id="1-请求分页"><a href="#1-请求分页" class="headerlink" title="1.请求分页"></a>1.请求分页</h4><p>​						请求分页是只有当访问到某页中的一个单元时才将页读入内存。进程开始时会出现大量缺页中断，随着读入页的增加，根据局部性原理，要访问的数据多数是最近读取的页，缺页中断率会减少到一个稳定水平。</p>
+<h4 id="2-预先分页"><a href="#2-预先分页" class="headerlink" title="2.预先分页"></a>2.预先分页</h4><p>​						预先分页是一次读取包含请求页的多个页。因为通常磁盘中一个进程的页是连续存储的，连续读取比单次读取效率高。但如果大多额外读取的页没被cpu使用，那就是低效的。</p>
+<p>​				通常进程启动时使用预先分页，读取一定的页。发生缺页中断时使用请求分页。</p>
+<h3 id="二、置换策略"><a href="#二、置换策略" class="headerlink" title="二、置换策略"></a>二、置换策略</h3><p>​			置换策略在决定置换的页集中，选择换出哪一页。所有策略的目标都是换出最近最不可能访问的页。</p>
+<p>​			页框锁定：内存中某些页框被锁定，无法置换。如内核页框</p>
+<h4 id="1-最佳（OPT）策略"><a href="#1-最佳（OPT）策略" class="headerlink" title="1.最佳（OPT）策略"></a>1.最佳（OPT）策略</h4><p>​					OPT策略选择置换<strong>下次访问距离当前时间最长的那些页</strong>，这种算法造成的缺页中断最少，但由于它需要预知未来，因此不可实现。但它可以作为衡量标准。</p>
+<h4 id="2-最近最少使用（LRU）策略"><a href="#2-最近最少使用（LRU）策略" class="headerlink" title="2.最近最少使用（LRU）策略"></a>2.最近最少使用（LRU）策略</h4><p>​					LRU策略置换内存中最长时间未被引用的页。这种方法实现起来比较困难，开销大。</p>
+<p>​					一种是给每页添加一个最后一次访问的时间戳，每次访问的时候更新；另一个是维护访问页的栈。</p>
+<h4 id="3-先进先出（FIFO）策略"><a href="#3-先进先出（FIFO）策略" class="headerlink" title="3.先进先出（FIFO）策略"></a>3.先进先出（FIFO）策略</h4><p>​						FIFO策略把分配给进程的页框视为一个循环缓冲区，并按循环的方式移动页。</p>
+<p>​						它使用一个指针，每次对页框进行读入或置换的时候指针都往下移动，当移动到边界时循环到开头。每次读入或置换页面都对指针所指的页框进行操作。	</p>
+<p>​						它的隐含的逻辑是置换驻留在内存中时间最长的页。</p>
+<p>​						这个方法性能最差。</p>
+<h4 id="4-时钟（Clock）策略"><a href="#4-时钟（Clock）策略" class="headerlink" title="4.时钟（Clock）策略"></a>4.时钟（Clock）策略</h4><p>​						Clock策略给每个页框增加一个称为<strong>使用位</strong>的附件位。每次cpu读取其中内容时，附加位置为1。对于用于置换的页框集，它被视为一个循环缓冲区，并有一个指针与其关联。需要置换一页时，操作系统扫描缓冲区，查找一个使用位为0的页框并置换。若途中遇到使用位为1的页框，则将其使用位置为0。若所有页框使用位都为1，则算法把所有使用位都置为0，并停留在初始位置上，置换该页框中的页。</p>
+<p>​						这个策略优于FIFO，差于LRU，若增加使用位的位数，可以提高效率。</p>
+<h3 id="三、页缓冲"><a href="#三、页缓冲" class="headerlink" title="三、页缓冲"></a>三、页缓冲</h3><p>​				置换一个修改过的页，比置换未修改过的页的代价更大。因为修改过的页要写回给磁盘。</p>
+<p>​				为了提高效率，页缓冲算法不丢弃置换出的页。而是将它们分配到两个表中。</p>
+<p>​				若未被修改，则分配到空闲页链表中，若被修改，则分配到修改页链表中。注意：内存中的页不会物理移动，移动的是页表项。</p>
+<p>​				页缓冲技术在任何时候保留一小部分空闲页框。</p>
+<p>​				空闲页链表里包含一系列可以读入的页框。需要从虚存读入一页时，使用位于空闲页链表头部的页框，置换原本在那个位置的页。</p>
+<p>​				由于被置换的页仍然留在内存中，当进程再次访问时，效率很高。当修改队列达到一定长度时，集体写回修改页，它一次性写回多个页，减少了IO操作的次数，进而减少了磁盘访问的时间。</p>
+<h3 id="四、驻留集管理"><a href="#四、驻留集管理" class="headerlink" title="四、驻留集管理"></a>四、驻留集管理</h3><p>​					驻留集管理考虑两个问题：驻留集大小和置换范围。</p>
+<h5 id="驻留集大小"><a href="#驻留集大小" class="headerlink" title="驻留集大小"></a>驻留集大小</h5><p>​						驻留集大小即分配给进程的内存空间。分配的内存越少，驻留在内存中的进程越多，增加了操作系统至少找到一个就绪进程的可能性，减少了由于交换而消耗的处理器时间，但缺页率高。</p>
+<p>​						固定分配策略:为一个进程分配固定数量的页框。一旦发生缺页中断，该进程的一页就被它所需要的页面置换</p>
+<p>​						可变分配策略：运行分配给进程的页框不断变化。</p>
+<h5 id="置换范围"><a href="#置换范围" class="headerlink" title="置换范围"></a>置换范围</h5><p>​						局部置换：仅在发生缺页中断的进程的驻留集中选择页来置换。</p>
+<p>​						全局置换：把内存中所有未锁定的页都作为置换的候选页。</p>
+<h4 id="1-固定分配，局部范围置换"><a href="#1-固定分配，局部范围置换" class="headerlink" title="1.固定分配，局部范围置换"></a>1.固定分配，局部范围置换</h4><p>​							缺点：一个进程的总页数分配过少时，产生很高缺页率。分配过多时，内存中进程太少，cpu把大量时间浪费在交换上。</p>
+<h4 id="2-可变分配，全局范围"><a href="#2-可变分配，全局范围" class="headerlink" title="2.可变分配，全局范围"></a>2.可变分配，全局范围</h4><p>​							这种方式最容易实现。每个进程分配到一定页框，操作系统维护一个空闲页框列表。发生一次缺页中断时，一个空闲页框被添加进进程的驻留集，并读入该页。</p>
+<p>​							这种方式的难点在于如何选择置换页。引入页缓冲技术可以解决这个问题。</p>
+<h4 id="3-可变分配，局部范围"><a href="#3-可变分配，局部范围" class="headerlink" title="3.可变分配，局部范围"></a>3.可变分配，局部范围</h4><p>​							这种方法的关键是不停地重新评估进程页框的分配情况，增加或减少分配该它的页框，以此来提高性能。</p>
+<p>​							比较常见方案的是工作集策略。但是它的开销比较大，一般使用近似算法替代。</p>
+<p>​							通过监视缺页率来评估进程的运行情况。若一个进程的缺页率低于某个最小阈值，则可以给进程分配一个较小的驻留集，但并不降低进程的性能（缺页率增加），使系统中其他进程受益；若进程的缺页率高于某个最高阈值，则在不降低整个系统性能的情况下，增大进程的驻留集。</p>
+<p>​							遵循该策略的一种算法是<strong>缺页中断频率算法</strong>。</p>
+<h5 id="缺页中断频率算法"><a href="#缺页中断频率算法" class="headerlink" title="缺页中断频率算法"></a>缺页中断频率算法</h5><p>​								某页被访问时，使用位置为1。发生一次缺页中断时，操作系统记录该进程从上次缺页中断到现在的虚拟时间，这通过维护一个页访问计数器实现。定义阈值F，若从上一次缺页中断到这次缺页中断时间小于F，则把该页加到进程的驻留集中；否则淘汰所有使用位为0的页，缩减驻留集大小。同时，把其余页的使用位重新置为0。</p>
+<h3 id="五、清除策略"><a href="#五、清除策略" class="headerlink" title="五、清除策略"></a>五、清除策略</h3><p>​			清除策略用于确定何时将已修改的一页写回辅存。</p>
+<h4 id="1-请求式清除"><a href="#1-请求式清除" class="headerlink" title="1.请求式清除"></a>1.请求式清除</h4><p>​							只有当一页被选择用于置换的时候才被写回辅存。</p>
+<p>​							缺点：写回一页和读入一页是成对出现的，虽然这样可以减少写回操作。但发生缺页中断的进程在接触阻塞之前必须等待两次页传送（写回一次，读入一次），降低处理器利用率。</p>
+<h4 id="2-预约式请除"><a href="#2-预约式请除" class="headerlink" title="2.预约式请除"></a>2.预约式请除</h4><p>​							将已经修改的多页在需要使用它们所占据的页框之前成批写回辅存。</p>
+<p>​							缺点:写回的页可能仍然在驻留集中，可能之后又被修改，会造成无意义的磁盘IO。</p>
+<p>​			    一种较好的方式是结合使用页缓冲技术。只清除用于置换的页，但去除了清除和置换操作的成对关系，即异步写回。被置换的页可以放在两个表（队列）中：修改表和未修改表。修改表中的页周期性地成批写出，并移到未修改表中。未修改表中的一页要么因为被访问而被回收到驻留集，要么在其页框分配给另一页时被淘汰。							</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/12/13/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%BA%8C/" data-id="clrbmrg3i00063kuz8kyb1yw9" data-title="虚拟内存二" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-内存管理" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2023/12/11/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" class="article-date">
@@ -158,7 +476,32 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        
+        <h1 id="虚拟内存一"><a href="#虚拟内存一" class="headerlink" title="虚拟内存一"></a>虚拟内存一</h1><h3 id="一、什么是虚拟内存"><a href="#一、什么是虚拟内存" class="headerlink" title="一、什么是虚拟内存"></a>一、什么是虚拟内存</h3><p>​				虚拟内存是对主存的抽象概念。它将主存看做是一个存储在磁盘上的地址空间的高速缓存，在主存中只保存活动区域，并根据需要再主存和磁盘之间传输数据。</p>
+<p>​				<strong>有了虚拟内存，进程不必将所有数据都装入主存，只需要将一部分活动的块装入内存即可。</strong>这加大了系统的并发度、</p>
+<p>​				<strong>任何时候都在内存中的部分称为进程的常驻集。</strong></p>
+<p>​				根据局部性原理，在任何一段很短的时间里，执行可能会限制在很小的一段程序中，仅可能访问少数数据数组。因此，虚拟内存将进程的一部分装入主存的做法是可行的。当cpu需要的数据不在主存中，会触发缺页中断，中断处理程序会将所需的页读入主存。</p>
+<h3 id="二、虚拟内存的实现"><a href="#二、虚拟内存的实现" class="headerlink" title="二、虚拟内存的实现"></a>二、虚拟内存的实现</h3><h4 id="1-分页"><a href="#1-分页" class="headerlink" title="1.分页"></a>1.分页</h4><p>​						分页是虚拟内存实现的前提。磁盘上的虚拟地址空间同样被分成一系列和页框大小相同的页，进程在执行时将一部分页缓存到主存中。</p>
+<p>​						每个进程同样维护一个页表，页表项上需要有一位来表示它对应的页是否被装入主存。还需要一个控制位是修改位，来表示相应页的内容从上次装入内存到现在是否被修改。若被修改，则该页换出时需要将数据写回磁盘中。</p>
+<h5 id="地址转换"><a href="#地址转换" class="headerlink" title="地址转换"></a>地址转换</h5><p>​							虚拟地址的页号用于检索页表，查询相应页框号，并与虚拟地址的偏移量结合起来形成物理地址</p>
+<p>​				![屏幕截图 2023-12-13 144934](&#x2F;..&#x2F;..&#x2F;images&#x2F;屏幕截图 2023-12-13 144934.png)</p>
+<h5 id="转换检测缓冲区"><a href="#转换检测缓冲区" class="headerlink" title="转换检测缓冲区"></a>转换检测缓冲区</h5><p>​						由于每次地址转换都会发生两次主存访问，一次读，一次取。所以大多虚存方案为页表提供了一个特殊的高速缓存，称为<strong>转换检测缓冲区</strong>（TLB）。给定一个虚拟地址，cpu先检查TLB，<strong>若所需的页表项在TLB中（TLB命中）</strong>，则检索页框号并形成物理地址。否则访问主存，并将相应页表项载入TLB中。</p>
+<p>​						![屏幕截图 2023-12-13 145504](&#x2F;..&#x2F;..&#x2F;images&#x2F;屏幕截图 2023-12-13 145504.png)</p>
+<h5 id="多级页表"><a href="#多级页表" class="headerlink" title="多级页表"></a>多级页表</h5><p>​						由于每个进程都有一个页表，所以页表可能会很大，所以大多虚存系统在虚存中保存页表。一个进程在运行时，它的页表至少有一部分在主存中。为了减少从磁盘中读页表锁耗费的时间，通常组织多级页表，即在页表上组织页目录，每个页目录指向一个页表（可以理解为页表的稀疏索引）。</p>
+<p>​						这样一来可以将比较小的页目录装入主存中，来减少读磁盘的次数。</p>
+<p>​			![屏幕截图 2023-12-13 150105](&#x2F;..&#x2F;..&#x2F;images&#x2F;屏幕截图 2023-12-13 150105.png)</p>
+<h5 id="倒排页表"><a href="#倒排页表" class="headerlink" title="倒排页表"></a>倒排页表</h5><p>​						上述页表的缺陷是，页表大小与虚拟地址空间大小成正比。<strong>倒排页表</strong>，顾名思义，它与常规页表相反，存储的是有关每个物理页框的信息，所以倒排页表项与物理内存页框有一一对应关系，它所包含的表项数量较少。</p>
+<p>​						在这种方法中，虚拟地址的页号部分使用一个简单的散列函数映射到散列表中。散列表包含一个指向倒排表的指针,而倒排表中含有页表项.通过这个结构,散列表和倒排表中各有一项对应于一个实存页.因此,不论有多少个进程、支持多少虚拟页，页表的大小都是固定的。</p>
+<p>​						地址转换时，虚拟地址的页号散列到倒排页表的页框号。然后通过配合进程位来确定这个页框中存的页是否是该进程的数据。通过链地址法来消除冲突。</p>
+<p>​					![屏幕截图 2023-12-13 152131](&#x2F;..&#x2F;..&#x2F;images&#x2F;屏幕截图 2023-12-13 152131.png)</p>
+<h3 id="二、分段"><a href="#二、分段" class="headerlink" title="二、分段"></a>二、分段</h3><p>​					分段允许程序员把内存视为由多个地址空间或段组成，段大小不等，内存访问以短号和偏移量构成</p>
+<h4 id="1-地址转换"><a href="#1-地址转换" class="headerlink" title="1.地址转换"></a>1.地址转换</h4><p>​					![屏幕截图 2023-12-13 152424](&#x2F;..&#x2F;..&#x2F;images&#x2F;屏幕截图 2023-12-13 152424.png)</p>
+<h4 id="2-优点"><a href="#2-优点" class="headerlink" title="2.优点"></a>2.优点</h4><p>​								1.简化了对不断增长的数据结构的处理</p>
+<p>​								2.允许程序独立地改变或重新编译，而不要求整个程序集重新链接或加载</p>
+<p>​								3.有助于进程间的共享</p>
+<p>​								4.有助于保护</p>
+<h3 id="三、段页式"><a href="#三、段页式" class="headerlink" title="三、段页式"></a>三、段页式</h3><p>​					段页式系统中，用户地址空间被程序员划分成多个段，每段依次划分为多个页，页长度等于页框大小。使用一个寄存器记录该进程段表的起始地址。对于每个虚拟地址，处理器用段号部分来检索进程段表以寻找该段的页表。</p>
+<p>​			![屏幕截图 2023-12-13 152827](&#x2F;..&#x2F;..&#x2F;images&#x2F;屏幕截图 2023-12-13 152827.png)				</p>
+
       
     </div>
     <footer class="article-footer">
@@ -166,6 +509,8 @@
       
       
       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li></ul>
+
     </footer>
   </div>
   
@@ -441,254 +786,11 @@
 
 
   
-    <article id="post-并发控制" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/12/06/%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/" class="article-date">
-  <time class="dt-published" datetime="2023-12-06T06:08:29.000Z" itemprop="datePublished">2023-12-06</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/12/06/%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/">并发控制</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="并发控制"><a href="#并发控制" class="headerlink" title="并发控制"></a>并发控制</h1><h3 id="一、常见的并发问题"><a href="#一、常见的并发问题" class="headerlink" title="一、常见的并发问题"></a>一、常见的并发问题</h3><p>​				更新丢失：两个或多个事务同时更新一条记录，会发生更新丢失。导致更新结果不可控。可以分为回滚覆盖和提交覆盖。</p>
-<p>​								回滚覆盖：一个事务回滚操作，把其他事务已提交的数据覆盖了</p>
-<p>​								提交覆盖：一个事务提交操作，把其他事务已提交的数据覆盖了</p>
-<p>​				脏读：一个事务读取到了另一个事务修改但未提交的数据。</p>
-<p>​				不可重复读：一个事务中多次读取同一行记录，后面读取的和前面读取的不一致。</p>
-<p>​				幻读：一个事务中多次按相同条件查询，结果不一致。</p>
-<h3 id="二、锁分类"><a href="#二、锁分类" class="headerlink" title="二、锁分类"></a>二、锁分类</h3><h4 id="1-按粒度分"><a href="#1-按粒度分" class="headerlink" title="1.按粒度分"></a>1.按粒度分</h4><p>​					表级锁：每次操作锁住整张表，粒度最大</p>
-<p>​					行级锁：每次操作锁住一行数据，粒度最小，仅Innodb引擎支持</p>
-<p>​					页等锁：每次锁定相邻的一组记录，粒度在表锁和行锁使用，仅BDB引擎支持</p>
-<h4 id="2-操作类型"><a href="#2-操作类型" class="headerlink" title="2.操作类型"></a>2.操作类型</h4><p>​					共享锁（读锁&#x2F;S锁）:对同一份数据，多个读操作可以同时进行。事务A对记录加了S锁，就可以对记录进行读操作，不能修改。其他事务也可以对记录追加S锁，但不能追加X锁。</p>
-<p>​					排它锁（写锁&#x2F;X锁）：当前写操作没有完成前，会阻断对其他事务获取该数据项上的写锁和读锁。事务A对记录添加了X锁，就可以对该记录读和写，其他事务不能对该记录进行读写。</p>
-<h5 id="意向锁"><a href="#意向锁" class="headerlink" title="意向锁"></a>意向锁</h5><p>​						S、X锁都是表级锁。意向锁是表级锁。当对表中记录加S或X锁之前，会先对表加IS或IX锁。主要用于迅速判断能否加锁。 一个记录被显式加锁前，它的所有父级记录都要加上意向锁（例：给表中某行显式加锁，那这个表和这个表所在的数据库都要加意向锁）。这样一个事务就不必遍历整个文件树来判定它能否给一个记录加锁。</p>
-<p>​					意向共享锁（IS）：如果一个记录被加上了IS锁，它的子记录只能加S锁。</p>
-<p>​					意向排它锁（IX）：如果一个记录被加上了IX锁，表明它的走子记录可以加S锁或X锁。</p>
-<h4 id="3-操作性能"><a href="#3-操作性能" class="headerlink" title="3.操作性能"></a>3.操作性能</h4><p>​					乐观锁：一般实现方式是对记录数据版本进行比对，在数据更新提交时才会进行冲突检测，如果发现冲突了，则让返回用户错误的信息，让用户决定如何去做。并发度很高</p>
-<pre><code>        乐观锁的实现：使用数据版本（Version）记录机制实现，这是乐观锁最常用的一种实现方式。何谓数据版本？即为数据增加一个版本标识，一般是通过为数据库表增加一个数字类型的 “version” 字段来实现。当读取数据时，将version字段的值一同读出，数据每更新一次，对此version值加一。当我们提交更新的时候，判断数据库表对应记录的当前版本信息与第一次取出来的version值进行比对，如果数据库表当前版本号与第一次取出来的version值相等，则予以更新，否则认为是过期数据。
-</code></pre>
-<p>​					悲观锁：对一条数据修改的时候，为了避免同时被其他人修改，修改之前先锁定该记录，再修改。共享锁和排它锁都属于排他锁。</p>
-<h3 id="三、死锁"><a href="#三、死锁" class="headerlink" title="三、死锁"></a>三、死锁</h3>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/12/06/%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/" data-id="clq0xq8r50003kwuz9nt9aqbq" data-title="并发控制" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-事务一" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/12/05/%E4%BA%8B%E5%8A%A1%E4%B8%80/" class="article-date">
-  <time class="dt-published" datetime="2023-12-05T04:55:21.000Z" itemprop="datePublished">2023-12-05</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/12/05/%E4%BA%8B%E5%8A%A1%E4%B8%80/">事务一</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="事务一"><a href="#事务一" class="headerlink" title="事务一"></a>事务一</h1><h3 id="1-事务的基本定义"><a href="#1-事务的基本定义" class="headerlink" title="1.事务的基本定义"></a>1.事务的基本定义</h3><p>​				事务是访问并可能更新各种数据项的一个逻辑单元。</p>
-<p>​			   事务的ACID特性：原子性、隔离性、持久性、一致性</p>
-<h3 id="二、事务的ACID特性"><a href="#二、事务的ACID特性" class="headerlink" title="二、事务的ACID特性"></a>二、事务的ACID特性</h3><h4 id="1-原子性"><a href="#1-原子性" class="headerlink" title="1.原子性"></a>1.原子性</h4><p>​					一个事务是不可分割的，要么执行其全部操作，要么全部不执行，这便是原子性。</p>
-<p>​					通常使用日志系统来保证事务的原子性。事务对数据库所做的每个修改先被记录到日志中。当事务未能成功执行，我们说这个事务<strong>中止</strong>了。这时，我们便使用日志中的数据来将数据库恢复到事务执行之前的状态，这称为事务的<strong>回滚</strong>。</p>
-<h4 id="2-隔离性"><a href="#2-隔离性" class="headerlink" title="2.隔离性"></a>2.隔离性</h4><p>​					当有多个事务并行执行的时候，事务之间不能相互影响，每个事务在自己的视角来看，应该只有它自己在执行，这便是隔离性。实际上就是对并行执行的控制。数据库中完成这项任务的是并发控制部件</p>
-<h5 id="隔离性级别"><a href="#隔离性级别" class="headerlink" title="隔离性级别"></a>隔离性级别</h5><p>​					可串行化：保证事务可串行化的执行。串行执行即一个一个的执行，不存在事务的并行。</p>
-<p>​					可重复读：只允许读取已经提交的数据，并且进一步要求一个事务在两次读取一个数据项期间，其他事务不得更新该数据项。</p>
-<p>​					已提交读：只允许读取已经提交的数据。</p>
-<p>​					未提交度：允许读取未提交的数据</p>
-<p>​					注意：以上四种级别均不允许<strong>脏写</strong>。不允许脏写是如果一个数据项已经被一个未提交或中止的事物写过，那么其他事务禁止再对该数据项进行写操作。</p>
-<h5 id="隔离性级别的实现"><a href="#隔离性级别的实现" class="headerlink" title="隔离性级别的实现"></a>隔离性级别的实现</h5><p>​					1.锁：通常我们使用两阶段封锁协议配合共享锁、排他锁来实现。两阶段封锁协议是指事务在第一个阶段只获得锁，第二个阶段只释放锁（实际上通常只有当事务提交或中止时才释放锁）。共享锁用于读，排他锁用于写。许多事务可以<strong>同时拥有数据项上</strong>的共享锁，但只有当<strong>其他任何事务在一个数据项上不持有任何锁</strong>的时候，一个事务才运行持有该数据项上的排他锁。</p>
-<p>​					2.时间戳：它为每个事务分配一个时间戳，通常是事务开始的时候。对与每个数据项，系统维护两个时间戳。读时间戳：保留最近读取的该数据项的事务的时间戳。写时间戳：写过该数据项当前值的事务的时间戳。事务依照事务时间戳来访问各个数据项，当不能访问时，违例事务被中止，并分配一个新的时间戳重新开始。</p>
-<p>​				  3.多版本和快照隔离：每个事务开始的时候有它自己需要的数据项的快照（即副本）。它从这个私有版本中读取数据，以此来避免冲突。更新同样发生在快照里，当事务被提交的时候，这些更新被真正地写到数据库里。当一个事务进入部分提交状态（即事务最后一个语句被执行后）时，只有在没有其他并发事务修改了该事务想要更新的数据的情况下，才能进入提交状态。不能被提交的事务被中止。</p>
-<h4 id="3-一致性"><a href="#3-一致性" class="headerlink" title="3.一致性"></a>3.一致性</h4><p>​						一致性是指系统从一个正-确的状态,迁移到另一个正确的状态。什么叫正确的状态呢?就是当前的状态满足预定的约束就叫做正确的状态.而事务具备ACID里C的特性是说通过事务的AID来保证我们的一致性。</p>
-<p>​						例：转账系统，转账前我的两张卡里钱的总和是1000，我把A中的钱转到B后，总和仍应该是1000。</p>
-<h4 id="4-持久性"><a href="#4-持久性" class="headerlink" title="4.持久性"></a>4.持久性</h4><p>​						一旦事务成功执行，它对数据库的改变应该是永久的，即使出现系统故障。	</p>
-<h3 id="三、事务调度"><a href="#三、事务调度" class="headerlink" title="三、事务调度"></a>三、事务调度</h3><h4 id="1-可恢复调度"><a href="#1-可恢复调度" class="headerlink" title="1.可恢复调度"></a>1.可恢复调度</h4><p>​					对于事务A,B如果B读取了由A之前所写过的数据项，那么A的提交操作应该出现在<strong>B的提交操作</strong>之前。</p>
-<h4 id="2-无级联调度"><a href="#2-无级联调度" class="headerlink" title="2.无级联调度"></a>2.无级联调度</h4><p>​					因为单个事务失效而导致一系列事务回滚的现象称为<strong>级联回滚</strong></p>
-<p>​					无级联调度是对于每对事物A,B,如果B读取了A中所写的一个数据项，那么A的提交必须出现在<strong>B的这一读操作</strong>之前。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/12/05/%E4%BA%8B%E5%8A%A1%E4%B8%80/" data-id="clq0xq8qy0000kwuz9cmwdmyn" data-title="事务一" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-索引的应用" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/12/03/%E7%B4%A2%E5%BC%95%E7%9A%84%E5%BA%94%E7%94%A8/" class="article-date">
-  <time class="dt-published" datetime="2023-12-03T07:16:17.000Z" itemprop="datePublished">2023-12-03</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/12/03/%E7%B4%A2%E5%BC%95%E7%9A%84%E5%BA%94%E7%94%A8/">索引的应用</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="索引的应用"><a href="#索引的应用" class="headerlink" title="索引的应用"></a>索引的应用</h1><h3 id="1-创建索引"><a href="#1-创建索引" class="headerlink" title="1.创建索引"></a>1.创建索引</h3><p>​			</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> index 索引名 <span class="keyword">on</span> 表名 (属性A，属性B...)	<span class="operator">/</span><span class="operator">/</span>创建索引</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">unique</span> 索引名 <span class="keyword">on</span> 表名 (属性A，属性B...)	<span class="operator">/</span><span class="operator">/</span>唯一索引</span><br><span class="line"></span><br><span class="line"><span class="keyword">drop</span> index 索引名 <span class="operator">/</span><span class="operator">/</span>删除</span><br></pre></td></tr></table></figure>
-
-<h5 id="应该创建索引的列：经常被搜索的列"><a href="#应该创建索引的列：经常被搜索的列" class="headerlink" title="应该创建索引的列：经常被搜索的列"></a>应该创建索引的列：经常被搜索的列</h5><p>​				在作为主键的列上，强制该列的唯一性和组织表中数据的排列结构<br>​				在经常用在连接（JOIN）的列上，这些列主要是一外键，可以加快连接的速度。因为大多连接都在外码和主码属性之间进行。<br>​				在经常需要根据范围（&lt;，&lt;&#x3D;，&#x3D;，&gt;，&gt;&#x3D;，BETWEEN，IN）进行搜索的列上创建索引，因为索引已经排序，其指定的范围是连				续的<br>​				在经常需要排序（order by）的列上创建索引，因为索引已经排序，这样查询可以利用索引的排序，加快排序查询时间；<br>​				在经常使用在WHERE子句中的列上面创建索引，加快条件的判断速度。</p>
-<h5 id="全文索引"><a href="#全文索引" class="headerlink" title="全文索引"></a>全文索引</h5><p>​					对于大量文本检索操作，使用like效率很低，这时可以使用全文索引来提高效率。它必须建立在字符串上。</p>
-<p>​					全文索引字段值必须建立在最大字段值和最小字段值之间才有效（Innodb：3-84）</p>
-<p>​					默认使用等值匹配，如a匹配a，而不匹配ab。可以使用against(‘a*’ in boolean mode)进行模糊匹配</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> fulltext 索引名 <span class="keyword">on</span> 表名 (属性A，属性B...)</span><br><span class="line"></span><br><span class="line"><span class="operator">/</span><span class="operator">/</span>使用</span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">from</span> 表</span><br><span class="line"><span class="keyword">where</span> <span class="keyword">match</span>(name<span class="comment">/*属性*/</span>) against(<span class="string">&#x27;aaa&#x27;</span><span class="comment">/*要匹配的串*/</span>)</span><br></pre></td></tr></table></figure>
-
-<h3 id="二、回表查询和覆盖索引"><a href="#二、回表查询和覆盖索引" class="headerlink" title="二、回表查询和覆盖索引"></a>二、回表查询和覆盖索引</h3><p>​					回表查询指通过索引项定位到数据后，还需要将相应数据行从磁盘读入主存。当select中包含不是搜索码的属性时，就会产生回表查询。</p>
-<p>​					覆盖索引值要查询的属性就是索引项的搜索码，属性的值就在索引项里存储，可以直接返回索引项中存储的数据，效率高。</p>
-<h3 id="三、最左前缀原则"><a href="#三、最左前缀原则" class="headerlink" title="三、最左前缀原则"></a>三、最左前缀原则</h3><p>​				当使用复合索引时遵循最左前缀原则。顾名思义，所谓最左前缀，就是最左优先，即查询中使用到最左边的搜索码，索引会生效，否则索引失效。例：一个复合索引包括(name,age,time)，那么单独查询name，或查询name和age，或name、age、time，索引都会生效。若查询age或age，name。等，则不会使用索引。<strong>但这只是理论上，实际上mysql的查询优化器会自动选择最优的查询顺序</strong>。</p>
-<p>​			实际上，建立一个索引，对于索引中的字段，mysql会一直向右匹配直到遇到范围查询(&gt;、&lt;、between、like)就停止匹配，比如a &#x3D; 1 and b &#x3D; 2 and c &gt; 3 and d &#x3D; 4 如果建立(a,b,c,d)顺序的索引，d是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d的顺序可以任意调整。</p>
-<h3 id="四、一些索引细节的面试题"><a href="#四、一些索引细节的面试题" class="headerlink" title="四、一些索引细节的面试题"></a>四、一些索引细节的面试题</h3><h5 id="1-mysql使用like模糊查询时，索引能不能起作用？"><a href="#1-mysql使用like模糊查询时，索引能不能起作用？" class="headerlink" title="1.mysql使用like模糊查询时，索引能不能起作用？"></a>1.mysql使用like模糊查询时，索引能不能起作用？</h5><p>​						1. like %keyword    索引失效，使用全表扫描。但可以通过翻转函数+like前模糊查询+建立翻转函数索引&#x3D;走翻转函数索						引，不走全表扫描。</p>
-<p>​						2.like keyword%    索引有效。</p>
-<p>​						3.like %keyword% 索引失效，也无法使用反向索引。</p>
-<h5 id="2-mysql中如果某一列有null值，那么包含该列的索引是否有效？"><a href="#2-mysql中如果某一列有null值，那么包含该列的索引是否有效？" class="headerlink" title="2.mysql中如果某一列有null值，那么包含该列的索引是否有效？"></a>2.mysql中如果某一列有null值，那么包含该列的索引是否有效？</h5><p>​						索引是有效的。虽然MySQL可以在含有null的列上使用索引，但不代表null和其他数据在索引中是一样的。null值通常需要额外的空间来记录null值。不建议列上允许为空。最好限制<code>not null</code>，并设置一个默认值，比如<code>0</code>和<code>&#39;&#39;</code>空字符串等，如果是datetime类型，可以设置成<code>&#39;1970-01-01 00:00:00&#39;</code>这样的特殊值。</p>
-<p>​					对MySQL来说，<code>null</code>是一个特殊的值，。比如：不能使用<code>=,&lt;,&gt;</code>这样的运算符，对<code>null</code>做算术运算的结果都是<code>null</code>，<code>count</code>时不会包括<code>null</code>行等，某列可为null比not null可能需要更多的存储空间等。</p>
-<h3 id="五、索引和排序"><a href="#五、索引和排序" class="headerlink" title="五、索引和排序"></a>五、索引和排序</h3><p>​			mysql中支持filesort和index两种排序方式。</p>
-<p>​			filesort：先把结果查出，然后在缓存中进行排序，效率低。它有两种算法：单路排序和双路排序。</p>
-<p>​			单路排序：从磁盘查询所需的所有列的数据，然后在内存中排序并返回。如果查询数据超出sortbuffer，会导致多次磁盘io，并创建临时表，降低效率。解决方案：少使用select *；增加sort_buffer_size容量和max_length_for_sort_data容量。</p>
-<p>​			双路排序：需要两次磁盘io，第一次将需要排序的字段（列）读出来进行排序，第二次读取其他字段数据。</p>
-<p>​			index：使用索引自动实现排序，不需另做排序操作，效率高。</p>
-<h4 id="以下几种情况会使用index排序"><a href="#以下几种情况会使用index排序" class="headerlink" title="以下几种情况会使用index排序"></a>以下几种情况会使用index排序</h4><p>​			1.order by子句索引列组合满足索引最左前缀原则 </p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select id from  表 order by id; //对应（id），（id，name，...）索引有效</span><br></pre></td></tr></table></figure>
-
-<p>​		  2.where子句+order by子句索引列组合满足索引最左前缀原则 </p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select id from 表 where id=3 order by name //对应（id，name）索引有效</span><br></pre></td></tr></table></figure>
-
-<h4 id="以下会使用filesort"><a href="#以下会使用filesort" class="headerlink" title="以下会使用filesort"></a>以下会使用filesort</h4><p>​		1.对索引列同时使用asc和desc</p>
-<p>​		2.where子句+order by子句索引列组合满足索引最左前缀原则 ，但where使用了范围查询</p>
-<p>​		3.order by子句或where子句+order by子句索引列组合不满足最左前缀原则。</p>
-<p>​		4.order by子句或where子句+order by子句使用了不同的索引。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select id from 表 order by name,age; //分别在name和age上建立了索引，但不是复合索引</span><br></pre></td></tr></table></figure>
-
-<p>​		5.order by子句或where子句+order by子句中索引列使用了表达式。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/12/03/%E7%B4%A2%E5%BC%95%E7%9A%84%E5%BA%94%E7%94%A8/" data-id="clpq9edpf0000zouzc3adfliq" data-title="索引的应用" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-索引" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/12/03/%E7%B4%A2%E5%BC%95/" class="article-date">
-  <time class="dt-published" datetime="2023-12-03T02:00:07.000Z" itemprop="datePublished">2023-12-03</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h1><h3 id="一-索引的概念"><a href="#一-索引的概念" class="headerlink" title="一.索引的概念"></a>一.索引的概念</h3><p>​				索引：索引实际上是一组键值对，键是表中的某些属性，值是指向相应文件内容的指针	</p>
-<p>​				顺序索引：基于值的顺序排序。</p>
-<p>​				散列索引：基于将值平均分布到若干桶中，一个值所属于哪个桶，是由一个散列函数决定的。（就是哈希表的思想）</p>
-<p>​				搜索码：用于在文件中查找记录的属性或属性集。即索引的“键”</p>
-<h3 id="二-顺序索引"><a href="#二-顺序索引" class="headerlink" title="二.顺序索引"></a>二.顺序索引</h3><p>​				顺序索引按照排好的顺序存储搜索码的值，并将每个搜索码与包含该搜索码的记录关联起来。</p>
-<p>​				被搜索文件本身也可以按一定顺序来排列。</p>
-<p>​				聚集索引：搜索码排序和被搜索文件内容排序一致的索引，它定义了文件中内容的次序。</p>
-<p>​				非聚集索引（辅助索引）：搜索码排序与文件内容不一致</p>
-<h4 id="1-稠密索引"><a href="#1-稠密索引" class="headerlink" title="1.稠密索引"></a>1.稠密索引</h4><p>​					对于文件中的每个搜索码值都有一个索引，即对表中的每一个元组都有索引。索引项包括<strong>搜索码值</strong>和<strong>一个指向具有该搜索码值的第一条数据记录的指针</strong>，其他拥有相同搜索码值的数据会顺序存储在第一条之后。</p>
-<h4 id="2-稀疏索引"><a href="#2-稀疏索引" class="headerlink" title="2.稀疏索引"></a>2.稀疏索引</h4><p>​					在稀疏索引中，只为某些是搜索码建立索引值。只有当表中数据按搜索码依次排序存储的时候才能用稀疏索引。</p>
-<h4 id="3-多级索引"><a href="#3-多级索引" class="headerlink" title="3.多级索引"></a>3.多级索引</h4><p>​					为了<strong>提高查找效率</strong>，我们可以使用多级索引。先来看一下索引的大小对查找效率的影响，如果一个索引非常大，它不能被存入主存，那么我们就需要去磁盘上读取一些索引项，这会大大降低效率。</p>
-<p>​					所以我们引入了多级索引，我们在原始索引上构建一个稀疏的外层索引，这个过程可以多次重复。这样可以将磁盘io的次数降到最低。例：我们现在有两层索引，原始索引有100个块，每个块有100条数据，二级索引存储了指向这些块的指针，共100条，它在主存中。我们通过<strong>二分查找找到最大搜索码值小于等于要搜索的数据的搜索码的索引项</strong>，进而得到相应的块。将该块读入主存，再去遍历或二分搜索具体数据。这个过程只需要1次磁盘io。如果不用多级索引，直接在原始索引上二分，我们读log2 100 &#x3D; 7次磁盘io。</p>
-<h4 id="4-索引的增删"><a href="#4-索引的增删" class="headerlink" title="4.索引的增删"></a>4.索引的增删</h4><h5 id="插入"><a href="#插入" class="headerlink" title="插入"></a>插入</h5><p>​							稠密索引：如果该搜索码未出现在索引中，就在索引中的适当位置插入带有该搜索码的索引项。否则，如果索引项存储的是所有指向具有相同搜索码的数据的指针，那么就在该索引项中添加一个新的指针；如果索引项存储的是具有相同搜索码的第一条记录的指针，就将待插入记录放到具有相同搜索码值的其他记录之后。</p>
-<p>​							稀疏索引：如果它的值不在目前的块的范围内，那就新建一个块，它是新块中的第一个索引项。如果这条插入记录具有所在块的最小值，就更新指向块的索引项。否则不做改动。例：现在有稀疏索引 1、5、10，如果插入15，那么系统将新建一个块，它的第一个索引项是15；如果插入5，那么指向5-9块的索引项指针将被更新，指向这个新插入的索引项。其他情况，稀疏索引不动。</p>
-<h5 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h5><p>​						  稠密索引：如果要删除的记录是唯一记录，那就直接删。否则，如果索引项存储的是所有指向具有相同搜索码的数据的指针，那么就从索引项中删除指向待删除记录的指针。如果索引项存储的是具有相同搜索码的第一条记录的指针，如果待删除记录是具有该搜索码值的第一条记录，那就将索引项指向下一条记录。</p>
-<p>​							稀疏索引：如果索引值不包含具有待删除记录搜索码值的索引项，索引不动。否则，如果待删除记录是具有该搜索码值的唯一记录，就用下一个搜索码值的索引记录来替换相应的索引记录，如果下一个搜索码值已经有了一个索引项，那就删除而不是替换该索引项。如果它不是唯一记录，那就用具有相同搜索码值的下一条记录更新索引项。</p>
-<h4 id="5-辅助索引"><a href="#5-辅助索引" class="headerlink" title="5.辅助索引"></a>5.辅助索引</h4><p>​				辅助索引必须是稠密的。每个索引项需要包含指向所有具有该索引项搜索码值的记录的指针。</p>
-<h4 id="6-B-树索引文件"><a href="#6-B-树索引文件" class="headerlink" title="6.B+树索引文件"></a>6.B+树索引文件</h4><p>​				顺序索引文件一般被组织成B+树，它随着数据量的增长，具有比较稳定的性能。</p>
-<h4 id="7-非唯一性搜索码"><a href="#7-非唯一性搜索码" class="headerlink" title="7.非唯一性搜索码"></a>7.非唯一性搜索码</h4><p>​				由于搜索码可以是表中的任意属性，所以它不一定是候选码。为了保证效率和避免一些负责的问题，大多数据库的B+树都实现只处理唯一搜索码。它们会自动添加记录ID或其他属性，使得非唯一搜索码变得唯一。</p>
-<h3 id="二、散列索引"><a href="#二、散列索引" class="headerlink" title="二、散列索引"></a>二、散列索引</h3><p>​			散列是在主存中构建索引的常用技术。散列索引的组织结构等同于哈希表。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/12/03/%E7%B4%A2%E5%BC%95/" data-id="clq0xq8ra0006kwuz9u7u9a5j" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
 
 
   <nav id="page-nav">
     
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
   </nav>
 
 </section>
@@ -712,7 +814,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/c-%E5%9F%BA%E7%A1%80/" style="font-size: 12.5px;">c++基础</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 15px;">操作系统</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 17.5px;">数据库</a> <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" style="font-size: 10px;">算法题</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 15px;">计算机网络</a> <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 20px;">设计模式</a>
+      <a href="/tags/c-%E5%9F%BA%E7%A1%80/" style="font-size: 12px;">c++基础</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 18px;">操作系统</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 16px;">数据库</a> <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" style="font-size: 10px;">算法题</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 14px;">计算机网络</a> <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 20px;">设计模式</a>
     </div>
   </div>
 
@@ -734,23 +836,23 @@
       <ul>
         
           <li>
+            <a href="/2023/12/14/IO%E7%AE%A1%E7%90%86%E5%92%8C%E7%A3%81%E7%9B%98%E8%B0%83%E5%BA%A6/">IO管理和磁盘调度</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/14/%E5%8D%95%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6/">单处理器调度</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/13/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%89/">虚拟内存三</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/13/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%BA%8C/">虚拟内存二</a>
+          </li>
+        
+          <li>
             <a href="/2023/12/11/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
-          </li>
-        
-          <li>
-            <a href="/2023/12/11/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%80/">虚拟内存一</a>
-          </li>
-        
-          <li>
-            <a href="/2023/12/10/%E7%BA%BF%E7%A8%8B%E4%B8%80/">线程一</a>
-          </li>
-        
-          <li>
-            <a href="/2023/12/09/%E8%BF%9B%E7%A8%8B%E5%BA%94%E7%94%A8/">进程应用</a>
-          </li>
-        
-          <li>
-            <a href="/2023/12/09/%E8%BF%9B%E7%A8%8B%E4%BA%8C/">进程二</a>
           </li>
         
       </ul>
@@ -766,7 +868,7 @@
   <div class="outer">
     <div id="footer-info" class="inner">
       
-      &copy; 2023 John Doe<br>
+      &copy; 2024 John Doe<br>
       Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>

@@ -73,6 +73,249 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-并发控制" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/12/06/%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/" class="article-date">
+  <time class="dt-published" datetime="2023-12-06T06:08:29.000Z" itemprop="datePublished">2023-12-06</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/12/06/%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/">并发控制</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="并发控制"><a href="#并发控制" class="headerlink" title="并发控制"></a>并发控制</h1><h3 id="一、常见的并发问题"><a href="#一、常见的并发问题" class="headerlink" title="一、常见的并发问题"></a>一、常见的并发问题</h3><p>​				更新丢失：两个或多个事务同时更新一条记录，会发生更新丢失。导致更新结果不可控。可以分为回滚覆盖和提交覆盖。</p>
+<p>​								回滚覆盖：一个事务回滚操作，把其他事务已提交的数据覆盖了</p>
+<p>​								提交覆盖：一个事务提交操作，把其他事务已提交的数据覆盖了</p>
+<p>​				脏读：一个事务读取到了另一个事务修改但未提交的数据。</p>
+<p>​				不可重复读：一个事务中多次读取同一行记录，后面读取的和前面读取的不一致。</p>
+<p>​				幻读：一个事务中多次按相同条件查询，结果不一致。</p>
+<h3 id="二、锁分类"><a href="#二、锁分类" class="headerlink" title="二、锁分类"></a>二、锁分类</h3><h4 id="1-按粒度分"><a href="#1-按粒度分" class="headerlink" title="1.按粒度分"></a>1.按粒度分</h4><p>​					表级锁：每次操作锁住整张表，粒度最大</p>
+<p>​					行级锁：每次操作锁住一行数据，粒度最小，仅Innodb引擎支持</p>
+<p>​					页等锁：每次锁定相邻的一组记录，粒度在表锁和行锁使用，仅BDB引擎支持</p>
+<h4 id="2-操作类型"><a href="#2-操作类型" class="headerlink" title="2.操作类型"></a>2.操作类型</h4><p>​					共享锁（读锁&#x2F;S锁）:对同一份数据，多个读操作可以同时进行。事务A对记录加了S锁，就可以对记录进行读操作，不能修改。其他事务也可以对记录追加S锁，但不能追加X锁。</p>
+<p>​					排它锁（写锁&#x2F;X锁）：当前写操作没有完成前，会阻断对其他事务获取该数据项上的写锁和读锁。事务A对记录添加了X锁，就可以对该记录读和写，其他事务不能对该记录进行读写。</p>
+<h5 id="意向锁"><a href="#意向锁" class="headerlink" title="意向锁"></a>意向锁</h5><p>​						S、X锁都是表级锁。意向锁是表级锁。当对表中记录加S或X锁之前，会先对表加IS或IX锁。主要用于迅速判断能否加锁。 一个记录被显式加锁前，它的所有父级记录都要加上意向锁（例：给表中某行显式加锁，那这个表和这个表所在的数据库都要加意向锁）。这样一个事务就不必遍历整个文件树来判定它能否给一个记录加锁。</p>
+<p>​					意向共享锁（IS）：如果一个记录被加上了IS锁，它的子记录只能加S锁。</p>
+<p>​					意向排它锁（IX）：如果一个记录被加上了IX锁，表明它的走子记录可以加S锁或X锁。</p>
+<h4 id="3-操作性能"><a href="#3-操作性能" class="headerlink" title="3.操作性能"></a>3.操作性能</h4><p>​					乐观锁：一般实现方式是对记录数据版本进行比对，在数据更新提交时才会进行冲突检测，如果发现冲突了，则让返回用户错误的信息，让用户决定如何去做。并发度很高</p>
+<pre><code>        乐观锁的实现：使用数据版本（Version）记录机制实现，这是乐观锁最常用的一种实现方式。何谓数据版本？即为数据增加一个版本标识，一般是通过为数据库表增加一个数字类型的 “version” 字段来实现。当读取数据时，将version字段的值一同读出，数据每更新一次，对此version值加一。当我们提交更新的时候，判断数据库表对应记录的当前版本信息与第一次取出来的version值进行比对，如果数据库表当前版本号与第一次取出来的version值相等，则予以更新，否则认为是过期数据。
+</code></pre>
+<p>​					悲观锁：对一条数据修改的时候，为了避免同时被其他人修改，修改之前先锁定该记录，再修改。共享锁和排它锁都属于排他锁。</p>
+<h3 id="三、死锁"><a href="#三、死锁" class="headerlink" title="三、死锁"></a>三、死锁</h3>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/12/06/%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/" data-id="clq0xq8r50003kwuz9nt9aqbq" data-title="并发控制" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-事务一" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/12/05/%E4%BA%8B%E5%8A%A1%E4%B8%80/" class="article-date">
+  <time class="dt-published" datetime="2023-12-05T04:55:21.000Z" itemprop="datePublished">2023-12-05</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/12/05/%E4%BA%8B%E5%8A%A1%E4%B8%80/">事务一</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="事务一"><a href="#事务一" class="headerlink" title="事务一"></a>事务一</h1><h3 id="1-事务的基本定义"><a href="#1-事务的基本定义" class="headerlink" title="1.事务的基本定义"></a>1.事务的基本定义</h3><p>​				事务是访问并可能更新各种数据项的一个逻辑单元。</p>
+<p>​			   事务的ACID特性：原子性、隔离性、持久性、一致性</p>
+<h3 id="二、事务的ACID特性"><a href="#二、事务的ACID特性" class="headerlink" title="二、事务的ACID特性"></a>二、事务的ACID特性</h3><h4 id="1-原子性"><a href="#1-原子性" class="headerlink" title="1.原子性"></a>1.原子性</h4><p>​					一个事务是不可分割的，要么执行其全部操作，要么全部不执行，这便是原子性。</p>
+<p>​					通常使用日志系统来保证事务的原子性。事务对数据库所做的每个修改先被记录到日志中。当事务未能成功执行，我们说这个事务<strong>中止</strong>了。这时，我们便使用日志中的数据来将数据库恢复到事务执行之前的状态，这称为事务的<strong>回滚</strong>。</p>
+<h4 id="2-隔离性"><a href="#2-隔离性" class="headerlink" title="2.隔离性"></a>2.隔离性</h4><p>​					当有多个事务并行执行的时候，事务之间不能相互影响，每个事务在自己的视角来看，应该只有它自己在执行，这便是隔离性。实际上就是对并行执行的控制。数据库中完成这项任务的是并发控制部件</p>
+<h5 id="隔离性级别"><a href="#隔离性级别" class="headerlink" title="隔离性级别"></a>隔离性级别</h5><p>​					可串行化：保证事务可串行化的执行。串行执行即一个一个的执行，不存在事务的并行。</p>
+<p>​					可重复读：只允许读取已经提交的数据，并且进一步要求一个事务在两次读取一个数据项期间，其他事务不得更新该数据项。</p>
+<p>​					已提交读：只允许读取已经提交的数据。</p>
+<p>​					未提交度：允许读取未提交的数据</p>
+<p>​					注意：以上四种级别均不允许<strong>脏写</strong>。不允许脏写是如果一个数据项已经被一个未提交或中止的事物写过，那么其他事务禁止再对该数据项进行写操作。</p>
+<h5 id="隔离性级别的实现"><a href="#隔离性级别的实现" class="headerlink" title="隔离性级别的实现"></a>隔离性级别的实现</h5><p>​					1.锁：通常我们使用两阶段封锁协议配合共享锁、排他锁来实现。两阶段封锁协议是指事务在第一个阶段只获得锁，第二个阶段只释放锁（实际上通常只有当事务提交或中止时才释放锁）。共享锁用于读，排他锁用于写。许多事务可以<strong>同时拥有数据项上</strong>的共享锁，但只有当<strong>其他任何事务在一个数据项上不持有任何锁</strong>的时候，一个事务才运行持有该数据项上的排他锁。</p>
+<p>​					2.时间戳：它为每个事务分配一个时间戳，通常是事务开始的时候。对与每个数据项，系统维护两个时间戳。读时间戳：保留最近读取的该数据项的事务的时间戳。写时间戳：写过该数据项当前值的事务的时间戳。事务依照事务时间戳来访问各个数据项，当不能访问时，违例事务被中止，并分配一个新的时间戳重新开始。</p>
+<p>​				  3.多版本和快照隔离：每个事务开始的时候有它自己需要的数据项的快照（即副本）。它从这个私有版本中读取数据，以此来避免冲突。更新同样发生在快照里，当事务被提交的时候，这些更新被真正地写到数据库里。当一个事务进入部分提交状态（即事务最后一个语句被执行后）时，只有在没有其他并发事务修改了该事务想要更新的数据的情况下，才能进入提交状态。不能被提交的事务被中止。</p>
+<h4 id="3-一致性"><a href="#3-一致性" class="headerlink" title="3.一致性"></a>3.一致性</h4><p>​						一致性是指系统从一个正-确的状态,迁移到另一个正确的状态。什么叫正确的状态呢?就是当前的状态满足预定的约束就叫做正确的状态.而事务具备ACID里C的特性是说通过事务的AID来保证我们的一致性。</p>
+<p>​						例：转账系统，转账前我的两张卡里钱的总和是1000，我把A中的钱转到B后，总和仍应该是1000。</p>
+<h4 id="4-持久性"><a href="#4-持久性" class="headerlink" title="4.持久性"></a>4.持久性</h4><p>​						一旦事务成功执行，它对数据库的改变应该是永久的，即使出现系统故障。	</p>
+<h3 id="三、事务调度"><a href="#三、事务调度" class="headerlink" title="三、事务调度"></a>三、事务调度</h3><h4 id="1-可恢复调度"><a href="#1-可恢复调度" class="headerlink" title="1.可恢复调度"></a>1.可恢复调度</h4><p>​					对于事务A,B如果B读取了由A之前所写过的数据项，那么A的提交操作应该出现在<strong>B的提交操作</strong>之前。</p>
+<h4 id="2-无级联调度"><a href="#2-无级联调度" class="headerlink" title="2.无级联调度"></a>2.无级联调度</h4><p>​					因为单个事务失效而导致一系列事务回滚的现象称为<strong>级联回滚</strong></p>
+<p>​					无级联调度是对于每对事物A,B,如果B读取了A中所写的一个数据项，那么A的提交必须出现在<strong>B的这一读操作</strong>之前。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/12/05/%E4%BA%8B%E5%8A%A1%E4%B8%80/" data-id="clq0xq8qy0000kwuz9cmwdmyn" data-title="事务一" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-索引的应用" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/12/03/%E7%B4%A2%E5%BC%95%E7%9A%84%E5%BA%94%E7%94%A8/" class="article-date">
+  <time class="dt-published" datetime="2023-12-03T07:16:17.000Z" itemprop="datePublished">2023-12-03</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/12/03/%E7%B4%A2%E5%BC%95%E7%9A%84%E5%BA%94%E7%94%A8/">索引的应用</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="索引的应用"><a href="#索引的应用" class="headerlink" title="索引的应用"></a>索引的应用</h1><h3 id="1-创建索引"><a href="#1-创建索引" class="headerlink" title="1.创建索引"></a>1.创建索引</h3><p>​			</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> index 索引名 <span class="keyword">on</span> 表名 (属性A，属性B...)	<span class="operator">/</span><span class="operator">/</span>创建索引</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">unique</span> 索引名 <span class="keyword">on</span> 表名 (属性A，属性B...)	<span class="operator">/</span><span class="operator">/</span>唯一索引</span><br><span class="line"></span><br><span class="line"><span class="keyword">drop</span> index 索引名 <span class="operator">/</span><span class="operator">/</span>删除</span><br></pre></td></tr></table></figure>
+
+<h5 id="应该创建索引的列：经常被搜索的列"><a href="#应该创建索引的列：经常被搜索的列" class="headerlink" title="应该创建索引的列：经常被搜索的列"></a>应该创建索引的列：经常被搜索的列</h5><p>​				在作为主键的列上，强制该列的唯一性和组织表中数据的排列结构<br>​				在经常用在连接（JOIN）的列上，这些列主要是一外键，可以加快连接的速度。因为大多连接都在外码和主码属性之间进行。<br>​				在经常需要根据范围（&lt;，&lt;&#x3D;，&#x3D;，&gt;，&gt;&#x3D;，BETWEEN，IN）进行搜索的列上创建索引，因为索引已经排序，其指定的范围是连				续的<br>​				在经常需要排序（order by）的列上创建索引，因为索引已经排序，这样查询可以利用索引的排序，加快排序查询时间；<br>​				在经常使用在WHERE子句中的列上面创建索引，加快条件的判断速度。</p>
+<h5 id="全文索引"><a href="#全文索引" class="headerlink" title="全文索引"></a>全文索引</h5><p>​					对于大量文本检索操作，使用like效率很低，这时可以使用全文索引来提高效率。它必须建立在字符串上。</p>
+<p>​					全文索引字段值必须建立在最大字段值和最小字段值之间才有效（Innodb：3-84）</p>
+<p>​					默认使用等值匹配，如a匹配a，而不匹配ab。可以使用against(‘a*’ in boolean mode)进行模糊匹配</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> fulltext 索引名 <span class="keyword">on</span> 表名 (属性A，属性B...)</span><br><span class="line"></span><br><span class="line"><span class="operator">/</span><span class="operator">/</span>使用</span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">from</span> 表</span><br><span class="line"><span class="keyword">where</span> <span class="keyword">match</span>(name<span class="comment">/*属性*/</span>) against(<span class="string">&#x27;aaa&#x27;</span><span class="comment">/*要匹配的串*/</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="二、回表查询和覆盖索引"><a href="#二、回表查询和覆盖索引" class="headerlink" title="二、回表查询和覆盖索引"></a>二、回表查询和覆盖索引</h3><p>​					回表查询指通过索引项定位到数据后，还需要将相应数据行从磁盘读入主存。当select中包含不是搜索码的属性时，就会产生回表查询。</p>
+<p>​					覆盖索引值要查询的属性就是索引项的搜索码，属性的值就在索引项里存储，可以直接返回索引项中存储的数据，效率高。</p>
+<h3 id="三、最左前缀原则"><a href="#三、最左前缀原则" class="headerlink" title="三、最左前缀原则"></a>三、最左前缀原则</h3><p>​				当使用复合索引时遵循最左前缀原则。顾名思义，所谓最左前缀，就是最左优先，即查询中使用到最左边的搜索码，索引会生效，否则索引失效。例：一个复合索引包括(name,age,time)，那么单独查询name，或查询name和age，或name、age、time，索引都会生效。若查询age或age，name。等，则不会使用索引。<strong>但这只是理论上，实际上mysql的查询优化器会自动选择最优的查询顺序</strong>。</p>
+<p>​			实际上，建立一个索引，对于索引中的字段，mysql会一直向右匹配直到遇到范围查询(&gt;、&lt;、between、like)就停止匹配，比如a &#x3D; 1 and b &#x3D; 2 and c &gt; 3 and d &#x3D; 4 如果建立(a,b,c,d)顺序的索引，d是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d的顺序可以任意调整。</p>
+<h3 id="四、一些索引细节的面试题"><a href="#四、一些索引细节的面试题" class="headerlink" title="四、一些索引细节的面试题"></a>四、一些索引细节的面试题</h3><h5 id="1-mysql使用like模糊查询时，索引能不能起作用？"><a href="#1-mysql使用like模糊查询时，索引能不能起作用？" class="headerlink" title="1.mysql使用like模糊查询时，索引能不能起作用？"></a>1.mysql使用like模糊查询时，索引能不能起作用？</h5><p>​						1. like %keyword    索引失效，使用全表扫描。但可以通过翻转函数+like前模糊查询+建立翻转函数索引&#x3D;走翻转函数索						引，不走全表扫描。</p>
+<p>​						2.like keyword%    索引有效。</p>
+<p>​						3.like %keyword% 索引失效，也无法使用反向索引。</p>
+<h5 id="2-mysql中如果某一列有null值，那么包含该列的索引是否有效？"><a href="#2-mysql中如果某一列有null值，那么包含该列的索引是否有效？" class="headerlink" title="2.mysql中如果某一列有null值，那么包含该列的索引是否有效？"></a>2.mysql中如果某一列有null值，那么包含该列的索引是否有效？</h5><p>​						索引是有效的。虽然MySQL可以在含有null的列上使用索引，但不代表null和其他数据在索引中是一样的。null值通常需要额外的空间来记录null值。不建议列上允许为空。最好限制<code>not null</code>，并设置一个默认值，比如<code>0</code>和<code>&#39;&#39;</code>空字符串等，如果是datetime类型，可以设置成<code>&#39;1970-01-01 00:00:00&#39;</code>这样的特殊值。</p>
+<p>​					对MySQL来说，<code>null</code>是一个特殊的值，。比如：不能使用<code>=,&lt;,&gt;</code>这样的运算符，对<code>null</code>做算术运算的结果都是<code>null</code>，<code>count</code>时不会包括<code>null</code>行等，某列可为null比not null可能需要更多的存储空间等。</p>
+<h3 id="五、索引和排序"><a href="#五、索引和排序" class="headerlink" title="五、索引和排序"></a>五、索引和排序</h3><p>​			mysql中支持filesort和index两种排序方式。</p>
+<p>​			filesort：先把结果查出，然后在缓存中进行排序，效率低。它有两种算法：单路排序和双路排序。</p>
+<p>​			单路排序：从磁盘查询所需的所有列的数据，然后在内存中排序并返回。如果查询数据超出sortbuffer，会导致多次磁盘io，并创建临时表，降低效率。解决方案：少使用select *；增加sort_buffer_size容量和max_length_for_sort_data容量。</p>
+<p>​			双路排序：需要两次磁盘io，第一次将需要排序的字段（列）读出来进行排序，第二次读取其他字段数据。</p>
+<p>​			index：使用索引自动实现排序，不需另做排序操作，效率高。</p>
+<h4 id="以下几种情况会使用index排序"><a href="#以下几种情况会使用index排序" class="headerlink" title="以下几种情况会使用index排序"></a>以下几种情况会使用index排序</h4><p>​			1.order by子句索引列组合满足索引最左前缀原则 </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select id from  表 order by id; //对应（id），（id，name，...）索引有效</span><br></pre></td></tr></table></figure>
+
+<p>​		  2.where子句+order by子句索引列组合满足索引最左前缀原则 </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select id from 表 where id=3 order by name //对应（id，name）索引有效</span><br></pre></td></tr></table></figure>
+
+<h4 id="以下会使用filesort"><a href="#以下会使用filesort" class="headerlink" title="以下会使用filesort"></a>以下会使用filesort</h4><p>​		1.对索引列同时使用asc和desc</p>
+<p>​		2.where子句+order by子句索引列组合满足索引最左前缀原则 ，但where使用了范围查询</p>
+<p>​		3.order by子句或where子句+order by子句索引列组合不满足最左前缀原则。</p>
+<p>​		4.order by子句或where子句+order by子句使用了不同的索引。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select id from 表 order by name,age; //分别在name和age上建立了索引，但不是复合索引</span><br></pre></td></tr></table></figure>
+
+<p>​		5.order by子句或where子句+order by子句中索引列使用了表达式。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/12/03/%E7%B4%A2%E5%BC%95%E7%9A%84%E5%BA%94%E7%94%A8/" data-id="clpq9edpf0000zouzc3adfliq" data-title="索引的应用" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-索引" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/12/03/%E7%B4%A2%E5%BC%95/" class="article-date">
+  <time class="dt-published" datetime="2023-12-03T02:00:07.000Z" itemprop="datePublished">2023-12-03</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h1><h3 id="一-索引的概念"><a href="#一-索引的概念" class="headerlink" title="一.索引的概念"></a>一.索引的概念</h3><p>​				索引：索引实际上是一组键值对，键是表中的某些属性，值是指向相应文件内容的指针	</p>
+<p>​				顺序索引：基于值的顺序排序。</p>
+<p>​				散列索引：基于将值平均分布到若干桶中，一个值所属于哪个桶，是由一个散列函数决定的。（就是哈希表的思想）</p>
+<p>​				搜索码：用于在文件中查找记录的属性或属性集。即索引的“键”</p>
+<h3 id="二-顺序索引"><a href="#二-顺序索引" class="headerlink" title="二.顺序索引"></a>二.顺序索引</h3><p>​				顺序索引按照排好的顺序存储搜索码的值，并将每个搜索码与包含该搜索码的记录关联起来。</p>
+<p>​				被搜索文件本身也可以按一定顺序来排列。</p>
+<p>​				聚集索引：搜索码排序和被搜索文件内容排序一致的索引，它定义了文件中内容的次序。</p>
+<p>​				非聚集索引（辅助索引）：搜索码排序与文件内容不一致</p>
+<h4 id="1-稠密索引"><a href="#1-稠密索引" class="headerlink" title="1.稠密索引"></a>1.稠密索引</h4><p>​					对于文件中的每个搜索码值都有一个索引，即对表中的每一个元组都有索引。索引项包括<strong>搜索码值</strong>和<strong>一个指向具有该搜索码值的第一条数据记录的指针</strong>，其他拥有相同搜索码值的数据会顺序存储在第一条之后。</p>
+<h4 id="2-稀疏索引"><a href="#2-稀疏索引" class="headerlink" title="2.稀疏索引"></a>2.稀疏索引</h4><p>​					在稀疏索引中，只为某些是搜索码建立索引值。只有当表中数据按搜索码依次排序存储的时候才能用稀疏索引。</p>
+<h4 id="3-多级索引"><a href="#3-多级索引" class="headerlink" title="3.多级索引"></a>3.多级索引</h4><p>​					为了<strong>提高查找效率</strong>，我们可以使用多级索引。先来看一下索引的大小对查找效率的影响，如果一个索引非常大，它不能被存入主存，那么我们就需要去磁盘上读取一些索引项，这会大大降低效率。</p>
+<p>​					所以我们引入了多级索引，我们在原始索引上构建一个稀疏的外层索引，这个过程可以多次重复。这样可以将磁盘io的次数降到最低。例：我们现在有两层索引，原始索引有100个块，每个块有100条数据，二级索引存储了指向这些块的指针，共100条，它在主存中。我们通过<strong>二分查找找到最大搜索码值小于等于要搜索的数据的搜索码的索引项</strong>，进而得到相应的块。将该块读入主存，再去遍历或二分搜索具体数据。这个过程只需要1次磁盘io。如果不用多级索引，直接在原始索引上二分，我们读log2 100 &#x3D; 7次磁盘io。</p>
+<h4 id="4-索引的增删"><a href="#4-索引的增删" class="headerlink" title="4.索引的增删"></a>4.索引的增删</h4><h5 id="插入"><a href="#插入" class="headerlink" title="插入"></a>插入</h5><p>​							稠密索引：如果该搜索码未出现在索引中，就在索引中的适当位置插入带有该搜索码的索引项。否则，如果索引项存储的是所有指向具有相同搜索码的数据的指针，那么就在该索引项中添加一个新的指针；如果索引项存储的是具有相同搜索码的第一条记录的指针，就将待插入记录放到具有相同搜索码值的其他记录之后。</p>
+<p>​							稀疏索引：如果它的值不在目前的块的范围内，那就新建一个块，它是新块中的第一个索引项。如果这条插入记录具有所在块的最小值，就更新指向块的索引项。否则不做改动。例：现在有稀疏索引 1、5、10，如果插入15，那么系统将新建一个块，它的第一个索引项是15；如果插入5，那么指向5-9块的索引项指针将被更新，指向这个新插入的索引项。其他情况，稀疏索引不动。</p>
+<h5 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h5><p>​						  稠密索引：如果要删除的记录是唯一记录，那就直接删。否则，如果索引项存储的是所有指向具有相同搜索码的数据的指针，那么就从索引项中删除指向待删除记录的指针。如果索引项存储的是具有相同搜索码的第一条记录的指针，如果待删除记录是具有该搜索码值的第一条记录，那就将索引项指向下一条记录。</p>
+<p>​							稀疏索引：如果索引值不包含具有待删除记录搜索码值的索引项，索引不动。否则，如果待删除记录是具有该搜索码值的唯一记录，就用下一个搜索码值的索引记录来替换相应的索引记录，如果下一个搜索码值已经有了一个索引项，那就删除而不是替换该索引项。如果它不是唯一记录，那就用具有相同搜索码值的下一条记录更新索引项。</p>
+<h4 id="5-辅助索引"><a href="#5-辅助索引" class="headerlink" title="5.辅助索引"></a>5.辅助索引</h4><p>​				辅助索引必须是稠密的。每个索引项需要包含指向所有具有该索引项搜索码值的记录的指针。</p>
+<h4 id="6-B-树索引文件"><a href="#6-B-树索引文件" class="headerlink" title="6.B+树索引文件"></a>6.B+树索引文件</h4><p>​				顺序索引文件一般被组织成B+树，它随着数据量的增长，具有比较稳定的性能。</p>
+<h4 id="7-非唯一性搜索码"><a href="#7-非唯一性搜索码" class="headerlink" title="7.非唯一性搜索码"></a>7.非唯一性搜索码</h4><p>​				由于搜索码可以是表中的任意属性，所以它不一定是候选码。为了保证效率和避免一些负责的问题，大多数据库的B+树都实现只处理唯一搜索码。它们会自动添加记录ID或其他属性，使得非唯一搜索码变得唯一。</p>
+<h3 id="二、散列索引"><a href="#二、散列索引" class="headerlink" title="二、散列索引"></a>二、散列索引</h3><p>​			散列是在主存中构建索引的常用技术。散列索引的组织结构等同于哈希表。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/12/03/%E7%B4%A2%E5%BC%95/" data-id="clq0xq8ra0006kwuz9u7u9a5j" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-SQL基础二" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2023/11/30/SQL%E5%9F%BA%E7%A1%80%E4%BA%8C/" class="article-date">
@@ -417,191 +660,11 @@
 
 
   
-    <article id="post-观察者模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/11/19/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/" class="article-date">
-  <time class="dt-published" datetime="2023-11-19T11:18:17.000Z" itemprop="datePublished">2023-11-19</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/11/19/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/">观察者模式</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="观察者模式"><a href="#观察者模式" class="headerlink" title="观察者模式"></a>观察者模式</h1><h3 id="1-何为观察者模式"><a href="#1-何为观察者模式" class="headerlink" title="1.何为观察者模式"></a>1.何为观察者模式</h3><p>​				观察者模式定义了一种一对多（变化）的依赖关系，以便当一个对象发生变化时，所有依赖与它的对象都能接受到通知并做出相应更新。</p>
-<h3 id="2-观察者模式的意义和使用场景"><a href="#2-观察者模式的意义和使用场景" class="headerlink" title="2.观察者模式的意义和使用场景"></a>2.观察者模式的意义和使用场景</h3><p>​				在软件构建中，我们可能需要对一些对象建立一种“通知依赖关系”，当一个对象（目标对象）的状态发生了改变，，所有依赖对象（观察者）都能收到通知。观察者模式解开了二者之间的耦合，使得我们可以独立地改变目标和观察者。这是依赖倒置原则的体现。</p>
-<h3 id="3-观察者模式的实现"><a href="#3-观察者模式的实现" class="headerlink" title="3.观察者模式的实现"></a>3.观察者模式的实现</h3><p>​				创建一个观察者基类，所有观察者继承于该基类，去实现对不同状态的观察。在目标对象中包含一个观察者集合，代表订阅当前对象的观察者，当目标变化发生时，无需指定某个观察者，通知（可以携带通知信息作为参数）将自动传播到所有订阅观察者。观察者自己决定是否订阅，目标对象对此一无所知。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 抽象观察者类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Observer</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">update</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 具体观察者类 - 学生</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Student</span> : <span class="keyword">public</span> Observer &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::string name;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Student</span>(<span class="type">const</span> std::string&amp; name) : <span class="built_in">name</span>(name) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">update</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; name &lt;&lt; <span class="string">&quot; received a notification&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 抽象主题类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Subject</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::vector&lt;Observer*&gt; observers;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">// 注册观察者</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">attach</span><span class="params">(Observer* observer)</span> </span>&#123;</span><br><span class="line">        observers.<span class="built_in">push_back</span>(observer);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 取消注册观察者</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">detach</span><span class="params">(Observer* observer)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">auto</span> it = observers.<span class="built_in">begin</span>(); it != observers.<span class="built_in">end</span>(); ++it) &#123;</span><br><span class="line">            <span class="keyword">if</span> (*it == observer) &#123;</span><br><span class="line">                observers.<span class="built_in">erase</span>(it);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 通知所有观察者</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">notify</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (Observer* observer : observers) &#123;</span><br><span class="line">            observer-&gt;<span class="built_in">update</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 具体主题类 - 教师</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Teacher</span> : <span class="keyword">public</span> Subject &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">teach</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Teacher is teaching&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        <span class="built_in">notify</span>(); <span class="comment">// 通知所有观察者</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>​		</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/19/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/" data-id="clp5eh9yd0001p8uz0cq4brye" data-title="观察者模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-中介者模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/11/19/%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F/" class="article-date">
-  <time class="dt-published" datetime="2023-11-19T05:50:36.000Z" itemprop="datePublished">2023-11-19</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/11/19/%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F/">中介者模式</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="中介者模式"><a href="#中介者模式" class="headerlink" title="中介者模式"></a>中介者模式</h1><h3 id="1-何为中介者模式"><a href="#1-何为中介者模式" class="headerlink" title="1.何为中介者模式"></a>1.何为中介者模式</h3><p>​				使用一个中介对象来封装（封装变化）一系列的对象交互。它使得各个对象不需要显示地相互引用（编译时依赖–&gt;运行时依赖），从而达到解耦的目的，而且可以独立地改变它们的交互</p>
-<h3 id="2-中介者模式的意义和使用场景"><a href="#2-中介者模式的意义和使用场景" class="headerlink" title="2.中介者模式的意义和使用场景"></a>2.中介者模式的意义和使用场景</h3><p>​				在软件系统中，经常会出现一系列对象相互引用的情况，这种紧耦合非常不利于应对变化。中介者模式本质上提出引入中间组件，使将多个对象间的控制逻辑进行集中，把“多个对象相互关联”转为“多个对象和一个中介者关联”，实现了解耦。值得注意的是，外观模式是解耦<strong>系统间</strong>（单向）的对象关联关系，中介者模式是解耦<strong>系统内</strong>各个对象间（双向）的关联关系</p>
-<h3 id="3-中介者模式的实现"><a href="#3-中介者模式的实现" class="headerlink" title="3.中介者模式的实现"></a>3.中介者模式的实现</h3><p>​				中介者模式的实现多种多样，中介组件内部可能非常复杂。但究其本质都是使系统中的各个成员都引用该中间组件，并通过它来相互通信。当中介者过于复杂的 时候，考虑拆分成多个中介者。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/19/%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F/" data-id="clp5eh9ya0000p8uz0osebd7z" data-title="中介者模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-命令模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/11/19/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F/" class="article-date">
-  <time class="dt-published" datetime="2023-11-19T02:21:43.000Z" itemprop="datePublished">2023-11-19</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/11/19/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F/">命令模式</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="命令模式"><a href="#命令模式" class="headerlink" title="命令模式"></a>命令模式</h1><h3 id="1-何为命令模式"><a href="#1-何为命令模式" class="headerlink" title="1.何为命令模式"></a>1.何为命令模式</h3><p>​				将一个请求封装为一个对象，向对象发送命令来指导它们做事，从而可用不同的请求来指导对象不同的行为。如此可以实现请求排队、记录请求日志、撤销请求、事务等操作。实现“行为”和“组件”的解耦。</p>
-<h3 id="2-命令模式的意义和使用场景"><a href="#2-命令模式的意义和使用场景" class="headerlink" title="2.命令模式的意义和使用场景"></a>2.命令模式的意义和使用场景</h3><p>​				在软件构建过程中，行为请求者和行为实现者通常是紧耦合关系，但在某些场合需要对请求进行记录、撤销、事务等操作，这种耦合是不合适的。所以将操作指令封装为一个命令对象，用于对象之间的通信，比通过函数参数通信更方便、灵活。</p>
-<h3 id="3-命令模式的实现"><a href="#3-命令模式的实现" class="headerlink" title="3.命令模式的实现"></a>3.命令模式的实现</h3><p>​				设计一个命令抽象基类，然后通过继承实现各种命令。也可以实现复合命令，即命令对象中用一个数组存放命令集。还可以将 查询命令和请求命令分开，就像sql一样。</p>
-<p>​				</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 命令基类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Command</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">execute</span><span class="params">()</span> </span>= <span class="number">0</span>;<span class="comment">//执行</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">undo</span><span class="params">()</span> </span>= <span class="number">0</span>;<span class="comment">//撤销</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 命令接收者</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Light</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">turnOn</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Light is ON&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">turnOff</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Light is OFF&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 具体命令</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TurnOnLightCommand</span> : <span class="keyword">public</span> Command &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Light&amp; light;</span><br><span class="line">	string args;<span class="comment">//命令参数</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">TurnOnLightCommand</span>(Light&amp; l,arg) : <span class="built_in">light</span>(l),<span class="built_in">args</span>(arg) &#123;&#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">execute</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        light.<span class="built_in">turnOn</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">undo</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        light.<span class="built_in">turnOff</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 具体命令</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TurnOffLightCommand</span> : <span class="keyword">public</span> Command &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Light&amp; light;</span><br><span class="line">    string args;<span class="comment">//命令参数</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">TurnOffLightCommand</span>(Light&amp; l) : <span class="built_in">light</span>(l),<span class="built_in">args</span>(arg) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">execute</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        light.<span class="built_in">turnOff</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">undo</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        light.<span class="built_in">turnOn</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//复合命令</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">LightCommands</span> : <span class="keyword">public</span> Command &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    vector&lt;Command*&gt; commands;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">TurnOffLightCommand</span>() &#123;&#125;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">addcommand</span><span class="params">(Command* cmd)</span></span></span><br><span class="line"><span class="function">    <span class="type">void</span> <span class="title">execute</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">auto</span> i : commands)</span><br><span class="line">        &#123;</span><br><span class="line">            i-&gt;<span class="built_in">execute</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>需要指出的是，在c++中由于性能的需求，实际应用中，许多命令模式被范式编程+仿函数代替。命令模式用接口-实现来定义行为接口规范，更严格，但性能有所损失。函数对象（仿函数）以函数签名定义行为规范，更灵活，性能高。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/19/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F/" data-id="clp4vxnto0000k4uz5zz0455w" data-title="命令模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-代理模式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/11/18/%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F/" class="article-date">
-  <time class="dt-published" datetime="2023-11-18T08:59:08.000Z" itemprop="datePublished">2023-11-18</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/11/18/%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F/">代理模式</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="代理模式"><a href="#代理模式" class="headerlink" title="代理模式"></a>代理模式</h1><h3 id="1-何为代理模式"><a href="#1-何为代理模式" class="headerlink" title="1.何为代理模式"></a>1.何为代理模式</h3><p>​				为其他对象提供一种代理以控制（隔离、使用接口）对这个对象的访问。代理模式与装饰模式的区别是，它不会拓展对象的功能，它只是强化现有对象的潜在行为。</p>
-<h3 id="2-代理模式的意义和使用场景"><a href="#2-代理模式的意义和使用场景" class="headerlink" title="2.代理模式的意义和使用场景"></a>2.代理模式的意义和使用场景</h3><p>​				有些对象由于某种原因（如创建开销大、需要安全加密、需要远程访问等），直接访问会带来许多问题，甚至不能直接访问。这是我们使用一个代理类，来访问该对象。如在分布式系统中，要访问存在于服务器的对象，无法直接访问。必须通过代理类，在代理类中封装网络通信的细节，实现服务器对象的访问。</p>
-<h3 id="3-代理模式的实现"><a href="#3-代理模式的实现" class="headerlink" title="3.代理模式的实现"></a>3.代理模式的实现</h3><p>​				代理模式的实现多种多样，核心是代理类的实现。代理类很多时候是框架自动生成的。有很多种代理类型，智能指针便是一种代理模式的实现。</p>
-<p>​				</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/11/18/%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F/" data-id="clp469b4000008kuz7hkz9nux" data-title="代理模式" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
 
 
   <nav id="page-nav">
     
-    <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/3/">Next &raquo;</a>
+    <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/3/">Next &raquo;</a>
   </nav>
 
 </section>
@@ -625,7 +688,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/c-%E5%9F%BA%E7%A1%80/" style="font-size: 12.5px;">c++基础</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 15px;">操作系统</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 17.5px;">数据库</a> <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" style="font-size: 10px;">算法题</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 15px;">计算机网络</a> <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 20px;">设计模式</a>
+      <a href="/tags/c-%E5%9F%BA%E7%A1%80/" style="font-size: 12px;">c++基础</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 18px;">操作系统</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 16px;">数据库</a> <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" style="font-size: 10px;">算法题</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 14px;">计算机网络</a> <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 20px;">设计模式</a>
     </div>
   </div>
 
@@ -647,23 +710,23 @@
       <ul>
         
           <li>
+            <a href="/2023/12/14/IO%E7%AE%A1%E7%90%86%E5%92%8C%E7%A3%81%E7%9B%98%E8%B0%83%E5%BA%A6/">IO管理和磁盘调度</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/14/%E5%8D%95%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6/">单处理器调度</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/13/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%89/">虚拟内存三</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/13/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%BA%8C/">虚拟内存二</a>
+          </li>
+        
+          <li>
             <a href="/2023/12/11/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
-          </li>
-        
-          <li>
-            <a href="/2023/12/11/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%80/">虚拟内存一</a>
-          </li>
-        
-          <li>
-            <a href="/2023/12/10/%E7%BA%BF%E7%A8%8B%E4%B8%80/">线程一</a>
-          </li>
-        
-          <li>
-            <a href="/2023/12/09/%E8%BF%9B%E7%A8%8B%E5%BA%94%E7%94%A8/">进程应用</a>
-          </li>
-        
-          <li>
-            <a href="/2023/12/09/%E8%BF%9B%E7%A8%8B%E4%BA%8C/">进程二</a>
           </li>
         
       </ul>
@@ -679,7 +742,7 @@
   <div class="outer">
     <div id="footer-info" class="inner">
       
-      &copy; 2023 John Doe<br>
+      &copy; 2024 John Doe<br>
       Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>

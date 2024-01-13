@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>单处理器调度 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="单处理器调度一、调度类型​				长程调度：决定是否把进程加入当前活跃的进程集中。创建进程时发生。 ​				中程调度：它是交换过程的一部分，它决定是否把进程添加到就绪队列或阻塞、挂起队列中 ​				短程调度：决定处理器执行哪个可运行的进程 ​				IO调度：决定可用IO设备处理哪个进程的IO请求 二、短程调度1.调度规则​								面向用户：与单个用户或进程感知到的系统行为有关。如交互">
+<meta property="og:type" content="article">
+<meta property="og:title" content="单处理器调度">
+<meta property="og:url" content="http://example.com/2023/12/14/%E5%8D%95%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="单处理器调度一、调度类型​				长程调度：决定是否把进程加入当前活跃的进程集中。创建进程时发生。 ​				中程调度：它是交换过程的一部分，它决定是否把进程添加到就绪队列或阻塞、挂起队列中 ​				短程调度：决定处理器执行哪个可运行的进程 ​				IO调度：决定可用IO设备处理哪个进程的IO请求 二、短程调度1.调度规则​								面向用户：与单个用户或进程感知到的系统行为有关。如交互">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-12-14T05:20:01.000Z">
+<meta property="article:modified_time" content="2023-12-14T06:11:39.743Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="操作系统">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-单处理器调度" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/12/14/%E5%8D%95%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6/" class="article-date">
+  <time class="dt-published" datetime="2023-12-14T05:20:01.000Z" itemprop="datePublished">2023-12-14</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      单处理器调度
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="单处理器调度"><a href="#单处理器调度" class="headerlink" title="单处理器调度"></a>单处理器调度</h1><h3 id="一、调度类型"><a href="#一、调度类型" class="headerlink" title="一、调度类型"></a>一、调度类型</h3><p>​				长程调度：决定是否把进程加入当前活跃的进程集中。创建进程时发生。</p>
+<p>​				中程调度：它是交换过程的一部分，它决定是否把进程添加到就绪队列或阻塞、挂起队列中</p>
+<p>​				短程调度：决定处理器执行哪个可运行的进程</p>
+<p>​				IO调度：决定可用IO设备处理哪个进程的IO请求</p>
+<h3 id="二、短程调度"><a href="#二、短程调度" class="headerlink" title="二、短程调度"></a>二、短程调度</h3><h4 id="1-调度规则"><a href="#1-调度规则" class="headerlink" title="1.调度规则"></a>1.调度规则</h4><p>​								面向用户：与单个用户或进程感知到的系统行为有关。如交互式程序的响应时间，这是用户可以感受到的，面向用户调度力求降低响应时间。</p>
+<p>​								面向系统：重点是提高处理器的使用效果和效率</p>
+<h5 id="一些名词"><a href="#一些名词" class="headerlink" title="一些名词"></a>一些名词</h5><p>​									周转时间：一个进程从提交到完成的时间。包括实际执行时间和等待资源（处理器资源、IO资源等）时间</p>
+<p>​									归一化周转时间：周转时间与实际执行时间的比值</p>
+<p>​									响应时间：交互式进程从提交请求到得到相应所经过的时间	</p>
+<p>​									吞吐量：单位时间内完成的进程数量</p>
+<p>​									处理器利用率：处理器处于忙状态的百分比</p>
+<h4 id="2-优先级"><a href="#2-优先级" class="headerlink" title="2.优先级"></a>2.优先级</h4><p>​								许多系统中，每个进程被指定一个优先级，调度程序优先选择优先级高的进程调度。系统通常维护一组优先级队列，一个优先级维护一个队列。纯优先级调度会出现优先级低的进程饥饿的问题、</p>
+<h4 id="3-决策模式"><a href="#3-决策模式" class="headerlink" title="3.决策模式"></a>3.决策模式</h4><p>​								抢占：当前中运行的进程可能被操作系统中断，并转为就绪态。如出现时间中断时，需要进行抢占决策</p>
+<p>​								非抢占：一旦进程处于运行态，它会一直执行到终止。除非出现等待IO或系统调用而阻塞。</p>
+<h3 id="三、调度算法"><a href="#三、调度算法" class="headerlink" title="三、调度算法"></a>三、调度算法</h3><h4 id="1-先来先服务（FCFS）"><a href="#1-先来先服务（FCFS）" class="headerlink" title="1.先来先服务（FCFS）"></a>1.先来先服务（FCFS）</h4><p>​											这种方法十分简单，每个进程就绪后加入就绪队列，系统从队列中依次取出进程执行。FCFS更适用于长进程。</p>
+<p>​											FCFS更有利于处理器密集型进程。若一个IO密集进程因等待IO被阻塞，调度算法选择了一个处理器密集型进程来执行。在执行过程中，可能IO完成了，但IO密集进程只能等待。导致大多IO设备空闲。</p>
+<h4 id="2-轮转"><a href="#2-轮转" class="headerlink" title="2.轮转"></a>2.轮转</h4><p>​										轮转算法是基于时钟的抢占策略。系统给每个进程分配一个时间片，时间片结束，进执行中的进程被抢占，按FCFS在就绪队列中选择一个进程来执行。</p>
+<p>​										时间片长度最好略大于一个经典交互的时间，但不能过大。</p>
+<p>​										这种方式在分时系统或事务处理系统中很有效。但由于IO密集型进程短时间使用处理器后便会阻塞，而处理器密集型进程可以用完整个时间片。所以这种算法对IO密集进程不公平，使得进程性能 降低。</p>
+<h5 id="虚拟轮转法"><a href="#虚拟轮转法" class="headerlink" title="虚拟轮转法"></a>虚拟轮转法</h5><p>​										为了优化上述问题，虚拟轮转法加入了一个辅助队列。由于等待IO而阻塞的进程阻塞结束后会加入辅助队列，进行调度时，辅助队列中的进程优先于就绪队列</p>
+<h4 id="3-最短进程优先（SPN）"><a href="#3-最短进程优先（SPN）" class="headerlink" title="3.最短进程优先（SPN）"></a>3.最短进程优先（SPN）</h4><p>​									这是一个非抢占策略，它的原则是下次选择预计处理时间最短的进程。</p>
+<p>​									对短作业有利，对长作业不利。可能产生饥饿现象。另外，进程&#x2F;作业的运行时间都是由用户提供的，并不一定真实，不一定能做到真正的短作业优先。</p>
+<h4 id="4-最短剩余时间（SRT）"><a href="#4-最短剩余时间（SRT）" class="headerlink" title="4.最短剩余时间（SRT）"></a>4.最短剩余时间（SRT）</h4><p>​									在SPN算法中增加了抢占机制。调度程序总是选择预期剩余时间最短的进程。	</p>
+<p>​									每当有进程加入就绪队列改变时就需要调度，如果新到达的进程剩余时间比当前运行的进程剩余时间更短，则由新进程抢占处理器，当前运行进程重新回到就绪队列。另外,当一个进程完成时也需要调度。</p>
+<p>​									同样有长进程饥饿风险</p>
+<h4 id="5-最高响应比优先（HRRN）"><a href="#5-最高响应比优先（HRRN）" class="headerlink" title="5.最高响应比优先（HRRN）"></a>5.最高响应比优先（HRRN）</h4><p>​										响应比即归一化周转时间</p>
+<p>​										响应比R &#x3D; (w+s）&#x2F; s</p>
+<p>​										w:等待处理器的时间			s：预计服务时间</p>
+<p>​									当前进程完成或阻塞时，选择响应比最大的进程。它相对于前两种算法，比较公平。因为它反映了进程的年龄。偏向短进程时，长进程由于得不到服务，等待时间一直增加，R变大，最终赢过短进程。</p>
+<h4 id="6-反馈法"><a href="#6-反馈法" class="headerlink" title="6.反馈法"></a>6.反馈法</h4><p>​									反馈法触发运行时间较长的进程。调度基于抢占原则并使用动态优先级机制。一个进程刚进入系统时，优先级最高，之后每被抢占一次，优先级下降一级。短进程会很快执行完毕，长进程会 多次降级。因此新进程和短进程会优于老进程和长进程。</p>
+<p>优先级降到最低后不会再降，会重复返回到最低优先级队列。</p>
+<p>​									为了避免老进程和长进程饥饿，当一个进程在当前队列中等待服务的时间超过一定时间后，就把它的优先级提高一级	</p>
+<h4 id="7-总结"><a href="#7-总结" class="headerlink" title="7.总结"></a>7.总结</h4><h4 id="屏幕截图-2023-12-14-141059-images-屏幕截图-2023-12-14-141059-png"><a href="#屏幕截图-2023-12-14-141059-images-屏幕截图-2023-12-14-141059-png" class="headerlink" title="![屏幕截图 2023-12-14 141059](&#x2F;..&#x2F;..&#x2F;images&#x2F;屏幕截图 2023-12-14 141059.png)"></a>![屏幕截图 2023-12-14 141059](&#x2F;..&#x2F;..&#x2F;images&#x2F;屏幕截图 2023-12-14 141059.png)</h4><p>​						</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/12/14/%E5%8D%95%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6/" data-id="clrbmrg3h00023kuzhaiubexs" data-title="单处理器调度" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2023/12/14/IO%E7%AE%A1%E7%90%86%E5%92%8C%E7%A3%81%E7%9B%98%E8%B0%83%E5%BA%A6/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          IO管理和磁盘调度
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2023/12/13/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%89/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">虚拟内存三</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/c-%E5%9F%BA%E7%A1%80/" rel="tag">c++基础</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" rel="tag">算法题</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/c-%E5%9F%BA%E7%A1%80/" style="font-size: 12px;">c++基础</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 18px;">操作系统</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 16px;">数据库</a> <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" style="font-size: 10px;">算法题</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 14px;">计算机网络</a> <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 20px;">设计模式</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/12/">December 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/11/">November 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/12/14/IO%E7%AE%A1%E7%90%86%E5%92%8C%E7%A3%81%E7%9B%98%E8%B0%83%E5%BA%A6/">IO管理和磁盘调度</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/14/%E5%8D%95%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6/">单处理器调度</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/13/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%89/">虚拟内存三</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/13/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%BA%8C/">虚拟内存二</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/11/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
